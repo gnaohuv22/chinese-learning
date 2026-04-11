@@ -8,6 +8,15 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
+  <!-- Stub echarts so cherry-markdown chart plugins don't throw on missing dependency -->
+  <script>
+    if (typeof window !== 'undefined' && !window.echarts) {
+      window.echarts = {
+        init: function() { return { setOption: function(){}, resize: function(){}, dispose: function(){}, clear: function(){} }; },
+        getInstanceByDom: function() { return null; }
+      };
+    }
+  </script>
   <app-root></app-root>
 </body>
 </html>

@@ -1,0 +1,42 @@
+@if (totalPages > 1) {
+  <nav class="flex items-center justify-center gap-1 mt-6 select-none" aria-label="Pagination">
+    <button
+      class="w-8 h-8 flex items-center justify-center rounded-md border text-sm transition-colors"
+      [class.opacity-40]="currentPage === 1"
+      [class.cursor-not-allowed]="currentPage === 1"
+      [disabled]="currentPage === 1"
+      (click)="goTo(currentPage - 1)"
+      style="border-color: var(--color-border); color: var(--color-text)"
+    >
+      <i class="fa-solid fa-chevron-left text-xs"></i>
+    </button>
+
+    @for (page of visiblePages; track $index) {
+      @if (page === -1) {
+        <span class="w-8 h-8 flex items-center justify-center text-sm" style="color: var(--color-text-muted)">…</span>
+      } @else {
+        <button
+          class="w-8 h-8 flex items-center justify-center rounded-md border text-sm font-medium transition-colors"
+          [class.bg-red-700]="page === currentPage"
+          [class.text-white]="page === currentPage"
+          [class.border-red-700]="page === currentPage"
+          (click)="goTo(page)"
+          style="border-color: var(--color-border); color: {{ page === currentPage ? 'white' : 'var(--color-text)' }}"
+        >
+          {{ page }}
+        </button>
+      }
+    }
+
+    <button
+      class="w-8 h-8 flex items-center justify-center rounded-md border text-sm transition-colors"
+      [class.opacity-40]="currentPage === totalPages"
+      [class.cursor-not-allowed]="currentPage === totalPages"
+      [disabled]="currentPage === totalPages"
+      (click)="goTo(currentPage + 1)"
+      style="border-color: var(--color-border); color: var(--color-text)"
+    >
+      <i class="fa-solid fa-chevron-right text-xs"></i>
+    </button>
+  </nav>
+}

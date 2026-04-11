@@ -1,0 +1,38 @@
+<div class="exercise-guided-writing space-y-4">
+  <p class="text-base font-medium text-gray-800">{{ exercise.prompt }}</p>
+
+  <textarea
+    [(ngModel)]="userText"
+    rows="6"
+    class="form-input form-textarea w-full"
+    placeholder="Nhập nội dung của bạn tại đây..."
+    (input)="onInput()"
+  ></textarea>
+
+  @if (exercise.keywords && exercise.keywords.length > 0) {
+    <div>
+      <p class="text-xs text-gray-500 mb-2">{{ 'exercise.keyword_hint' | translate }}</p>
+      <div class="flex flex-wrap gap-2">
+        @for (kw of exercise.keywords; track kw) {
+          <span
+            class="chip text-sm transition-all duration-300"
+            [class.chip-green]="isKeywordUsed(kw)"
+            [class.chip-gray]="!isKeywordUsed(kw)"
+          >
+            {{ kw }}
+            @if (isKeywordUsed(kw)) {
+              <svg class="w-3 h-3 ml-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+            }
+          </span>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="flex items-center justify-between text-sm text-gray-500">
+    <span>{{ userText.length }} ký tự</span>
+    <span>{{ usedKeywordsCount() }}/{{ exercise.keywords?.length ?? 0 }} từ khóa</span>
+  </div>
+</div>

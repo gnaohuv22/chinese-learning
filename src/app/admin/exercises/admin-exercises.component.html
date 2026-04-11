@@ -1,0 +1,251 @@
+<div class="page-container">
+  <div class="flex items-center gap-3 mb-6">
+    <a [routerLink]="['/admin/courses', courseId, 'lessons']" class="hover:opacity-70" style="color: var(--color-text-muted)">
+      <i class="fa-solid fa-chevron-left"></i>
+    </a>
+    <div>
+      <p class="text-sm" style="color: var(--color-text-muted)">{{ lessonTitle() }}</p>
+      <h1 class="text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.questions' | translate }}</h1>
+    </div>
+    <div class="ml-auto flex items-center gap-3">
+      <label class="flex items-center gap-2 cursor-pointer select-none" [title]="'admin.shuffle_hint' | translate">
+        <input
+          type="checkbox"
+          [checked]="shuffleDefault()"
+          (change)="shuffleDefault.set($any($event.target).checked)"
+          class="rounded accent-amber-500"
+        />
+        <span class="text-sm flex items-center gap-1" style="color: var(--color-text)">
+          <i class="fa-solid fa-shuffle text-amber-500"></i>{{ 'admin.shuffle' | translate }}
+        </span>
+      </label>
+      <button class="btn-primary" (click)="openForm()">
+        <i class="fa-solid fa-plus"></i>
+        {{ 'admin.add_question' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-700 border-t-transparent"></div>
+    </div>
+  } @else {
+    <!-- Question list with drag & drop -->
+    @if (exercises().length > 0) {
+      <p class="text-xs mb-3 flex items-center gap-1" style="color: var(--color-text-muted)">
+        <i class="fa-solid fa-grip-lines"></i>{{ 'admin.drag_to_reorder' | translate }}
+      </p>
+      <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3 mb-6">
+        @for (ex of exercises(); track ex.id) {
+          <div cdkDrag class="card" [class.animate-fade-out]="fadingOutId() === ex.id">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-start gap-3 flex-1 min-w-0">
+                <span cdkDragHandle class="drag-handle mt-1 flex-shrink-0" style="color: var(--color-text-muted)">
+                  <i class="fa-solid fa-grip-vertical"></i>
+                </span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <span class="chip chip-gray text-xs">{{ 'exercise_types.' + ex.type | translate }}</span>
+                    <span class="chip skill-{{ ex.skill }} text-xs">{{ 'skills.' + ex.skill | translate }}</span>
+                    @if (ex.mediaUrl) {
+                      <span class="chip chip-blue text-xs">{{ ex.mediaType }}</span>
+                    }
+                    @if (ex.shuffle) {
+                      <span class="chip chip-yellow text-xs">
+                        <i class="fa-solid fa-shuffle mr-1"></i>{{ 'admin.shuffle' | translate }}
+                      </span>
+                    }
+                  </div>
+                  <p class="text-sm line-clamp-2" style="color: var(--color-text)">{{ ex.prompt }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button class="btn-secondary text-xs py-1.5 px-3" (click)="editExercise(ex)">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i>{{ 'common.edit' | translate }}
+                </button>
+                <button class="btn-danger text-xs py-1.5 px-3" (click)="deleteExercise(ex)">
+                  <i class="fa-solid fa-trash text-xs"></i>{{ 'common.delete' | translate }}
+                </button>
+              </div>
+            </div>
+            <div *cdkDragPlaceholder class="h-16 border-dashed border-2 rounded-xl" style="border-color: var(--color-border); background: transparent"></div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="card text-center py-12 mb-6" style="color: var(--color-text-muted)">{{ 'admin.no_questions' | translate }}</div>
+    }
+
+    <!-- Inline swipe-up form -->
+    @if (showForm()) {
+      <div #formPanel class="card animate-slide-up border-2 border-red-200">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold" style="color: var(--color-text)">
+            {{ editingExercise() ? ('admin.edit_question' | translate) : ('admin.new_question' | translate) }}
+          </h2>
+          <button type="button" (click)="closeForm()" class="hover:opacity-70" style="color: var(--color-text-muted)">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="save()" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.type' | translate }} *</label>
+              <select formControlName="type" class="form-input form-select" data-field="type"
+                [class.error]="validationErrors()['type']">
+                @for (t of exerciseTypes; track t) {
+                  <option [value]="t">{{ 'exercise_types.' + t | translate }}</option>
+                }
+              </select>
+              @if (validationErrors()['type']) {
+                <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['type'] | translate }}</p>
+              }
+            </div>
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.skill' | translate }} *</label>
+              <select formControlName="skill" class="form-input form-select" data-field="skill"
+                [class.error]="validationErrors()['skill']">
+                @for (s of skills; track s) {
+                  <option [value]="s">{{ 'skills.' + s | translate }}</option>
+                }
+              </select>
+              @if (validationErrors()['skill']) {
+                <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['skill'] | translate }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">{{ 'admin.prompt' | translate }} *</label>
+            <textarea formControlName="prompt" class="form-input form-textarea" rows="3"
+              data-field="prompt" [class.error]="validationErrors()['prompt']"></textarea>
+            @if (validationErrors()['prompt']) {
+              <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['prompt'] | translate }}</p>
+            }
+          </div>
+
+          @if (needsMedia) {
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.media_type' | translate }}</label>
+              <select formControlName="mediaType" class="form-input form-select">
+                <option value="">— {{ 'admin.no_media' | translate }} —</option>
+                <option value="video">Video</option>
+                <option value="audio">Audio</option>
+                <option value="image">{{ 'admin.image' | translate }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.media_upload' | translate }}</label>
+              <app-file-uploader
+                [fileId]="form.value.mediaUrl ?? undefined"
+                (uploaded)="onMediaUploaded($event)"
+                (cleared)="onMediaCleared()"
+                [accept]="mediaAccept()"
+                [disabled]="!form.value.mediaType"
+              />
+            </div>
+          }
+
+          @if (needsOptions) {
+            <div class="form-field" data-field="options">
+              <div class="flex items-center justify-between">
+                <label class="form-label">{{ 'admin.options' | translate }} *</label>
+                <span class="text-xs" style="color: var(--color-text-muted)">{{ optionsArray.length }}/10</span>
+              </div>
+              <div formArrayName="options" class="space-y-2">
+                @for (opt of optionsArray.controls; track $index) {
+                  <div class="flex gap-2">
+                    <input [formControlName]="$index" class="form-input flex-1" [placeholder]="('admin.option' | translate) + ' ' + ($index + 1)" />
+                    <button type="button" class="btn-danger py-1.5 px-2" (click)="removeOption($index)">
+                      <i class="fa-solid fa-xmark w-4 text-center"></i>
+                    </button>
+                  </div>
+                }
+                <button
+                  type="button"
+                  class="btn-secondary text-xs py-1.5"
+                  (click)="addOption()"
+                  [disabled]="optionsArray.length >= 10"
+                >
+                  <i class="fa-solid fa-plus mr-1"></i>{{ 'admin.add_option' | translate }}
+                </button>
+              </div>
+              @if (validationErrors()['options']) {
+                <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['options'] | translate }}</p>
+              }
+            </div>
+          }
+
+          @if (needsAnswer) {
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.answer' | translate }}</label>
+              @if (form.value.type === 'scramble') {
+                <p class="text-xs mb-1" style="color: var(--color-text-muted)">{{ 'admin.scramble_hint' | translate }}</p>
+              }
+              <input formControlName="answer" class="form-input" [placeholder]="'admin.answer_placeholder' | translate" />
+            </div>
+          }
+
+          @if (needsKeywords) {
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.keywords' | translate }}</label>
+              <div formArrayName="keywords" class="space-y-2">
+                @for (kw of keywordsArray.controls; track $index) {
+                  <div class="flex gap-2">
+                    <input [formControlName]="$index" class="form-input flex-1" [placeholder]="'admin.keyword' | translate" />
+                    <button type="button" class="btn-danger py-1.5 px-2" (click)="removeKeyword($index)">
+                      <i class="fa-solid fa-xmark w-4 text-center"></i>
+                    </button>
+                  </div>
+                }
+                <button type="button" class="btn-secondary text-xs py-1.5" (click)="addKeyword()">
+                  <i class="fa-solid fa-plus mr-1"></i>{{ 'admin.add_keyword' | translate }}
+                </button>
+              </div>
+            </div>
+          }
+
+          @if (needsOutline) {
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.outline' | translate }}</label>
+              <div formArrayName="outline" class="space-y-2">
+                @for (pt of outlineArray.controls; track $index) {
+                  <div class="flex gap-2">
+                    <input [formControlName]="$index" class="form-input flex-1" [placeholder]="'admin.outline_point' | translate" />
+                    <button type="button" class="btn-danger py-1.5 px-2" (click)="removeOutline($index)">
+                      <i class="fa-solid fa-xmark w-4 text-center"></i>
+                    </button>
+                  </div>
+                }
+                <button type="button" class="btn-secondary text-xs py-1.5" (click)="addOutline()">
+                  <i class="fa-solid fa-plus mr-1"></i>{{ 'admin.add_outline' | translate }}
+                </button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.duration' | translate }}</label>
+              <input formControlName="durationSeconds" type="number" class="form-input" placeholder="60" />
+            </div>
+          }
+
+          <div class="flex justify-end gap-3 pt-2 border-t" style="border-color: var(--color-border)">
+            <button type="button" class="btn-secondary" (click)="closeForm()">{{ 'common.cancel' | translate }}</button>
+            <button type="submit" class="btn-primary" [disabled]="saving()">
+              @if (saving()) {
+                <i class="fa-solid fa-spinner animate-spin"></i>{{ 'common.loading' | translate }}
+              } @else {
+                <i class="fa-solid fa-floppy-disk"></i>{{ 'common.save' | translate }}
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    } @else {
+      <button class="w-full btn-secondary py-3 border-dashed" (click)="openForm()">
+        <i class="fa-solid fa-plus mr-2"></i>{{ 'admin.add_question' | translate }}
+      </button>
+    }
+  }
+</div>

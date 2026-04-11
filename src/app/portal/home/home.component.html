@@ -1,0 +1,240 @@
+<!-- Hero -->
+<section class="relative bg-gradient-to-br from-red-800 via-red-700 to-rose-600 text-white overflow-hidden">
+  <!-- Decorative background blobs -->
+  <div class="absolute inset-0 pointer-events-none select-none overflow-hidden">
+    <div class="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-white/5 blur-3xl"></div>
+    <div class="absolute bottom-0 -left-8 w-48 h-48 rounded-full bg-black/10 blur-2xl"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative">
+    <div class="max-w-2xl">
+      <!-- Typing animation display -->
+      <div class="text-7xl sm:text-9xl font-bold mb-4 opacity-80 select-none leading-none tracking-tight h-24 sm:h-32 flex items-center">
+        <span>{{ typedText() }}</span><span [class.opacity-0]="!showCursor()" class="transition-opacity duration-100 ml-0.5">|</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-bold leading-tight mb-3">{{ 'app.title' | translate }}</h1>
+      <p class="text-lg sm:text-xl text-red-100 mb-8">{{ 'app.tagline' | translate }}</p>
+
+      <div class="flex flex-wrap gap-3 mb-10">
+        <a routerLink="/courses" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-red-700 font-semibold rounded-xl hover:bg-red-50 transition-colors shadow-lg shadow-black/20">
+          <i class="fa-solid fa-graduation-cap"></i>
+          {{ 'nav.courses' | translate }}
+        </a>
+        <a routerLink="/news" class="inline-flex items-center gap-2 px-6 py-3 border border-white/40 text-white font-medium rounded-xl hover:bg-white/10 transition-colors">
+          <i class="fa-solid fa-newspaper"></i>
+          {{ 'nav.news' | translate }}
+        </a>
+      </div>
+
+      <!-- Stats bar -->
+      @if (statsTotal().courses > 0 || statsTotal().exams > 0) {
+        <div class="flex flex-wrap gap-6 text-sm text-red-100">
+          @if (statsTotal().courses > 0) {
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-book-open text-red-300 text-xs"></i>
+              <strong class="text-white font-bold">{{ statsTotal().courses }}</strong>
+              {{ 'home.stats_courses' | translate }}
+            </span>
+          }
+          @if (statsTotal().exams > 0) {
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-file-lines text-red-300 text-xs"></i>
+              <strong class="text-white font-bold">{{ statsTotal().exams }}</strong>
+              {{ 'home.stats_exams' | translate }}
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Skill cards -->
+<section class="bg-white border-b dark:bg-slate-900 dark:border-slate-700">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Intro -->
+    <div class="mb-6 text-center">
+      <h2 class="text-xl sm:text-2xl font-bold mb-1" style="color: var(--color-text)">
+        {{ 'home.skills_title' | translate }}
+      </h2>
+      <p class="text-sm sm:text-base" style="color: var(--color-text-muted)">
+        {{ 'home.skills_subtitle' | translate }}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      @for (skill of skills; track skill.key) {
+        <button
+          type="button"
+          (click)="toggleSkill(skill.skill)"
+          class="flex flex-col items-center gap-2 p-5 rounded-2xl text-center transition-all cursor-pointer border-2 group"
+          [class.border-red-500]="activeSkill() === skill.skill"
+          [class.bg-red-50]="activeSkill() === skill.skill"
+          [class.shadow-md]="activeSkill() === skill.skill"
+          [class.border-transparent]="activeSkill() !== skill.skill"
+          [class.hover:border-red-200]="activeSkill() !== skill.skill"
+          style="background: activeSkill() === skill.skill ? '' : 'var(--color-bg-surface)'"
+        >
+          <div
+            class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+            [class.bg-red-100]="activeSkill() === skill.skill"
+            [class.bg-gray-100]="activeSkill() !== skill.skill"
+            style="{{ activeSkill() !== skill.skill ? 'background: var(--color-bg)' : '' }}"
+          >
+            <i [class]="skill.icon + ' text-xl text-red-600'"></i>
+          </div>
+          <span class="text-sm font-semibold" style="color: var(--color-text)">{{ skill.key | translate }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Expanded skill lessons -->
+    @if (activeSkill()) {
+      <div class="mt-8 animate-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-base" style="color: var(--color-text)">
+            {{ 'home.lessons_for_skill' | translate }}:
+            <span class="text-red-600 ml-1">{{ 'skills.' + activeSkill() | translate }}</span>
+          </h3>
+          <button (click)="activeSkill.set(null); skillLessons.set([])" class="text-xs flex items-center gap-1 hover:text-red-600 transition-colors" style="color: var(--color-text-muted)">
+            <i class="fa-solid fa-xmark"></i>{{ 'common.close' | translate }}
+          </button>
+        </div>
+
+        @if (loadingSkill()) {
+          <div class="flex flex-col items-center py-10 gap-3">
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-700 border-t-transparent"></div>
+            <p class="text-xs" style="color: var(--color-text-muted)">{{ 'common.loading' | translate }}</p>
+          </div>
+        } @else if (skillLessons().length === 0) {
+          <p class="text-sm text-gray-400 text-center py-8">{{ 'home.no_lessons_skill' | translate }}</p>
+        } @else {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            @for (item of skillLessons(); track item.lesson.id) {
+              @let result = getPracticeResults(item.lesson.id);
+              <a
+                [routerLink]="['/courses', item.courseId]"
+                class="card hover:shadow-md transition-all hover:-translate-y-0.5 group flex flex-col gap-1"
+              >
+                <p class="text-xs" style="color: var(--color-text-muted)">{{ item.courseName }}</p>
+                <h4 class="font-medium text-sm group-hover:text-red-600 transition-colors" style="color: var(--color-text)">
+                  {{ item.lesson.title }}
+                </h4>
+                @if (result) {
+                  <p class="text-xs text-green-600 mt-1">
+                    <i class="fa-solid fa-check-circle mr-1"></i>{{ result.correct }}/{{ result.total }} {{ 'home.correct' | translate }}
+                  </p>
+                }
+              </a>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Latest courses -->
+<section class="page-container">
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="text-xl font-bold" style="color: var(--color-text)">{{ 'home.latest_courses' | translate }}</h2>
+    <a routerLink="/courses" class="text-sm text-red-700 hover:text-red-800 font-medium flex items-center gap-1 transition-colors">
+      {{ 'common.view_all' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
+    </a>
+  </div>
+
+  @if (courses().length === 0) {
+    <div class="text-center py-8" style="color: var(--color-text-muted)">{{ 'course.no_courses' | translate }}</div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (course of courses().slice(0, 3); track course.id) {
+        <a [routerLink]="['/courses', course.id]" class="card hover:shadow-lg transition-all hover:-translate-y-0.5 group flex flex-col">
+          <div class="flex items-start gap-3 flex-1">
+            <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+              <span class="text-red-700 font-bold text-lg">{{ course.title[0] }}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-semibold group-hover:text-red-700 transition-colors" style="color: var(--color-text)">{{ course.title }}</h3>
+              @if (course.description) {
+                <p class="text-sm mt-1 line-clamp-2" style="color: var(--color-text-muted)">{{ course.description }}</p>
+              }
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t flex items-center justify-end" style="border-color: var(--color-border)">
+            <span class="text-xs font-semibold text-red-700 flex items-center gap-1">
+              {{ 'home.start_learning' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
+            </span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</section>
+
+<!-- Exams -->
+@if (exams().length > 0) {
+  <section class="bg-red-50 py-8 sm:py-12 dark:bg-slate-800/60">
+    <div class="page-container">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xl font-bold" style="color: var(--color-text)">{{ 'exam.title' | translate }}</h2>
+        <a routerLink="/exam" class="text-sm text-red-700 hover:text-red-800 font-medium flex items-center gap-1 transition-colors">
+          {{ 'common.view_all' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (exam of exams(); track exam.id) {
+          <a [routerLink]="['/exam', exam.id]" class="card hover:shadow-lg transition-all hover:-translate-y-0.5 block group">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-red-700 text-white flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-file-lines text-sm"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold group-hover:text-red-700 transition-colors" style="color: var(--color-text)">{{ exam.title }}</h3>
+                <p class="text-xs" style="color: var(--color-text-muted)">
+                  {{ exam.timeLimitSeconds / 60 | number:'1.0-0' }} {{ 'common.minutes' | translate }}
+                </p>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<!-- Latest news -->
+@if (news().length > 0) {
+  <section class="page-container">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold" style="color: var(--color-text)">{{ 'home.latest_news' | translate }}</h2>
+      <a routerLink="/news" class="text-sm text-red-700 hover:text-red-800 font-medium flex items-center gap-1 transition-colors">
+        {{ 'common.view_all' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      @for (item of news().slice(0, 2); track item.id) {
+        <a [routerLink]="['/news', item.id]" class="card hover:shadow-lg transition-all hover:-translate-y-0.5 block group">
+          <h3 class="font-semibold group-hover:text-red-700 transition-colors mb-2" style="color: var(--color-text)">{{ item.title }}</h3>
+          <p class="text-sm line-clamp-2 mb-3" style="color: var(--color-text-muted)">{{ markdownExcerpt(item.content) }}</p>
+          <div class="flex items-center justify-between">
+            <p class="text-xs" style="color: var(--color-text-muted)">{{ item.publishedAt | date:'dd/MM/yyyy' }}</p>
+            <span class="text-xs font-medium text-red-700 flex items-center gap-1">
+              {{ 'news.read_more' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
+            </span>
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+}
+
+<!-- Footer with admin link -->
+<footer class="border-t mt-4 py-6" style="background: var(--color-bg); border-color: var(--color-border)">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-sm" style="color: var(--color-text-muted)">
+    <span>{{ 'app.title' | translate }} &copy; 2026</span>
+    <a routerLink="/admin" class="hover:text-gray-600 transition-colors flex items-center gap-1">
+      <i class="fa-solid fa-lock text-xs"></i>{{ 'nav.admin' | translate }}
+    </a>
+  </div>
+</footer>

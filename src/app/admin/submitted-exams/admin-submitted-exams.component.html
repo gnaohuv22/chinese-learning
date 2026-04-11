@@ -1,0 +1,95 @@
+<div class="page-container">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.submitted_exams' | translate }}</h1>
+      <p class="text-sm mt-0.5" style="color: var(--color-text-muted)">
+        {{ submissions().length }} {{ 'admin.submissions_total' | translate }}
+      </p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-700 border-t-transparent"></div>
+    </div>
+  } @else if (submissions().length === 0) {
+    <div class="card text-center py-16">
+      <i class="fa-solid fa-inbox text-4xl mb-3" style="color: var(--color-text-muted)"></i>
+      <p style="color: var(--color-text-muted)">{{ 'admin.no_submissions' | translate }}</p>
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (sub of submissions(); track sub.id) {
+        <div class="card">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <!-- Score badge -->
+              <div
+                class="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                [class.bg-green-100]="scorePercent(sub) >= 70"
+                [class.text-green-700]="scorePercent(sub) >= 70"
+                [class.bg-orange-100]="scorePercent(sub) >= 40 && scorePercent(sub) < 70"
+                [class.text-orange-700]="scorePercent(sub) >= 40 && scorePercent(sub) < 70"
+                [class.bg-red-100]="scorePercent(sub) < 40"
+                [class.text-red-700]="scorePercent(sub) < 40"
+              >
+                {{ scorePercent(sub) }}%
+              </div>
+
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-semibold" style="color: var(--color-text)">{{ sub.participantName }}</span>
+                  @if (sub.autoSubmitted) {
+                    <span class="chip chip-yellow text-xs">
+                      <i class="fa-solid fa-clock mr-1"></i>{{ 'exam.auto_submit' | translate }}
+                    </span>
+                  }
+                </div>
+                <p class="text-sm mt-0.5" style="color: var(--color-text-muted)">
+                  {{ sub.examTitle }}
+                  &mdash;
+                  {{ sub.totalScore }}/{{ sub.totalExercises }} {{ 'exam.questions_count' | translate }}
+                </p>
+                <p class="text-xs mt-0.5" style="color: var(--color-text-muted)">
+                  <i class="fa-regular fa-clock mr-1"></i>{{ sub.submittedAt | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button
+                class="btn-secondary text-xs py-1.5 px-3"
+                (click)="toggleExpand(sub.id)"
+              >
+                <i class="fa-solid fa-chevron-down text-xs transition-transform"
+                  [class.rotate-180]="expandedId() === sub.id"></i>
+                {{ 'common.detail' | translate }}
+              </button>
+              <button class="btn-danger text-xs py-1.5 px-3" (click)="deleteSubmission(sub)">
+                <i class="fa-solid fa-trash text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded detail -->
+          @if (expandedId() === sub.id) {
+            <div class="mt-4 pt-4 border-t space-y-3 animate-slide-up" style="border-color: var(--color-border)">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                @for (section of sub.sections; track section.skill) {
+                  @if (section.total > 0) {
+                    <div class="rounded-lg p-3 text-center" style="background: var(--color-bg); border: 1px solid var(--color-border)">
+                      <span class="chip skill-{{ section.skill }} text-xs mb-1 inline-block">
+                        {{ 'skills.' + section.skill | translate }}
+                      </span>
+                      <div class="text-lg font-bold" style="color: var(--color-text)">{{ section.score }}/{{ section.total }}</div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

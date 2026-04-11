@@ -1,0 +1,30 @@
+<div class="relative inline-block text-left">
+  <button
+    (click)="toggleDropdown()"
+    class="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-white/30 text-white hover:bg-white/10 transition-colors"
+  >
+    <i class="fa-solid fa-globe text-xs"></i>
+    <span class="font-medium tracking-wide">{{ currentLang().abbr }}</span>
+    <i class="fa-solid fa-chevron-down text-xs opacity-70"></i>
+  </button>
+
+  @if (dropdownOpen()) {
+    <div
+      class="absolute right-0 mt-1 w-40 rounded-md shadow-lg z-50 py-1 border"
+      style="background: var(--color-bg-surface); border-color: var(--color-border)"
+      (mouseleave)="dropdownOpen.set(false)"
+    >
+      @for (lang of langs; track lang.code) {
+        <button
+          (click)="switchLang(lang.code)"
+          class="w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors hover:bg-red-50"
+          [class.font-semibold]="lang.code === translate.currentLang"
+          style="color: var(--color-text)"
+        >
+          <span class="w-7 text-center text-xs font-bold rounded px-1 py-0.5 bg-gray-100 text-gray-600">{{ lang.abbr }}</span>
+          <span>{{ lang.label }}</span>
+        </button>
+      }
+    </div>
+  }
+</div>

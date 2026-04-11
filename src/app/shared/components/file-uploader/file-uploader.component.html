@@ -1,0 +1,45 @@
+<div class="file-uploader">
+  @if (currentFileId()) {
+    <div class="flex items-center gap-2 mb-2 text-sm text-gray-600">
+      <i class="fa-solid fa-circle-check text-green-500"></i>
+      <span class="truncate text-xs">{{ 'admin.file_uploaded' | translate }}</span>
+      <button type="button" (click)="clearFile()" class="text-red-500 hover:text-red-700 ml-auto flex-shrink-0">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  }
+
+  <label
+    class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed rounded-lg text-sm transition-colors"
+    [class.opacity-40]="disabled"
+    [class.cursor-not-allowed]="disabled"
+    [class.cursor-pointer]="!disabled"
+    [class.border-gray-300]="!uploading() && !disabled"
+    [class.border-blue-400]="uploading()"
+    [class.border-gray-200]="disabled"
+    [class.text-gray-500]="!uploading()"
+    [class.text-blue-500]="uploading()"
+  >
+    @if (uploading()) {
+      <i class="fa-solid fa-spinner animate-spin"></i>
+      <span>{{ 'admin.uploading' | translate }}</span>
+    } @else if (disabled) {
+      <i class="fa-solid fa-lock text-gray-400"></i>
+      <span class="text-gray-400 text-xs">{{ 'admin.select_media_type_first' | translate }}</span>
+    } @else {
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      <span>{{ label || ('admin.choose_file' | translate) }}</span>
+    }
+    <input
+      type="file"
+      class="hidden"
+      [accept]="accept"
+      [disabled]="uploading() || disabled"
+      (change)="onFileSelected($event)"
+    />
+  </label>
+
+  @if (error()) {
+    <p class="mt-1 text-xs text-red-500">{{ error() }}</p>
+  }
+</div>

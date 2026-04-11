@@ -1,0 +1,46 @@
+<div class="exercise-mcq space-y-4">
+  <p class="text-base font-medium" style="color: var(--color-text)">{{ exercise.prompt }}</p>
+
+  @if (exercise.mediaUrl && exercise.mediaType) {
+    <app-media-embed [fileId]="exercise.mediaUrl" [mediaType]="exercise.mediaType" />
+  }
+
+  <div class="space-y-2">
+    @for (option of displayOptions(); track $index) {
+      <button
+        type="button"
+        (click)="selectOption($index)"
+        [disabled]="checked()"
+        class="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all"
+        [class]="getOptionClass($index)"
+      >
+        <span class="font-mono text-gray-500 mr-2">{{ optionLabel($index) }}.</span>
+        {{ option.text }}
+      </button>
+    }
+  </div>
+
+  @if (!checked()) {
+    <button class="btn-primary" [disabled]="selectedIndex() === null" (click)="check()">
+      {{ 'exercise.check' | translate }}
+    </button>
+  } @else {
+    <div
+      class="flex items-start gap-2 p-3 rounded-lg text-sm"
+      [class.bg-green-50]="isCorrect()"
+      [class.bg-red-50]="!isCorrect()"
+    >
+      @if (isCorrect()) {
+        <i class="fa-solid fa-circle-check text-green-600 mt-0.5"></i>
+        <span class="text-green-700 font-medium">{{ 'exercise.correct' | translate }}</span>
+      } @else {
+        <i class="fa-solid fa-circle-xmark text-red-500 mt-0.5"></i>
+        <span class="text-red-700">
+          {{ 'exercise.incorrect' | translate }}
+          <strong>{{ correctOptionText() }}</strong>
+        </span>
+      }
+    </div>
+    <button class="btn-secondary text-sm" (click)="reset()">{{ 'exercise.retry' | translate }}</button>
+  }
+</div>

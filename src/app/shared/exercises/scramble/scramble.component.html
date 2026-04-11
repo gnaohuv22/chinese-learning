@@ -1,0 +1,50 @@
+<div class="exercise-scramble space-y-4">
+  <p class="text-base font-medium" style="color: var(--color-text)">{{ exercise.prompt }}</p>
+  <p class="text-xs" style="color: var(--color-text-muted)">{{ 'exercise.drag_hint' | translate }}</p>
+
+  <div
+    cdkDropList
+    cdkDropListOrientation="horizontal"
+    (cdkDropListDropped)="drop($event)"
+    class="flex flex-wrap gap-2 min-h-[48px] p-3 border-2 border-dashed rounded-lg"
+    style="border-color: var(--color-border); background: var(--color-bg)"
+  >
+    @for (word of arrangedWords(); track $index) {
+      <div
+        cdkDrag
+        [cdkDragDisabled]="checked()"
+        class="px-4 py-2 border-2 rounded-lg text-sm font-medium cursor-grab shadow-sm transition-all select-none"
+        style="background: var(--color-bg-surface); color: var(--color-text)"
+        [class.border-gray-300]="!checked()"
+        [class.border-green-400]="checked() && isCorrect()"
+        [class.border-red-400]="checked() && !isCorrect()"
+      >
+        {{ word }}
+        <ng-template cdkDragPreview></ng-template>
+      </div>
+    }
+  </div>
+
+  @if (!checked()) {
+    <button class="btn-primary" (click)="check()">
+      {{ 'exercise.check' | translate }}
+    </button>
+  } @else {
+    <div
+      class="flex items-start gap-2 p-3 rounded-lg text-sm"
+      [class.bg-green-50]="isCorrect()"
+      [class.bg-red-50]="!isCorrect()"
+    >
+      @if (isCorrect()) {
+        <i class="fa-solid fa-circle-check text-green-600 mt-0.5"></i>
+        <span class="text-green-700 font-medium">{{ 'exercise.correct' | translate }}</span>
+      } @else {
+        <div>
+          <p class="text-red-700">{{ 'exercise.incorrect' | translate }}</p>
+          <p class="text-red-600 font-medium mt-1">{{ correctSentence }}</p>
+        </div>
+      }
+    </div>
+    <button class="btn-secondary text-sm" (click)="reset()">{{ 'exercise.retry' | translate }}</button>
+  }
+</div>

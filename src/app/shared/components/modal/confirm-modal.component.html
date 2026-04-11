@@ -1,0 +1,67 @@
+@if (state.open) {
+  <div
+    class="fixed inset-0 z-[200] flex items-center justify-center p-4"
+    role="dialog"
+    aria-modal="true"
+    (click)="cancel()"
+  >
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"></div>
+
+    <!-- Dialog panel -->
+    <div
+      class="relative w-full max-w-sm rounded-2xl shadow-2xl p-6 animate-slide-up"
+      style="background: var(--color-bg-surface); border: 1px solid var(--color-border)"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Icon -->
+      <div class="flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-4"
+        [class.bg-red-100]="state.type === 'danger'"
+        [class.bg-amber-100]="state.type === 'warning'"
+        [class.bg-blue-100]="state.type === 'info'"
+      >
+        @if (state.type === 'danger') {
+          <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
+        } @else if (state.type === 'warning') {
+          <i class="fa-solid fa-circle-exclamation text-amber-500 text-xl"></i>
+        } @else {
+          <i class="fa-solid fa-circle-info text-blue-600 text-xl"></i>
+        }
+      </div>
+
+      <!-- Content -->
+      <h3 class="text-base font-semibold text-center mb-2" style="color: var(--color-text)">
+        {{ state.title }}
+      </h3>
+      @if (state.message) {
+        <p class="text-sm text-center" style="color: var(--color-text-muted)">
+          {{ state.message }}
+        </p>
+      }
+
+      <!-- Actions — bottom-right, auto-width buttons -->
+      <div class="flex gap-2 justify-end mt-5">
+        <button
+          class="btn-secondary"
+          style="padding: 4px 16px"
+          (click)="cancel()"
+        >
+          {{ state.cancelLabel || ('common.cancel' | translate) }}
+        </button>
+        <button
+          class="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium border-none cursor-pointer transition-colors text-white"
+          style="padding: 4px 16px"
+          [class.bg-red-700]="state.type === 'danger'"
+          [class.hover:bg-red-800]="state.type === 'danger'"
+          [class.bg-amber-600]="state.type === 'warning'"
+          [class.hover:bg-amber-700]="state.type === 'warning'"
+          [class.bg-blue-600]="state.type === 'info'"
+          [class.hover:bg-blue-700]="state.type === 'info'"
+          (click)="confirm()"
+        >
+          {{ state.confirmLabel || ('common.confirm' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

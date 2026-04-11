@@ -1,0 +1,58 @@
+<div class="page-container">
+  <a [routerLink]="['/courses', courseId]" class="inline-flex items-center gap-1 text-sm mb-6 hover:text-red-700 transition-colors" style="color: var(--color-text-muted)">
+    <i class="fa-solid fa-chevron-left text-xs"></i>
+    {{ 'lesson.back_to_course' | translate }}
+  </a>
+
+  @if (loading()) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-red-700 border-t-transparent"></div>
+    </div>
+  } @else if (lesson()) {
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold" style="color: var(--color-text)">{{ lesson()!.title }}</h1>
+      <div class="flex flex-wrap gap-2 mt-2">
+        @for (skill of lesson()!.skills; track skill) {
+          <span class="chip skill-{{ skill }}">{{ 'skills.' + skill | translate }}</span>
+        }
+      </div>
+    </div>
+
+    @if (lesson()!.skills.length > 1) {
+      <div class="flex gap-1 mb-6 overflow-x-auto border-b" style="border-color: var(--color-border)">
+        @for (skill of lesson()!.skills; track skill) {
+          <button
+            (click)="activeSkill.set(skill)"
+            class="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px"
+            [class.border-red-700]="activeSkill() === skill"
+            [class.text-red-700]="activeSkill() === skill"
+            [class.border-transparent]="activeSkill() !== skill"
+            [style.color]="activeSkill() !== skill ? 'var(--color-text-muted)' : null"
+          >
+            {{ 'skills.' + skill | translate }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="space-y-6">
+      @if (exercisesForActiveSkill().length === 0) {
+        <div class="card text-center py-12" style="color: var(--color-text-muted)">
+          {{ 'lesson.no_exercises' | translate }}
+        </div>
+      } @else {
+        @for (ex of exercisesForActiveSkill(); track ex.id; let i = $index) {
+          <div class="card">
+            <div class="flex items-center gap-2 mb-4 pb-3 border-b" style="border-color: var(--color-border)">
+              <span class="w-6 h-6 rounded-full bg-red-700 text-white text-xs flex items-center justify-center font-bold flex-shrink-0">
+                {{ i + 1 }}
+              </span>
+              <span class="chip chip-gray text-xs">{{ 'exercise_types.' + ex.type | translate }}</span>
+            </div>
+            <app-exercise-renderer [exercise]="ex" />
+          </div>
+        }
+      }
+    </div>
+  }
+</div>

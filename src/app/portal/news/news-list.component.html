@@ -1,0 +1,41 @@
+<div class="page-container">
+  <h1 class="text-2xl sm:text-3xl font-bold mb-8" style="color: var(--color-text)">{{ 'news.all_news' | translate }}</h1>
+
+  @if (loading()) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-red-700 border-t-transparent"></div>
+    </div>
+  } @else if (allNews().length === 0) {
+    <div class="card text-center py-16" style="color: var(--color-text-muted)">{{ 'news.no_news' | translate }}</div>
+  } @else {
+    <div class="space-y-4">
+      @for (item of newsList(); track item.id) {
+        <a [routerLink]="['/news', item.id]" class="card flex gap-4 hover:shadow-md transition-shadow group block">
+          @if (item.mediaUrl) {
+            <img
+              [src]="'https://drive.google.com/thumbnail?id=' + item.mediaUrl"
+              [alt]="item.title"
+              class="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg flex-shrink-0"
+            />
+          } @else {
+            <div class="w-24 h-24 sm:w-32 sm:h-32 bg-red-50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-newspaper text-2xl text-red-200"></i>
+            </div>
+          }
+          <div class="flex-1 min-w-0">
+            <h2 class="font-semibold group-hover:text-red-700 transition-colors" style="color: var(--color-text)">{{ item.title }}</h2>
+            <p class="text-sm mt-1 line-clamp-3" style="color: var(--color-text-muted)">{{ markdownExcerpt(item.content) }}</p>
+            <p class="text-xs mt-2" style="color: var(--color-text-muted)">{{ item.publishedAt | date:'dd/MM/yyyy' }}</p>
+          </div>
+        </a>
+      }
+    </div>
+
+    <app-pagination
+      [total]="allNews().length"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage()"
+      (pageChange)="onPageChange($event)"
+    />
+  }
+</div>

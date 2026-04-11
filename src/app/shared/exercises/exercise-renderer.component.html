@@ -1,0 +1,29 @@
+@switch (exercise.type) {
+  @case ('mcq') {
+    <app-exercise-mcq [exercise]="exercise" />
+  }
+  @case ('scramble') {
+    <app-exercise-scramble [exercise]="exercise" />
+  }
+  @case ('guided_writing') {
+    <app-exercise-guided-writing [exercise]="exercise" />
+  }
+  @case ('speaking_topic') {
+    <app-exercise-speaking-topic [exercise]="exercise" />
+  }
+  @case ('reflex_speaking') {
+    <app-exercise-video [exercise]="exercise" />
+  }
+  @case ('audio_mcq') {
+    <app-exercise-audio-mcq [exercise]="exercise" />
+  }
+  @case ('interactive_video') {
+    <app-exercise-video [exercise]="exercise" />
+  }
+  @case ('speaking_record') {
+    <app-exercise-speaking-record [exercise]="exercise" />
+  }
+  @default {
+    <app-exercise-speaking-topic [exercise]="exercise" />
+  }
+}

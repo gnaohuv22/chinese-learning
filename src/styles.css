@@ -1,3 +1,369 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/* Angular Material theming */
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+/* Tailwind v4: class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Global resets & typography */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Dark mode fade transition — applied globally */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html,
+html *,
+html *::before,
+html *::after {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Override: keep interaction transitions fast */
+html a,
+html button,
+html input,
+html select,
+html textarea {
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+
+/* CSS custom properties — light mode */
+:root {
+  --color-bg: #f9fafb;
+  --color-bg-surface: #ffffff;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-input-bg: #ffffff;
+  --color-card-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+/* CSS custom properties — dark mode */
+html.dark {
+  --color-bg: #0f172a;
+  --color-bg-surface: #1e293b;
+  --color-text: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-border: #334155;
+  --color-input-bg: #1e293b;
+  --color-card-shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px rgb(0 0 0 / 0.3);
+}
+
+/* Smooth router transitions */
+router-outlet + * {
+  animation: pageEnter 0.2s ease-out both;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade-in animation for modals */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out both;
+}
+
+/* Slide-up animation for inline forms */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.25s ease-out both;
+}
+
+/* Utility classes */
+.card {
+  background: var(--color-bg-surface);
+  border-radius: 0.75rem;
+  box-shadow: var(--color-card-shadow);
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background-color: #b91c1c;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-primary:hover {
+  background-color: #991b1b;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background-color: var(--color-bg-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-bg);
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background-color: #fef2f2;
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  border: 1px solid #fecaca;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-danger:hover {
+  background-color: #fee2e2;
+}
+
+html.dark .btn-danger {
+  background-color: #450a0a;
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+html.dark .btn-danger:hover {
+  background-color: #7f1d1d;
+}
+
+/* Chip / badge */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.chip-blue   { background: #dbeafe; color: #1d4ed8; }
+.chip-green  { background: #dcfce7; color: #16a34a; }
+.chip-yellow { background: #fef9c3; color: #ca8a04; }
+.chip-red    { background: #fee2e2; color: #dc2626; }
+.chip-purple { background: #f3e8ff; color: #7e22ce; }
+.chip-gray   { background: #f3f4f6; color: #6b7280; }
+
+html.dark .chip-gray { background: #334155; color: #cbd5e1; }
+
+/* Skill color map */
+.skill-listening { background: #dbeafe; color: #1d4ed8; }
+.skill-speaking  { background: #dcfce7; color: #16a34a; }
+.skill-reading   { background: #fef9c3; color: #ca8a04; }
+.skill-writing   { background: #f3e8ff; color: #7e22ce; }
+
+/* Page container */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Form styles */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.form-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background: var(--color-input-bg);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+  width: 100%;
+}
+
+.form-input:focus {
+  border-color: #b91c1c;
+  box-shadow: 0 0 0 2px rgb(185 28 28 / 0.15);
+}
+
+.form-input.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgb(239 68 68 / 0.2);
+}
+
+.form-textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25em 1.25em;
+  padding-right: 2.5rem;
+}
+
+.form-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 0.25rem;
+}
+
+/* Exercise result states */
+.answer-correct { background: #dcfce7 !important; border-color: #16a34a !important; }
+.answer-incorrect { background: #fee2e2 !important; border-color: #dc2626 !important; }
+
+/* ── Cherry Markdown editor height overrides ────────────────────────────── */
+.cherry { height: 480px !important; }
+.cherry .cherry-content { height: calc(480px - 40px) !important; min-height: 0 !important; overflow: hidden; }
+.cherry .cherry-editor { height: 100% !important; min-height: 0 !important; }
+.cherry .cherry-editor .CodeMirror,
+.cherry .cherry-editor .CodeMirror-scroll { height: 100% !important; min-height: 0 !important; }
+.cherry .cherry-previewer { height: 100% !important; min-height: 0 !important; overflow-y: auto; }
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/* Drag handle cursor */
+.drag-handle {
+  cursor: grab;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* CDK drag placeholder */
+.cdk-drag-placeholder {
+  opacity: 0.4;
+  border: 2px dashed #d1d5db;
+  background: transparent;
+  border-radius: 0.75rem;
+}
+
+html.dark .cdk-drag-placeholder {
+  border-color: #475569;
+}
+
+/* Custom scrollbar for main scroll container */
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+html.dark .scroll-container::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+html.dark .scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Fade-out animation for exercise edit */
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.2s ease-out forwards;
+}

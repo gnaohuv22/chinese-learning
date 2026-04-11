@@ -1,0 +1,66 @@
+<div class="page-container">
+  <a routerLink="/courses" class="inline-flex items-center gap-1 text-sm mb-6 hover:text-red-700 transition-colors" style="color: var(--color-text-muted)">
+    <i class="fa-solid fa-chevron-left text-xs"></i>
+    {{ 'course.all_courses' | translate }}
+  </a>
+
+  @if (loading()) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-red-700 border-t-transparent"></div>
+    </div>
+  } @else if (course()) {
+    <div class="card mb-6">
+      <div class="flex items-start gap-4">
+        <div class="w-14 h-14 rounded-xl bg-red-700 text-white flex items-center justify-center text-3xl font-bold flex-shrink-0">
+          {{ course()!.title[0] }}
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold" style="color: var(--color-text)">{{ course()!.title }}</h1>
+          @if (course()!.description) {
+            <p class="mt-1" style="color: var(--color-text-muted)">{{ course()!.description }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-lg font-semibold mb-4" style="color: var(--color-text)">
+        {{ 'course.lessons' | translate }}
+        <span class="text-sm font-normal ml-2" style="color: var(--color-text-muted)">({{ lessons().length }})</span>
+      </h2>
+
+      @if (lessons().length === 0) {
+        <div class="card text-center py-12" style="color: var(--color-text-muted)">
+          {{ 'lesson.no_lessons' | translate }}
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (lesson of lessons(); track lesson.id; let i = $index) {
+            <a
+              [routerLink]="['/courses', courseId, 'lessons', lesson.id]"
+              class="card flex items-center gap-4 hover:shadow-md transition-shadow group"
+            >
+              <div
+                class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 group-hover:bg-red-700 group-hover:text-white transition-colors"
+                style="background: var(--color-border); color: var(--color-text-muted)"
+              >
+                {{ i + 1 }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-medium group-hover:text-red-700 transition-colors" style="color: var(--color-text)">
+                  {{ lesson.title }}
+                </h3>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  @for (skill of lesson.skills; track skill) {
+                    <span class="chip skill-{{ skill }} text-xs">{{ 'skills.' + skill | translate }}</span>
+                  }
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-sm flex-shrink-0 group-hover:text-red-700 transition-colors" style="color: var(--color-text-muted)"></i>
+            </a>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

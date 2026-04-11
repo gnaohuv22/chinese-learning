@@ -1,0 +1,37 @@
+<div class="page-container max-w-3xl mx-auto">
+  <a routerLink="/news" class="inline-flex items-center gap-1 text-sm hover:text-red-600 transition-colors mb-6" style="color: var(--color-text-muted)">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    {{ 'news.all_news' | translate }}
+  </a>
+
+  @if (loading()) {
+    <div class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-red-700 border-t-transparent"></div>
+    </div>
+  } @else if (news()) {
+    <article class="card">
+      <header class="mb-6">
+        <h1 class="text-2xl sm:text-3xl font-bold" style="color: var(--color-text)">{{ news()!.title }}</h1>
+        <p class="text-sm mt-2" style="color: var(--color-text-muted)">
+          {{ 'news.published' | translate }}: {{ news()!.publishedAt | date:'dd/MM/yyyy' }}
+        </p>
+      </header>
+
+      @if (news()!.mediaUrl) {
+        <div class="mb-6 relative w-full rounded-lg overflow-hidden" style="padding-top: 56.25%">
+          <iframe
+            [src]="'https://drive.google.com/file/d/' + news()!.mediaUrl + '/preview'"
+            class="absolute inset-0 w-full h-full border-0"
+            allowfullscreen
+          ></iframe>
+        </div>
+      }
+
+      <div class="border-t pt-6" style="border-color: var(--color-border)">
+        <app-markdown-viewer [content]="news()!.content" />
+      </div>
+    </article>
+  }
+</div>
