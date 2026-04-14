@@ -26,10 +26,25 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Full-height flex shell — prevents body-level scrolling.
+   app-root acts as a flex column; main takes all remaining space. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   background-color: var(--color-bg);
   color: var(--color-text);
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Dark mode fade transition — applied globally */
