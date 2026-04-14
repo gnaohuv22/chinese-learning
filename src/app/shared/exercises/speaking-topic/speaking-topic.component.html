@@ -1,11 +1,14 @@
 <div class="exercise-speaking-topic space-y-4">
-  <p class="text-base font-medium text-gray-800">{{ exercise.prompt }}</p>
+  <p class="text-base font-medium" style="color: var(--color-text);">{{ exercise.prompt }}</p>
 
   @if (exercise.outline && exercise.outline.length > 0) {
     <ul class="space-y-2">
       @for (point of exercise.outline; track $index) {
-        <li class="flex items-start gap-2 text-sm text-gray-700">
-          <span class="w-5 h-5 rounded-full bg-red-100 text-red-700 text-xs flex items-center justify-center flex-shrink-0 mt-0.5 font-medium">
+        <li class="flex items-start gap-2 text-sm" style="color: var(--color-text);">
+          <span
+            class="w-5 h-5 rounded-full text-xs flex items-center justify-center flex-shrink-0 mt-0.5 font-medium"
+            style="background: var(--color-border); color: var(--color-primary);"
+          >
             {{ $index + 1 }}
           </span>
           {{ point }}
@@ -14,41 +17,28 @@
     </ul>
   }
 
+  @if (exercise.keywords && exercise.keywords.length > 0) {
+    <div class="flex flex-wrap gap-1.5">
+      <span class="text-xs font-medium" style="color: var(--color-text-muted);">{{ 'exercise.keyword_hint' | translate }}</span>
+      @for (kw of exercise.keywords; track $index) {
+        <span class="chip chip-brown text-xs">{{ kw }}</span>
+      }
+    </div>
+  }
+
   @if (!started()) {
     <button class="btn-primary" (click)="start()">
       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
       </svg>
-      {{ 'exercise.start' | translate }} ({{ exercise.durationSeconds ?? 60 }}s)
+      {{ 'exercise.start' | translate }}
     </button>
-  } @else if (timeOver()) {
-    <div class="flex items-center gap-2 p-4 bg-orange-50 rounded-lg border border-orange-200">
-      <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span class="font-medium text-orange-700">{{ 'exercise.time_up' | translate }}</span>
-    </div>
-    <button class="btn-secondary text-sm" (click)="reset()">Thử lại</button>
   } @else {
-    <div class="space-y-2">
-      <div class="flex items-center justify-between text-sm text-gray-600">
-        <span>Thời gian còn lại</span>
-        <span class="font-mono font-bold text-lg" [class.text-red-600]="timeLeft() <= 10">
-          {{ formatTime(timeLeft()) }}
-        </span>
-      </div>
-      <div class="w-full bg-gray-200 rounded-full h-2">
-        <div
-          class="h-2 rounded-full transition-all duration-1000"
-          [class.bg-red-600]="timeLeft() <= 10"
-          [class.bg-yellow-500]="timeLeft() > 10 && timeLeft() <= 30"
-          [class.bg-green-500]="timeLeft() > 30"
-          [style.width.%]="progressPercent()"
-        ></div>
-      </div>
+    <div class="flex items-center gap-3 p-4 rounded-xl border" style="background: var(--color-bg); border-color: var(--color-border);">
+      <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--color-primary);"></div>
+      <span class="text-sm font-medium" style="color: var(--color-text);">Đang thực hành...</span>
     </div>
-    <button class="btn-secondary text-sm" (click)="stop()">Dừng</button>
+    <button class="btn-secondary text-sm" (click)="reset()">{{ 'exercise.retry' | translate }}</button>
   }
 </div>

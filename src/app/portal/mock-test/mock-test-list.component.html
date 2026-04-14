@@ -1,0 +1,109 @@
+<div class="page-container">
+  <!-- Page header -->
+  <div class="mb-8">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-2" style="color: var(--color-text);">
+      {{ 'mock_test.title' | translate }}
+    </h1>
+    <p class="text-sm sm:text-base" style="color: var(--color-text-muted);">
+      {{ 'mock_test.subtitle' | translate }}
+    </p>
+  </div>
+
+  <!-- Học phần tabs -->
+  <div class="flex gap-2 mb-6 flex-wrap">
+    @for (n of hocPhanItems; track n) {
+      <button
+        type="button"
+        (click)="selectHocPhan(n)"
+        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all"
+        [style.background]="activeHocPhan() === n ? 'var(--color-primary)' : 'var(--color-bg-surface)'"
+        [style.color]="activeHocPhan() === n ? '#efe7db' : 'var(--color-text-muted)'"
+        [style.border-color]="activeHocPhan() === n ? 'var(--color-primary)' : 'var(--color-border)'"
+      >
+        <span
+          class="w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold"
+          [style.background]="activeHocPhan() === n ? 'rgba(255,255,255,0.2)' : 'var(--color-border)'"
+        >{{ n }}</span>
+        {{ 'hoc_phan.' + n | translate }}
+        @if (!loading() && countForHocPhan(n) > 0) {
+          <span
+            class="text-xs px-1.5 py-0.5 rounded-full font-medium"
+            [style.background]="activeHocPhan() === n ? 'rgba(255,255,255,0.2)' : 'var(--color-border)'"
+          >{{ countForHocPhan(n) }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+    </div>
+  } @else if (filteredTests().length === 0) {
+    <div class="card text-center py-16">
+      <div class="text-5xl mb-4" style="color: var(--color-border);">卷</div>
+      <p class="font-semibold mb-1" style="color: var(--color-text);">{{ 'mock_test.no_tests' | translate }}</p>
+      <p class="text-sm" style="color: var(--color-text-muted);">{{ 'hoc_phan.' + activeHocPhan() | translate }}</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (test of filteredTests(); track test.id) {
+        <a
+          [routerLink]="['/thi-thu', test.id]"
+          class="card hover:shadow-lg transition-all hover:-translate-y-0.5 group flex flex-col gap-3"
+        >
+          <!-- Header row -->
+          <div class="flex items-start gap-3">
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold transition-all"
+              style="background: var(--color-primary); color: #efe7db;"
+            >
+              <i class="fa-solid fa-file-pen"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full mb-1 inline-block" style="background: var(--color-border); color: var(--color-primary);">
+                {{ 'hoc_phan.' + test.hocPhan | translate }}
+              </span>
+              <h3 class="font-semibold leading-tight transition-colors" style="color: var(--color-text);">
+                {{ test.title }}
+              </h3>
+            </div>
+          </div>
+
+          @if (test.description) {
+            <p class="text-sm line-clamp-2 leading-relaxed" style="color: var(--color-text-muted);">{{ test.description }}</p>
+          }
+
+          <!-- Meta row -->
+          <div class="flex items-center gap-4 pt-1 border-t text-xs" style="border-color: var(--color-border); color: var(--color-text-muted);">
+            <span class="flex items-center gap-1">
+              <i class="fa-regular fa-clock"></i>
+              {{ formatMinutes(test.timeLimitSeconds) }} {{ 'mock_test.minutes' | translate }}
+            </span>
+            <span class="flex items-center gap-1">
+              <i class="fa-regular fa-circle-question"></i>
+              {{ totalExercises(test) }} {{ 'mock_test.questions' | translate }}
+            </span>
+          </div>
+
+          <!-- Skill chips -->
+          <div class="flex flex-wrap gap-1">
+            @if (test.sections.listening.length > 0) {
+              <span class="chip skill-listening text-xs">{{ 'skills.listening' | translate }}</span>
+            }
+            @if (test.sections.speaking.length > 0) {
+              <span class="chip skill-speaking text-xs">{{ 'skills.speaking' | translate }}</span>
+            }
+            @if (test.sections.reading.length > 0) {
+              <span class="chip skill-reading text-xs">{{ 'skills.reading' | translate }}</span>
+            }
+            @if (test.sections.writing.length > 0) {
+              <span class="chip skill-writing text-xs">{{ 'skills.writing' | translate }}</span>
+            }
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

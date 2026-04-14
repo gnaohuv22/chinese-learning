@@ -1,44 +1,118 @@
-<header class="sticky top-0 z-50 bg-red-700/95 text-white shadow-md backdrop-blur-md">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<header class="sticky top-0 z-50 shadow-lg" style="background: #3a1b00; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);">
+  <!-- Floating Chinese character background -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+    @for (char of floatingChars; track $index) {
+      <span
+        class="absolute font-bold header-float-char"
+        [style.left.%]="char.left"
+        [style.bottom.px]="-10"
+        [style.font-size.px]="char.size"
+        [style.opacity]="char.opacity"
+        [style.animation-duration.s]="char.duration"
+        [style.animation-delay.s]="char.delay"
+        style="color: #c8ac89;"
+      >{{ char.char }}</span>
+    }
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
     <div class="flex items-center justify-between h-16">
-      <!-- Logo -->
-      <a routerLink="/" class="flex items-center gap-2 font-bold text-xl tracking-tight">
-        <span class="text-2xl">漢</span>
-        <span class="hidden sm:inline">{{ 'app.title' | translate }}</span>
+
+      <!-- Logo + Title -->
+      <a routerLink="/" class="flex items-center gap-3 flex-shrink-0">
+        <img
+          src="/temp-logo.jpg"
+          alt="HÁN NGỮ KÝ Logo"
+          class="h-10 w-10 rounded-lg object-cover border-2 flex-shrink-0"
+          style="border-color: #c8ac89;"
+        />
+        <div class="flex flex-col leading-none">
+          <span class="font-bold text-base tracking-wider" style="color: #efe7db; letter-spacing: 0.08em;">HÁN NGỮ KÝ</span>
+          <span class="text-xs font-medium" style="color: #c8ac89;">汉语记</span>
+        </div>
       </a>
 
       <!-- Desktop nav -->
       <nav class="hidden md:flex items-center gap-1">
         <a
           routerLink="/"
-          routerLinkActive="bg-white/20"
+          routerLinkActive="active-nav"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors"
+          class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          style="color: #efe7db;"
         >
           {{ 'nav.home' | translate }}
         </a>
-        <a
-          routerLink="/courses"
-          routerLinkActive="bg-white/20"
-          class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors"
-        >
-          {{ 'nav.courses' | translate }}
-        </a>
+
+        <!-- Ôn tập with submenu -->
+        <div class="relative">
+          <button
+            type="button"
+            (click)="toggleOntap($event)"
+            class="nav-link flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            style="color: #efe7db;"
+            [style.background]="ontapOpen() ? 'rgba(200,172,137,0.2)' : ''"
+          >
+            {{ 'nav.courses' | translate }}
+            <svg
+              class="w-3.5 h-3.5 transition-transform duration-200"
+              [class.rotate-180]="ontapOpen()"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Submenu -->
+          @if (ontapOpen()) {
+            <div
+              class="absolute top-full left-0 mt-1.5 w-48 rounded-xl shadow-xl border overflow-hidden submenu-enter"
+              style="background: #3a1b00; border-color: #7e480a;"
+            >
+              @for (n of [1, 2, 3, 4]; track n) {
+                <a
+                  [routerLink]="['/on-tap', n]"
+                  (click)="closeOntap()"
+                  class="submenu-item flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-b last:border-b-0"
+                  style="color: #efe7db; border-color: #7e480a;"
+                >
+                  <span
+                    class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0"
+                    style="background: #7e480a; color: #efe7db;"
+                  >{{ n }}</span>
+                  {{ 'hoc_phan.' + n | translate }}
+                </a>
+              }
+            </div>
+          }
+        </div>
+
         <a
           routerLink="/news"
-          routerLinkActive="bg-white/20"
-          class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors"
+          routerLinkActive="active-nav"
+          class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          style="color: #efe7db;"
         >
           {{ 'nav.news' | translate }}
+        </a>
+
+        <a
+          routerLink="/thi-thu"
+          routerLinkActive="active-nav"
+          class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          style="color: #efe7db;"
+        >
+          {{ 'nav.mock_test' | translate }}
         </a>
       </nav>
 
       <!-- Right side -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <!-- Dark mode toggle -->
         <button
           (click)="theme.toggle()"
-          class="p-2 rounded-md hover:bg-white/10 transition-colors"
+          class="nav-link p-2 rounded-md transition-colors"
+          style="color: #c8ac89;"
           [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
         >
           @if (theme.isDark()) {
@@ -49,51 +123,7 @@
         </button>
 
         <app-language-switcher />
-
-        <!-- Mobile menu button -->
-        <button
-          class="md:hidden p-2 rounded-md hover:bg-white/10"
-          (click)="mobileMenuOpen.update(v => !v)"
-          aria-label="Toggle menu"
-        >
-          @if (mobileMenuOpen()) {
-            <i class="fa-solid fa-xmark w-5 text-center"></i>
-          } @else {
-            <i class="fa-solid fa-bars w-5 text-center"></i>
-          }
-        </button>
       </div>
     </div>
-
-    <!-- Mobile nav -->
-    @if (mobileMenuOpen()) {
-      <nav class="md:hidden pb-3 space-y-1">
-        <a
-          routerLink="/"
-          routerLinkActive="bg-white/20"
-          [routerLinkActiveOptions]="{ exact: true }"
-          (click)="mobileMenuOpen.set(false)"
-          class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10"
-        >
-          {{ 'nav.home' | translate }}
-        </a>
-        <a
-          routerLink="/courses"
-          routerLinkActive="bg-white/20"
-          (click)="mobileMenuOpen.set(false)"
-          class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10"
-        >
-          {{ 'nav.courses' | translate }}
-        </a>
-        <a
-          routerLink="/news"
-          routerLinkActive="bg-white/20"
-          (click)="mobileMenuOpen.set(false)"
-          class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10"
-        >
-          {{ 'nav.news' | translate }}
-        </a>
-      </nav>
-    }
   </div>
 </header>

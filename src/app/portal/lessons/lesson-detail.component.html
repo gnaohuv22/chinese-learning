@@ -1,12 +1,12 @@
 <div class="page-container">
-  <a [routerLink]="['/courses', courseId]" class="inline-flex items-center gap-1 text-sm mb-6 hover:text-red-700 transition-colors" style="color: var(--color-text-muted)">
+  <a [routerLink]="['/courses', courseId]" class="inline-flex items-center gap-1 text-sm mb-6 transition-colors" style="color: var(--color-text-muted)">
     <i class="fa-solid fa-chevron-left text-xs"></i>
     {{ 'lesson.back_to_course' | translate }}
   </a>
 
   @if (loading()) {
     <div class="flex justify-center py-16">
-      <div class="animate-spin rounded-full h-10 w-10 border-2 border-red-700 border-t-transparent"></div>
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
     </div>
   } @else if (lesson()) {
     <div class="mb-6">
@@ -24,10 +24,8 @@
           <button
             (click)="activeSkill.set(skill)"
             class="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px"
-            [class.border-red-700]="activeSkill() === skill"
-            [class.text-red-700]="activeSkill() === skill"
-            [class.border-transparent]="activeSkill() !== skill"
-            [style.color]="activeSkill() !== skill ? 'var(--color-text-muted)' : null"
+            [style.border-bottom-color]="activeSkill() === skill ? 'var(--color-primary)' : 'transparent'"
+            [style.color]="activeSkill() === skill ? 'var(--color-primary)' : 'var(--color-text-muted)'"
           >
             {{ 'skills.' + skill | translate }}
           </button>
@@ -44,7 +42,10 @@
         @for (ex of exercisesForActiveSkill(); track ex.id; let i = $index) {
           <div class="card">
             <div class="flex items-center gap-2 mb-4 pb-3 border-b" style="border-color: var(--color-border)">
-              <span class="w-6 h-6 rounded-full bg-red-700 text-white text-xs flex items-center justify-center font-bold flex-shrink-0">
+              <span
+                class="w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0"
+                style="background: var(--color-primary); color: #efe7db;"
+              >
                 {{ i + 1 }}
               </span>
               <span class="chip chip-gray text-xs">{{ 'exercise_types.' + ex.type | translate }}</span>

@@ -63,23 +63,27 @@ html textarea {
 
 /* CSS custom properties — light mode */
 :root {
-  --color-bg: #f9fafb;
-  --color-bg-surface: #ffffff;
-  --color-text: #111827;
-  --color-text-muted: #6b7280;
-  --color-border: #e5e7eb;
-  --color-input-bg: #ffffff;
-  --color-card-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.06);
+  --color-bg: #efe7db;
+  --color-bg-surface: #faf6f0;
+  --color-primary: #7e480a;
+  --color-primary-hover: #3a1b00;
+  --color-text: #3a1b00;
+  --color-text-muted: #be9672;
+  --color-border: #c8ac89;
+  --color-input-bg: #faf6f0;
+  --color-card-shadow: 0 1px 3px rgb(58 27 0 / 0.10), 0 1px 2px rgb(58 27 0 / 0.08);
 }
 
 /* CSS custom properties — dark mode */
 html.dark {
-  --color-bg: #0f172a;
-  --color-bg-surface: #1e293b;
-  --color-text: #f1f5f9;
-  --color-text-muted: #94a3b8;
-  --color-border: #334155;
-  --color-input-bg: #1e293b;
+  --color-bg: #1a0d00;
+  --color-bg-surface: #3a1b00;
+  --color-primary: #be9672;
+  --color-primary-hover: #c8ac89;
+  --color-text: #efe7db;
+  --color-text-muted: #c8ac89;
+  --color-border: #7e480a;
+  --color-input-bg: #3a1b00;
   --color-card-shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px rgb(0 0 0 / 0.3);
 }
 
@@ -125,6 +129,97 @@ router-outlet + * {
   animation: slideUp 0.25s ease-out both;
 }
 
+/* Floating Chinese character animation for header */
+@keyframes floatChar {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-120px) scale(1.1);
+  }
+}
+
+.header-float-char {
+  animation: floatChar linear infinite;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Header nav link hover effects */
+.nav-link:hover {
+  background: rgba(200, 172, 137, 0.15) !important;
+}
+
+.active-nav {
+  background: rgba(200, 172, 137, 0.2) !important;
+}
+
+.submenu-item:hover {
+  background: rgba(200, 172, 137, 0.15) !important;
+}
+
+/* Admin sidebar nav links */
+.admin-nav-link:hover {
+  background: rgba(200, 172, 137, 0.12) !important;
+  color: #efe7db !important;
+}
+
+.admin-nav-active {
+  background: #7e480a !important;
+  color: #efe7db !important;
+}
+
+/* Bottom nav pill buttons */
+.bottom-nav-btn:active {
+  transform: scale(0.92);
+}
+
+.bottom-nav-active {
+  background: rgba(200, 172, 137, 0.22) !important;
+}
+
+/* Admin drawer slide-in from left */
+@keyframes drawerSlideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.admin-drawer-enter {
+  animation: drawerSlideIn 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Submenu fade + blur transition */
+.submenu-enter {
+  animation: submenuShow 0.2s ease-out both;
+}
+
+@keyframes submenuShow {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
 /* Utility classes */
 .card {
   background: var(--color-bg-surface);
@@ -139,7 +234,7 @@ router-outlet + * {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
-  background-color: #b91c1c;
+  background-color: var(--color-primary);
   color: white;
   font-size: 0.875rem;
   font-weight: 500;
@@ -150,7 +245,7 @@ router-outlet + * {
 }
 
 .btn-primary:hover {
-  background-color: #991b1b;
+  background-color: var(--color-primary-hover);
 }
 
 .btn-primary:disabled {
@@ -222,8 +317,10 @@ html.dark .btn-danger:hover {
 .chip-red    { background: #fee2e2; color: #dc2626; }
 .chip-purple { background: #f3e8ff; color: #7e22ce; }
 .chip-gray   { background: #f3f4f6; color: #6b7280; }
+.chip-brown  { background: #efe7db; color: #7e480a; }
 
-html.dark .chip-gray { background: #334155; color: #cbd5e1; }
+html.dark .chip-gray   { background: #334155; color: #cbd5e1; }
+html.dark .chip-brown  { background: #3a1b00; color: #c8ac89; }
 
 /* Skill color map */
 .skill-listening { background: #dbeafe; color: #1d4ed8; }
@@ -270,8 +367,12 @@ html.dark .chip-gray { background: #334155; color: #cbd5e1; }
 }
 
 .form-input:focus {
-  border-color: #b91c1c;
-  box-shadow: 0 0 0 2px rgb(185 28 28 / 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgb(126 72 10 / 0.15);
+}
+
+html.dark .form-input:focus {
+  box-shadow: 0 0 0 2px rgb(190 150 114 / 0.2);
 }
 
 .form-input.error {
@@ -300,7 +401,7 @@ html.dark .chip-gray { background: #334155; color: #cbd5e1; }
 }
 
 /* Exercise result states */
-.answer-correct { background: #dcfce7 !important; border-color: #16a34a !important; }
+.answer-correct   { background: #dcfce7 !important; border-color: #16a34a !important; }
 .answer-incorrect { background: #fee2e2 !important; border-color: #dc2626 !important; }
 
 /* ── Cherry Markdown editor height overrides ────────────────────────────── */
@@ -323,13 +424,9 @@ html.dark .chip-gray { background: #334155; color: #cbd5e1; }
 /* CDK drag placeholder */
 .cdk-drag-placeholder {
   opacity: 0.4;
-  border: 2px dashed #d1d5db;
+  border: 2px dashed var(--color-border);
   background: transparent;
   border-radius: 0.75rem;
-}
-
-html.dark .cdk-drag-placeholder {
-  border-color: #475569;
 }
 
 /* Custom scrollbar for main scroll container */
@@ -342,20 +439,20 @@ html.dark .cdk-drag-placeholder {
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #c8ac89;
   border-radius: 3px;
 }
 
 .scroll-container::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #be9672;
 }
 
 html.dark .scroll-container::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #7e480a;
 }
 
 html.dark .scroll-container::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: #be9672;
 }
 
 /* Fade-out animation for exercise edit */
@@ -366,4 +463,16 @@ html.dark .scroll-container::-webkit-scrollbar-thumb:hover {
 
 .animate-fade-out {
   animation: fadeOut 0.2s ease-out forwards;
+}
+
+/* Floating timer ring for mock test */
+.timer-ring-track {
+  stroke: var(--color-border);
+}
+
+.timer-ring-fill {
+  stroke: var(--color-primary);
+  transition: stroke-dashoffset 1s linear;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
 }

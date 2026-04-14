@@ -1,23 +1,23 @@
-<div class="page-container">
+<div class="p-4 sm:p-6 w-full">
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.courses' | translate }}</h1>
+    <h1 class="text-xl sm:text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.courses' | translate }}</h1>
     @if (!showForm()) {
-      <button class="btn-primary" (click)="openForm()">
+      <button class="btn-primary text-sm" (click)="openForm()">
         <i class="fa-solid fa-plus"></i>
-        {{ 'common.create' | translate }}
+        <span class="hidden sm:inline">{{ 'common.create' | translate }}</span>
       </button>
     }
   </div>
 
   <!-- Inline create / edit card -->
   @if (showForm()) {
-    <div class="card animate-slide-up border-2 border-red-200 dark:border-red-900 mb-6">
+    <div class="card animate-slide-up mb-6" style="border: 2px solid var(--color-primary);">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-base font-semibold" style="color: var(--color-text)">
           @if (editingCourse()) {
-            <i class="fa-solid fa-pen-to-square text-red-600 mr-2"></i>{{ 'common.edit' | translate }} — {{ editingCourse()!.title }}
+            <i class="fa-solid fa-pen-to-square mr-2" style="color: var(--color-primary);"></i>{{ 'common.edit' | translate }} — {{ editingCourse()!.title }}
           } @else {
-            <i class="fa-solid fa-plus text-red-600 mr-2"></i>{{ 'common.create' | translate }} — {{ 'course.title' | translate }}
+            <i class="fa-solid fa-plus mr-2" style="color: var(--color-primary);"></i>{{ 'common.create' | translate }} — {{ 'course.title' | translate }}
           }
         </h2>
         <button type="button" (click)="closeForm()" class="hover:opacity-70 transition-opacity" style="color: var(--color-text-muted)">
@@ -51,22 +51,23 @@
 
   @if (loading()) {
     <div class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-700 border-t-transparent"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
     </div>
   } @else if (courses().length === 0) {
-    <div class="card text-center py-12" style="color: var(--color-text-muted)">{{ 'course.no_courses' | translate }}</div>
+    <div class="card text-center py-12 text-sm" style="color: var(--color-text-muted)">{{ 'course.no_courses' | translate }}</div>
   } @else {
     <p class="text-xs mb-3 flex items-center gap-1" style="color: var(--color-text-muted)">
       <i class="fa-solid fa-grip-lines"></i>{{ 'admin.drag_to_reorder' | translate }}
     </p>
     <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3">
       @for (course of courses(); track course.id) {
-        <div cdkDrag class="card flex items-center justify-between gap-4">
-          <div class="flex items-center gap-3 flex-1 min-w-0">
-            <span cdkDragHandle class="drag-handle text-gray-400 flex-shrink-0 cursor-grab">
+        <div cdkDrag class="card flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <!-- Drag handle + title row -->
+          <div class="flex items-center gap-3 min-w-0 flex-1 w-full overflow-hidden">
+            <span cdkDragHandle class="drag-handle flex-shrink-0 cursor-grab" style="color: var(--color-text-muted);">
               <i class="fa-solid fa-grip-vertical"></i>
             </span>
-            <div class="min-w-0">
+            <div class="min-w-0 overflow-hidden flex-1">
               <h3 class="font-semibold truncate" style="color: var(--color-text)">{{ course.title }}</h3>
               @if (course.description) {
                 <p class="text-sm truncate mt-0.5" style="color: var(--color-text-muted)">{{ course.description }}</p>
@@ -74,17 +75,22 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <a [routerLink]="['/admin/courses', course.id, 'lessons']" class="btn-secondary text-xs py-1.5 px-3">
-              <i class="fa-solid fa-book-open text-xs"></i>{{ 'admin.lessons' | translate }}
+          <!-- Action buttons — icon-only on mobile, icon+label on sm+ -->
+          <div class="flex items-center gap-2 flex-shrink-0 pl-7 sm:pl-0">
+            <a [routerLink]="['/admin/courses', course.id, 'lessons']" class="btn-secondary text-xs py-1.5 px-2.5 sm:px-3">
+              <i class="fa-solid fa-book-open text-xs"></i>
+              <span class="hidden sm:inline">{{ 'admin.lessons' | translate }}</span>
             </a>
-            <button class="btn-secondary text-xs py-1.5 px-3" (click)="editCourse(course)">
-              <i class="fa-solid fa-pen-to-square text-xs"></i>{{ 'common.edit' | translate }}
+            <button class="btn-secondary text-xs py-1.5 px-2.5 sm:px-3" (click)="editCourse(course)">
+              <i class="fa-solid fa-pen-to-square text-xs"></i>
+              <span class="hidden sm:inline">{{ 'common.edit' | translate }}</span>
             </button>
-            <button class="btn-danger text-xs py-1.5 px-3" (click)="deleteCourse(course)">
-              <i class="fa-solid fa-trash text-xs"></i>{{ 'common.delete' | translate }}
+            <button class="btn-danger text-xs py-1.5 px-2.5 sm:px-3" (click)="deleteCourse(course)">
+              <i class="fa-solid fa-trash text-xs"></i>
+              <span class="hidden sm:inline">{{ 'common.delete' | translate }}</span>
             </button>
           </div>
+
           <div *cdkDragPlaceholder class="card h-14 border-dashed border-2" style="border-color: var(--color-border); background: transparent"></div>
         </div>
       }

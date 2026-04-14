@@ -6,16 +6,15 @@ import {
   OnDestroy,
   computed,
 } from '@angular/core';
-import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { forkJoin, of, switchMap } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { CourseService } from '../../core/services/course.service';
 import { NewsService } from '../../core/services/news.service';
-import { ExamService } from '../../core/services/exam.service';
 import { LessonService } from '../../core/services/lesson.service';
-import { Course, News, Exam, Lesson } from '../../core/models';
+import { Course, News, Lesson } from '../../core/models';
 
 type Skill = 'listening' | 'speaking' | 'reading' | 'writing';
 
@@ -37,18 +36,16 @@ export interface PracticeResult {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule, DecimalPipe, DatePipe],
+  imports: [CommonModule, RouterLink, TranslateModule, DatePipe],
   templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private courseService = inject(CourseService);
   private newsService = inject(NewsService);
-  private examService = inject(ExamService);
   private lessonService = inject(LessonService);
 
   courses = signal<Course[]>([]);
   news = signal<News[]>([]);
-  exams = signal<Exam[]>([]);
   activeSkill = signal<Skill | null>(null);
   skillLessons = signal<Array<{ lesson: Lesson; courseName: string; courseId: string }>>([]);
   loadingSkill = signal(false);
@@ -72,13 +69,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   statsTotal = computed(() => ({
     courses: this.courses().length,
-    exams: this.exams().length,
+    exams: 0,
   }));
 
   ngOnInit() {
     this.courseService.getCourses().subscribe((c) => this.courses.set(c));
     this.newsService.getNewsList().subscribe((n) => this.news.set(n));
-    this.examService.getExams().subscribe((e) => this.exams.set(e));
     this.startTypingAnimation();
     this.startCursorBlink();
   }

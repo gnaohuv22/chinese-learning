@@ -1,10 +1,10 @@
-<div class="page-container">
+<div class="p-4 sm:p-6 w-full">
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.news' | translate }}</h1>
+    <h1 class="text-xl sm:text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.news' | translate }}</h1>
     @if (!showForm()) {
-      <button class="btn-primary" (click)="openForm()">
+      <button class="btn-primary text-sm" (click)="openForm()">
         <i class="fa-solid fa-plus"></i>
-        {{ 'common.create' | translate }}
+        <span class="hidden sm:inline">{{ 'common.create' | translate }}</span>
       </button>
     }
   </div>
@@ -21,25 +21,30 @@
 
   @if (loading()) {
     <div class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-700 border-t-transparent"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
     </div>
   } @else if (newsList().length === 0) {
-    <div class="card text-center py-12" style="color: var(--color-text-muted)">{{ 'admin.no_news' | translate }}</div>
+    <div class="card text-center py-12 text-sm" style="color: var(--color-text-muted)">{{ 'admin.no_news' | translate }}</div>
   } @else {
     <div class="space-y-3">
       @for (item of newsList(); track item.id) {
-        <div class="card flex items-start justify-between gap-4">
-          <div class="flex-1 min-w-0">
-            <h3 class="font-semibold" style="color: var(--color-text)">{{ item.title }}</h3>
+        <div class="card flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+          <!-- Text content -->
+          <div class="flex-1 min-w-0 overflow-hidden">
+            <h3 class="font-semibold truncate" style="color: var(--color-text)">{{ item.title }}</h3>
             <p class="text-sm mt-1 line-clamp-2" style="color: var(--color-text-muted)">{{ markdownExcerpt(item.content) }}</p>
             <p class="text-xs mt-1" style="color: var(--color-text-muted)">{{ item.publishedAt | date:'dd/MM/yyyy' }}</p>
           </div>
-          <div class="flex gap-2 flex-shrink-0">
-            <button class="btn-secondary text-xs py-1.5 px-3" (click)="editNews(item)">
-              <i class="fa-solid fa-pen-to-square text-xs"></i>{{ 'common.edit' | translate }}
+
+          <!-- Action buttons -->
+          <div class="flex gap-2 flex-shrink-0 self-end sm:self-start">
+            <button class="btn-secondary text-xs py-1.5 px-2.5 sm:px-3" (click)="editNews(item)">
+              <i class="fa-solid fa-pen-to-square text-xs"></i>
+              <span class="hidden sm:inline ml-1">{{ 'common.edit' | translate }}</span>
             </button>
-            <button class="btn-danger text-xs py-1.5 px-3" (click)="deleteNews(item)">
-              <i class="fa-solid fa-trash text-xs"></i>{{ 'common.delete' | translate }}
+            <button class="btn-danger text-xs py-1.5 px-2.5 sm:px-3" (click)="deleteNews(item)">
+              <i class="fa-solid fa-trash text-xs"></i>
+              <span class="hidden sm:inline ml-1">{{ 'common.delete' | translate }}</span>
             </button>
           </div>
         </div>

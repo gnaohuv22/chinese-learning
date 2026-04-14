@@ -1,5 +1,5 @@
 <div class="exercise-guided-writing space-y-4">
-  <p class="text-base font-medium text-gray-800">{{ exercise.prompt }}</p>
+  <p class="text-base font-medium" style="color: var(--color-text)">{{ exercise.prompt }}</p>
 
   <textarea
     [(ngModel)]="userText"
@@ -11,7 +11,9 @@
 
   @if (exercise.keywords && exercise.keywords.length > 0) {
     <div>
-      <p class="text-xs text-gray-500 mb-2">{{ 'exercise.keyword_hint' | translate }}</p>
+      <p class="text-xs mb-2" style="color: var(--color-text-muted);">
+        {{ 'exercise.keyword_hint' | translate }}
+      </p>
       <div class="flex flex-wrap gap-2">
         @for (kw of exercise.keywords; track kw) {
           <span
@@ -31,7 +33,7 @@
     </div>
   }
 
-  <div class="flex items-center justify-between text-sm text-gray-500">
+  <div class="flex items-center justify-between text-xs" style="color: var(--color-text-muted);">
     <span>{{ userText.length }} ký tự</span>
     <span>{{ usedKeywordsCount() }}/{{ exercise.keywords?.length ?? 0 }} từ khóa</span>
   </div>

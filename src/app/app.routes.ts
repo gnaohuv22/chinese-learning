@@ -28,6 +28,34 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'on-tap/:phan',
+    loadComponent: () =>
+      import('./portal/on-tap/on-tap-detail.component').then(
+        (m) => m.OnTapDetailComponent
+      ),
+  },
+  {
+    path: 'thi-thu',
+    loadComponent: () =>
+      import('./portal/mock-test/mock-test-list.component').then(
+        (m) => m.MockTestListComponent
+      ),
+  },
+  {
+    path: 'thi-thu/:testId',
+    loadComponent: () =>
+      import('./portal/mock-test/mock-test-summary.component').then(
+        (m) => m.MockTestSummaryComponent
+      ),
+  },
+  {
+    path: 'thi-thu/:testId/test',
+    loadComponent: () =>
+      import('./portal/mock-test/mock-test-exam.component').then(
+        (m) => m.MockTestExamComponent
+      ),
+  },
+  {
     path: 'exam/:examId',
     loadComponent: () =>
       import('./portal/exam/exam.component').then((m) => m.ExamComponent),
@@ -84,6 +112,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./admin/exams/admin-exams.component').then(
             (m) => m.AdminExamsComponent
+          ),
+      },
+      {
+        path: 'mock-tests',
+        loadComponent: () =>
+          import('./admin/mock-tests/admin-mock-tests.component').then(
+            (m) => m.AdminMockTestsComponent
           ),
       },
       {
