@@ -157,7 +157,8 @@
     "hoc_phan": "单元",
     "time_limit": "时间限制",
     "skills_covered": "技能",
-    "test_summary": "考试信息"
+    "test_summary": "考试信息",
+    "anonymous_participant": "匿名用户"
   },
   "news": {
     "title": "新闻",

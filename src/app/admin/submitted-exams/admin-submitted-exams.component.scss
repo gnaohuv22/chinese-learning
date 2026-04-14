@@ -1,0 +1,93 @@
+.page-title {
+  color: var(--color-text);
+}
+
+.page-subtitle {
+  color: var(--color-text-muted);
+}
+
+.tab-bar {
+  border-color: var(--color-border);
+}
+
+// Active tab indicator — toggled via [class.tab-active]
+.tab-active {
+  border-bottom-color: var(--color-primary) !important;
+  color: var(--color-primary);
+}
+
+.tab-inactive {
+  color: var(--color-text-muted);
+}
+
+.tab-badge {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  border-color: var(--color-primary);
+  border-top-color: transparent;
+}
+
+.empty-icon {
+  color: var(--color-text-muted);
+}
+
+.empty-state {
+  color: var(--color-text-muted);
+}
+
+// Score badge — base layout shared, variant class sets color
+.score-badge {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.score-high {
+  background: rgba(22, 163, 74, 0.15);
+  color: #16a34a;
+}
+
+.score-mid {
+  background: rgba(234, 88, 12, 0.15);
+  color: #ea580c;
+}
+
+.score-low {
+  background: rgba(220, 38, 38, 0.15);
+  color: #dc2626;
+}
+
+.participant-name {
+  color: var(--color-text);
+}
+
+.badge-mock {
+  background: rgba(126, 72, 10, 0.15);
+  color: var(--color-primary);
+}
+
+.submission-info {
+  color: var(--color-text-muted);
+}
+
+.detail-section {
+  border-color: var(--color-border);
+}
+
+.stat-box {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.stat-score {
+  color: var(--color-text);
+}

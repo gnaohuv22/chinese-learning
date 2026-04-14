@@ -1,9 +1,6 @@
 <!-- Compact floating timer -->
 @if (state() === 'running' && test()) {
-  <div
-    class="fixed top-20 right-4 z-40 flex flex-col items-center gap-1 p-2 rounded-2xl shadow-xl border"
-    style="background: #3a1b00; border-color: #7e480a; min-width: 64px;"
-  >
+  <div class="fixed top-20 right-4 z-40 flex flex-col items-center gap-1 p-2 rounded-2xl shadow-xl border timer-widget">
     <!-- SVG ring timer -->
     <svg width="44" height="44" viewBox="0 0 44 44">
       <circle
@@ -23,7 +20,7 @@
         {{ formatTime(timeLeft()) }}
       </text>
     </svg>
-    <span class="text-xs font-medium" style="color: #c8ac89;">{{ totalAnswered() }}/{{ totalExercises() }}</span>
+    <span class="text-xs font-medium timer-label">{{ totalAnswered() }}/{{ totalExercises() }}</span>
   </div>
 }
 
@@ -32,7 +29,7 @@
   <!-- Loading -->
   @if (state() === 'loading') {
     <div class="flex justify-center py-20">
-      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
     </div>
   }
 
@@ -42,14 +39,13 @@
     <div class="mb-6">
       <a
         [routerLink]="['/thi-thu', testId]"
-        class="inline-flex items-center gap-1.5 text-sm mb-4 transition-colors"
-        style="color: var(--color-text-muted);"
+        class="inline-flex items-center gap-1.5 text-sm mb-4 transition-colors back-link"
       >
         <i class="fa-solid fa-chevron-left text-xs"></i>
         {{ 'mock_test.back_to_list' | translate }}
       </a>
-      <h1 class="text-xl font-bold" style="color: var(--color-text);">{{ test()!.title }}</h1>
-      <p class="text-sm mt-0.5" style="color: var(--color-text-muted);">
+      <h1 class="text-xl font-bold page-title">{{ test()!.title }}</h1>
+      <p class="text-sm mt-0.5 page-subtitle">
         {{ 'hoc_phan.' + test()!.hocPhan | translate }}
       </p>
     </div>
@@ -61,18 +57,15 @@
           <button
             type="button"
             (click)="activeSection.set(section)"
-            class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold border transition-all"
-            [style.background]="activeSection() === section ? 'var(--color-primary)' : 'var(--color-bg-surface)'"
-            [style.color]="activeSection() === section ? '#efe7db' : 'var(--color-text-muted)'"
-            [style.border-color]="activeSection() === section ? 'var(--color-primary)' : 'var(--color-border)'"
+            class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold border transition-all section-tab"
+            [class.section-tab-active]="activeSection() === section"
           >
-            <span class="chip skill-{{ section }} text-xs !bg-transparent !p-0"
-              [style.color]="activeSection() === section ? '#efe7db' : ''"
-            >{{ 'skills.' + section | translate }}</span>
-            <span
-              class="text-xs px-1.5 py-0.5 rounded-full font-bold"
-              [style.background]="activeSection() === section ? 'rgba(255,255,255,0.2)' : 'var(--color-border)'"
-            >{{ answeredInSection(section) }}/{{ sectionExercises(section).length }}</span>
+            <span class="chip skill-{{ section }} text-xs !bg-transparent !p-0 section-tab-chip">
+              {{ 'skills.' + section | translate }}
+            </span>
+            <span class="text-xs px-1.5 py-0.5 rounded-full font-bold section-tab-badge">
+              {{ answeredInSection(section) }}/{{ sectionExercises(section).length }}
+            </span>
           </button>
         }
       }
@@ -83,11 +76,8 @@
       @for (ex of sectionExercises(activeSection()); track ex.id; let i = $index) {
         <div class="card">
           <div class="flex items-start gap-3 mb-3">
-            <span
-              class="w-7 h-7 rounded-full text-sm font-bold flex items-center justify-center flex-shrink-0"
-              style="background: var(--color-border); color: var(--color-text);"
-            >{{ i + 1 }}</span>
-            <p class="text-sm font-medium leading-relaxed flex-1" style="color: var(--color-text);">{{ ex.prompt }}</p>
+            <span class="w-7 h-7 rounded-full text-sm font-bold flex items-center justify-center flex-shrink-0 q-number">{{ i + 1 }}</span>
+            <p class="text-sm font-medium leading-relaxed flex-1 q-prompt">{{ ex.prompt }}</p>
           </div>
 
           <!-- MCQ options -->
@@ -97,13 +87,10 @@
                 <button
                   type="button"
                   (click)="setAnswer(ex.id, j.toString())"
-                  class="w-full text-left px-4 py-2.5 rounded-xl border text-sm transition-all"
-                  [style.border-color]="getAnswer(ex.id) === j.toString() ? 'var(--color-primary)' : 'var(--color-border)'"
-                  [style.background]="getAnswer(ex.id) === j.toString() ? 'rgba(126,72,10,0.12)' : 'var(--color-bg)'"
-                  [style.color]="getAnswer(ex.id) === j.toString() ? 'var(--color-primary)' : 'var(--color-text)'"
-                  [style.font-weight]="getAnswer(ex.id) === j.toString() ? '600' : '400'"
+                  class="w-full text-left px-4 py-2.5 rounded-xl border text-sm transition-all option-btn"
+                  [class.option-selected]="getAnswer(ex.id) === j.toString()"
                 >
-                  <span class="font-mono mr-2 text-xs" style="color: var(--color-text-muted);">{{ ['A','B','C','D'][j] }}.</span>
+                  <span class="font-mono mr-2 text-xs option-label">{{ ['A','B','C','D'][j] }}.</span>
                   {{ opt }}
                 </button>
               }
@@ -142,7 +129,7 @@
     <div class="max-w-2xl mx-auto">
       <!-- Auto-submit notice -->
       @if (wasAutoSubmitted()) {
-        <div class="mb-4 p-4 rounded-xl flex items-center gap-3 text-sm" style="background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid #fca5a5;">
+        <div class="mb-4 p-4 rounded-xl flex items-center gap-3 text-sm auto-submit-notice">
           <i class="fa-solid fa-clock-rotate-left flex-shrink-0"></i>
           {{ 'mock_test.auto_submitted' | translate }}
         </div>
@@ -150,32 +137,28 @@
 
       <!-- Score card -->
       <div class="card mb-6 text-center">
-        <h2 class="text-lg font-bold mb-4" style="color: var(--color-text);">{{ 'mock_test.result_title' | translate }}</h2>
-        <div
-          class="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-4 border-4"
-          style="border-color: var(--color-primary);"
-        >
+        <h2 class="text-lg font-bold mb-4 result-heading">{{ 'mock_test.result_title' | translate }}</h2>
+        <div class="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-4 border-4 score-ring">
           <div>
-            <div class="text-3xl font-bold" style="color: var(--color-primary);">{{ scorePercent() }}%</div>
-            <div class="text-xs" style="color: var(--color-text-muted);">{{ totalScore() }}/{{ totalExercises() }}</div>
+            <div class="text-3xl font-bold score-percent">{{ scorePercent() }}%</div>
+            <div class="text-xs score-detail">{{ totalScore() }}/{{ totalExercises() }}</div>
           </div>
         </div>
-        <p class="text-sm" style="color: var(--color-text-muted);">{{ 'mock_test.total_score' | translate }}</p>
+        <p class="text-sm score-detail">{{ 'mock_test.total_score' | translate }}</p>
       </div>
 
       <!-- Section results -->
       <div class="space-y-3 mb-6">
         @for (result of sectionResults(); track result.skill) {
           @if (result.total > 0) {
-            <div class="card" style="padding: 1rem 1.25rem;">
+            <div class="card section-result-card">
               <div class="flex items-center justify-between mb-2">
                 <span class="chip skill-{{ result.skill }} text-sm">{{ 'skills.' + result.skill | translate }}</span>
-                <span class="text-sm font-bold" style="color: var(--color-text);">{{ result.score }}/{{ result.total }}</span>
+                <span class="text-sm font-bold section-score">{{ result.score }}/{{ result.total }}</span>
               </div>
-              <div class="w-full h-2 rounded-full overflow-hidden" style="background: var(--color-border);">
+              <div class="w-full h-2 rounded-full overflow-hidden progress-track">
                 <div
-                  class="h-2 rounded-full transition-all duration-700"
-                  style="background: var(--color-primary);"
+                  class="h-2 rounded-full transition-all duration-700 progress-fill"
                   [style.width.%]="result.total > 0 ? (result.score / result.total) * 100 : 0"
                 ></div>
               </div>
@@ -188,7 +171,7 @@
       @for (result of sectionResults(); track result.skill) {
         @if (result.exercises.length > 0) {
           <div class="mb-6">
-            <h3 class="font-semibold mb-3 flex items-center gap-2" style="color: var(--color-text);">
+            <h3 class="font-semibold mb-3 flex items-center gap-2 review-heading">
               <span class="chip skill-{{ result.skill }}">{{ 'skills.' + result.skill | translate }}</span>
             </h3>
             <div class="space-y-3">
@@ -196,23 +179,22 @@
                 @let answer = result.answers[i];
                 @let isCorrect = checkAnswer(ex, answer.selected);
                 <div
-                  class="card text-sm"
-                  style="padding: 1rem;"
+                  class="card text-sm review-card"
                   [class.answer-correct]="isCorrect"
                   [class.answer-incorrect]="!isCorrect"
                 >
-                  <p class="font-medium mb-2" style="color: var(--color-text);">{{ i + 1 }}. {{ ex.prompt }}</p>
+                  <p class="font-medium mb-2 review-question">{{ i + 1 }}. {{ ex.prompt }}</p>
                   <div class="flex flex-wrap gap-4 text-xs">
                     <span>
-                      <span class="font-semibold" style="color: var(--color-text-muted);">{{ 'exam.your_answer' | translate }}:</span>
-                      <span class="ml-1" [style.color]="isCorrect ? '#16a34a' : '#dc2626'">
+                      <span class="font-semibold review-label">{{ 'exam.your_answer' | translate }}:</span>
+                      <span class="ml-1 font-medium" [class.correct-text]="isCorrect" [class.incorrect-text]="!isCorrect">
                         {{ answer.selected ? displayAnswer(ex, answer.selected) : ('exam.no_answer' | translate) }}
                       </span>
                     </span>
                     @if (!isCorrect) {
                       <span>
-                        <span class="font-semibold" style="color: var(--color-text-muted);">{{ 'exam.correct_answers' | translate }}:</span>
-                        <span class="ml-1 font-semibold text-green-700">{{ displayCorrectAnswer(ex) }}</span>
+                        <span class="font-semibold review-label">{{ 'exam.correct_answers' | translate }}:</span>
+                        <span class="ml-1 font-semibold correct-text">{{ displayCorrectAnswer(ex) }}</span>
                       </span>
                     }
                   </div>

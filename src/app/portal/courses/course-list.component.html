@@ -1,26 +1,20 @@
 <div class="page-container">
   <!-- Page header -->
   <div class="mb-8">
-    <h1 class="text-2xl sm:text-3xl font-bold mb-1" style="color: var(--color-text)">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-1 page-title">
       {{ 'course.all_courses' | translate }}
     </h1>
-    <p class="text-sm sm:text-base" style="color: var(--color-text-muted)">
+    <p class="text-sm sm:text-base page-subtitle">
       {{ 'course.choose_course' | translate }}
     </p>
   </div>
 
   @if (loading()) {
     <div class="flex justify-center py-20">
-      <div
-        class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent"
-        style="border-color: var(--color-primary); border-top-color: transparent;"
-      ></div>
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
     </div>
   } @else if (allCourses().length === 0) {
-    <div
-      class="card text-center py-20 text-sm"
-      style="color: var(--color-text-muted)"
-    >
+    <div class="card text-center py-20 text-sm empty-state">
       {{ 'course.no_courses' | translate }}
     </div>
   } @else {
@@ -28,18 +22,10 @@
       @for (course of courses(); track course.id) {
         <a
           [routerLink]="['/on-tap', course.order]"
-          class="group relative flex flex-col rounded-2xl overflow-hidden border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
-          style="
-            background: var(--color-bg-surface);
-            border-color: var(--color-border);
-            box-shadow: var(--color-card-shadow);
-          "
+          class="group relative flex flex-col rounded-2xl overflow-hidden border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl course-card"
         >
-          <!-- Colored top band -->
-          <div
-            class="h-1.5 w-full flex-shrink-0"
-            [style.background]="courseColor(course.order)"
-          ></div>
+          <!-- Colored top band (dynamic per course — kept as binding) -->
+          <div class="h-1.5 w-full flex-shrink-0" [style.background]="courseColor(course.order)"></div>
 
           <!-- Card body -->
           <div class="flex flex-col flex-1 p-4 sm:p-5 gap-3">
@@ -51,48 +37,30 @@
               >
                 {{ course.order }}
               </span>
-              <span
-                class="text-xs font-semibold px-2 py-0.5 rounded-full border"
-                style="color: var(--color-primary); border-color: var(--color-primary); background: transparent;"
-              >
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full border hsk-badge">
                 HSK {{ course.order + 1 }}-{{ course.order + 2 }}
               </span>
             </div>
 
             <!-- Title -->
-            <h2
-              class="text-sm sm:text-base font-semibold leading-snug line-clamp-2 transition-colors group-hover:opacity-80"
-              style="color: var(--color-text)"
-            >
+            <h2 class="text-sm sm:text-base font-semibold leading-snug line-clamp-2 transition-colors group-hover:opacity-80 card-title">
               {{ course.title }}
             </h2>
 
             <!-- Description -->
             @if (course.description) {
-              <p
-                class="text-xs sm:text-sm leading-relaxed line-clamp-3 flex-1"
-                style="color: var(--color-text-muted)"
-              >
+              <p class="text-xs sm:text-sm leading-relaxed line-clamp-3 flex-1 card-desc">
                 {{ course.description }}
               </p>
             }
           </div>
 
           <!-- Card footer -->
-          <div
-            class="px-4 sm:px-5 py-3 border-t flex items-center justify-between gap-2 mt-auto"
-            style="border-color: var(--color-border);"
-          >
-            <span
-              class="text-xs font-medium"
-              style="color: var(--color-text-muted)"
-            >
+          <div class="px-4 sm:px-5 py-3 border-t flex items-center justify-between gap-2 mt-auto card-footer">
+            <span class="text-xs font-medium footer-label">
               {{ 'hoc_phan.label' | translate : { n: course.order } }}
             </span>
-            <span
-              class="text-xs font-semibold flex items-center gap-1 transition-all group-hover:gap-2"
-              style="color: var(--color-primary)"
-            >
+            <span class="text-xs font-semibold flex items-center gap-1 transition-all group-hover:gap-2 start-link">
               {{ 'course.start' | translate }}
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </span>

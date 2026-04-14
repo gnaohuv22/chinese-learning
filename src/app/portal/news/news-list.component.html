@@ -1,12 +1,12 @@
 <div class="page-container">
-  <h1 class="text-2xl sm:text-3xl font-bold mb-8" style="color: var(--color-text)">{{ 'news.all_news' | translate }}</h1>
+  <h1 class="text-2xl sm:text-3xl font-bold mb-8 page-title">{{ 'news.all_news' | translate }}</h1>
 
   @if (loading()) {
     <div class="flex justify-center py-16">
       <div class="animate-spin rounded-full h-10 w-10 border-2 border-red-700 border-t-transparent"></div>
     </div>
   } @else if (allNews().length === 0) {
-    <div class="card text-center py-16" style="color: var(--color-text-muted)">{{ 'news.no_news' | translate }}</div>
+    <div class="card text-center py-16 empty-state">{{ 'news.no_news' | translate }}</div>
   } @else {
     <div class="space-y-4">
       @for (item of newsList(); track item.id) {
@@ -23,9 +23,9 @@
             </div>
           }
           <div class="flex-1 min-w-0">
-            <h2 class="font-semibold group-hover:text-red-700 transition-colors" style="color: var(--color-text)">{{ item.title }}</h2>
-            <p class="text-sm mt-1 line-clamp-3" style="color: var(--color-text-muted)">{{ markdownExcerpt(item.content) }}</p>
-            <p class="text-xs mt-2" style="color: var(--color-text-muted)">{{ item.publishedAt | date:'dd/MM/yyyy' }}</p>
+            <h2 class="font-semibold group-hover:text-red-700 transition-colors item-title">{{ item.title }}</h2>
+            <p class="text-sm mt-1 line-clamp-3 item-desc">{{ markdownExcerpt(item.content) }}</p>
+            <p class="text-xs mt-2 item-date">{{ item.publishedAt | date:'dd/MM/yyyy' }}</p>
           </div>
         </a>
       }

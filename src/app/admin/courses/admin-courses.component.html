@@ -1,6 +1,6 @@
 <div class="p-4 sm:p-6 w-full">
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-xl sm:text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.courses' | translate }}</h1>
+    <h1 class="text-xl sm:text-2xl font-bold page-title">{{ 'admin.courses' | translate }}</h1>
     @if (!showForm()) {
       <button class="btn-primary text-sm" (click)="openForm()">
         <i class="fa-solid fa-plus"></i>
@@ -11,16 +11,16 @@
 
   <!-- Inline create / edit card -->
   @if (showForm()) {
-    <div class="card animate-slide-up mb-6" style="border: 2px solid var(--color-primary);">
+    <div class="card animate-slide-up mb-6 form-panel">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base font-semibold" style="color: var(--color-text)">
+        <h2 class="text-base font-semibold form-heading">
           @if (editingCourse()) {
-            <i class="fa-solid fa-pen-to-square mr-2" style="color: var(--color-primary);"></i>{{ 'common.edit' | translate }} — {{ editingCourse()!.title }}
+            <i class="fa-solid fa-pen-to-square mr-2 icon-primary"></i>{{ 'common.edit' | translate }} — {{ editingCourse()!.title }}
           } @else {
-            <i class="fa-solid fa-plus mr-2" style="color: var(--color-primary);"></i>{{ 'common.create' | translate }} — {{ 'course.title' | translate }}
+            <i class="fa-solid fa-plus mr-2 icon-primary"></i>{{ 'common.create' | translate }} — {{ 'course.title' | translate }}
           }
         </h2>
-        <button type="button" (click)="closeForm()" class="hover:opacity-70 transition-opacity" style="color: var(--color-text-muted)">
+        <button type="button" (click)="closeForm()" class="hover:opacity-70 transition-opacity close-btn">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
@@ -35,7 +35,7 @@
           <textarea formControlName="description" class="form-input form-textarea" [placeholder]="'admin.description' | translate"></textarea>
         </div>
 
-        <div class="flex justify-end gap-3 pt-2 border-t" style="border-color: var(--color-border)">
+        <div class="flex justify-end gap-3 pt-2 border-t form-footer">
           <button type="button" class="btn-secondary" (click)="closeForm()">{{ 'common.cancel' | translate }}</button>
           <button type="submit" class="btn-primary" [disabled]="form.invalid || saving()">
             @if (saving()) {
@@ -51,12 +51,12 @@
 
   @if (loading()) {
     <div class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent spinner"></div>
     </div>
   } @else if (courses().length === 0) {
-    <div class="card text-center py-12 text-sm" style="color: var(--color-text-muted)">{{ 'course.no_courses' | translate }}</div>
+    <div class="card text-center py-12 text-sm empty-state">{{ 'course.no_courses' | translate }}</div>
   } @else {
-    <p class="text-xs mb-3 flex items-center gap-1" style="color: var(--color-text-muted)">
+    <p class="text-xs mb-3 flex items-center gap-1 drag-hint">
       <i class="fa-solid fa-grip-lines"></i>{{ 'admin.drag_to_reorder' | translate }}
     </p>
     <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3">
@@ -64,13 +64,13 @@
         <div cdkDrag class="card flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <!-- Drag handle + title row -->
           <div class="flex items-center gap-3 min-w-0 flex-1 w-full overflow-hidden">
-            <span cdkDragHandle class="drag-handle flex-shrink-0 cursor-grab" style="color: var(--color-text-muted);">
+            <span cdkDragHandle class="drag-handle flex-shrink-0 cursor-grab list-drag-handle">
               <i class="fa-solid fa-grip-vertical"></i>
             </span>
             <div class="min-w-0 overflow-hidden flex-1">
-              <h3 class="font-semibold truncate" style="color: var(--color-text)">{{ course.title }}</h3>
+              <h3 class="font-semibold truncate item-title">{{ course.title }}</h3>
               @if (course.description) {
-                <p class="text-sm truncate mt-0.5" style="color: var(--color-text-muted)">{{ course.description }}</p>
+                <p class="text-sm truncate mt-0.5 item-desc">{{ course.description }}</p>
               }
             </div>
           </div>
@@ -91,7 +91,7 @@
             </button>
           </div>
 
-          <div *cdkDragPlaceholder class="card h-14 border-dashed border-2" style="border-color: var(--color-border); background: transparent"></div>
+          <div *cdkDragPlaceholder class="card h-14 border-dashed border-2 drag-placeholder"></div>
         </div>
       }
     </div>

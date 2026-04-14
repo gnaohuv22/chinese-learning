@@ -26,10 +26,25 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Full-height flex shell — prevents body-level scrolling.
+   app-root acts as a flex column; main takes all remaining space. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   background-color: var(--color-bg);
   color: var(--color-text);
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Dark mode fade transition — applied globally */
@@ -150,6 +165,7 @@ router-outlet + * {
 .header-float-char {
   animation: floatChar linear infinite;
   pointer-events: none;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -179,9 +195,10 @@ router-outlet + * {
 
 /* Bottom nav pill buttons */
 .bottom-nav-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.96);
 }
 
+/* Active indicator — scoped to the inner button row, not the full nav height */
 .bottom-nav-active {
   background: rgba(200, 172, 137, 0.22) !important;
 }
@@ -403,15 +420,9 @@ html.dark .form-input:focus {
 /* Exercise result states */
 .answer-correct   { background: #dcfce7 !important; border-color: #16a34a !important; }
 .answer-incorrect { background: #fee2e2 !important; border-color: #dc2626 !important; }
+html.dark .answer-correct   { background: rgba(22, 163, 74, 0.18) !important; border-color: #16a34a !important; }
+html.dark .answer-incorrect { background: rgba(220, 38, 38, 0.18) !important; border-color: #dc2626 !important; }
 
-/* ── Cherry Markdown editor height overrides ────────────────────────────── */
-.cherry { height: 480px !important; }
-.cherry .cherry-content { height: calc(480px - 40px) !important; min-height: 0 !important; overflow: hidden; }
-.cherry .cherry-editor { height: 100% !important; min-height: 0 !important; }
-.cherry .cherry-editor .CodeMirror,
-.cherry .cherry-editor .CodeMirror-scroll { height: 100% !important; min-height: 0 !important; }
-.cherry .cherry-previewer { height: 100% !important; min-height: 0 !important; overflow-y: auto; }
-/* ─────────────────────────────────────────────────────────────────────────── */
 
 /* Drag handle cursor */
 .drag-handle {

@@ -1,0 +1,48 @@
+.page-title {
+  color: var(--color-text);
+}
+
+.page-subtitle {
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  border-color: var(--color-primary);
+  border-top-color: transparent;
+}
+
+.empty-state {
+  color: var(--color-text-muted);
+}
+
+.course-card {
+  background: var(--color-bg-surface);
+  border-color: var(--color-border);
+  box-shadow: var(--color-card-shadow);
+}
+
+.hsk-badge {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: transparent;
+}
+
+.card-title {
+  color: var(--color-text);
+}
+
+.card-desc {
+  color: var(--color-text-muted);
+}
+
+.card-footer {
+  border-color: var(--color-border);
+}
+
+.footer-label {
+  color: var(--color-text-muted);
+}
+
+.start-link {
+  color: var(--color-primary);
+}

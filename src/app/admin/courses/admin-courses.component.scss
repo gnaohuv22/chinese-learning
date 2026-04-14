@@ -1,0 +1,53 @@
+.page-title {
+  color: var(--color-text);
+}
+
+.form-panel {
+  border: 2px solid var(--color-primary);
+}
+
+.form-heading {
+  color: var(--color-text);
+}
+
+.icon-primary {
+  color: var(--color-primary);
+}
+
+.close-btn {
+  color: var(--color-text-muted);
+}
+
+.form-footer {
+  border-color: var(--color-border);
+}
+
+.spinner {
+  border-color: var(--color-primary);
+  border-top-color: transparent;
+}
+
+.empty-state {
+  color: var(--color-text-muted);
+}
+
+.drag-hint {
+  color: var(--color-text-muted);
+}
+
+.list-drag-handle {
+  color: var(--color-text-muted);
+}
+
+.item-title {
+  color: var(--color-text);
+}
+
+.item-desc {
+  color: var(--color-text-muted);
+}
+
+.drag-placeholder {
+  border-color: var(--color-border);
+  background: transparent;
+}

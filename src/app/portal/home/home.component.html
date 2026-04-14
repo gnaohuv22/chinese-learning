@@ -1,47 +1,44 @@
 <!-- Hero -->
-<section class="relative text-white overflow-hidden" style="background: linear-gradient(135deg, #3a1b00 0%, #7e480a 60%, #be9672 100%);">
+<section class="relative text-white overflow-hidden hero">
   <!-- Decorative background elements -->
   <div class="absolute inset-0 pointer-events-none select-none overflow-hidden">
-    <div class="absolute -top-16 -right-16 w-72 h-72 rounded-full opacity-10 blur-3xl" style="background: #c8ac89;"></div>
-    <div class="absolute bottom-0 -left-8 w-48 h-48 rounded-full opacity-15 blur-2xl" style="background: #3a1b00;"></div>
-    <!-- Floating Chinese characters in background -->
-    <span class="absolute text-8xl font-bold opacity-5 select-none" style="top: -10px; right: 8%; color: #efe7db;">汉</span>
-    <span class="absolute text-6xl font-bold opacity-5 select-none" style="bottom: 10%; left: 3%; color: #efe7db;">语</span>
-    <span class="absolute text-5xl font-bold opacity-5 select-none" style="top: 30%; right: 20%; color: #efe7db;">记</span>
+    <div class="absolute -top-16 -right-16 w-72 h-72 rounded-full opacity-10 blur-3xl hero-blob-top"></div>
+    <div class="absolute bottom-0 -left-8 w-48 h-48 rounded-full opacity-15 blur-2xl hero-blob-bottom"></div>
+    <!-- Floating Chinese characters -->
+    <span class="absolute text-8xl font-bold opacity-5 select-none hero-char" style="top: -10px; right: 8%;">汉</span>
+    <span class="absolute text-6xl font-bold opacity-5 select-none hero-char" style="bottom: 10%; left: 3%;">语</span>
+    <span class="absolute text-5xl font-bold opacity-5 select-none hero-char" style="top: 30%; right: 20%;">记</span>
   </div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative">
     <div class="max-w-2xl">
       <!-- Typing animation display -->
-      <div class="text-7xl sm:text-9xl font-bold mb-4 opacity-70 select-none leading-none tracking-tight h-24 sm:h-32 flex items-center" style="color: #efe7db;">
+      <div class="text-7xl sm:text-9xl font-bold mb-4 opacity-70 select-none leading-none tracking-tight h-24 sm:h-32 flex items-center hero-typed">
         <span>{{ typedText() }}</span><span [class.opacity-0]="!showCursor()" class="transition-opacity duration-100 ml-0.5">|</span>
       </div>
 
-      <h1 class="text-3xl sm:text-5xl font-bold leading-tight mb-2" style="color: #efe7db;">HÁN NGỮ KÝ</h1>
-      <p class="text-xl sm:text-2xl font-light mb-2 tracking-widest" style="color: #c8ac89;">汉语记</p>
-      <p class="text-base sm:text-lg mb-8" style="color: rgba(239,231,219,0.8);">{{ 'app.tagline' | translate }}</p>
+      <h1 class="text-3xl sm:text-5xl font-bold leading-tight mb-2 hero-title">HÁN NGỮ KÝ</h1>
+      <p class="text-xl sm:text-2xl font-light mb-2 tracking-widest hero-subtitle">汉语记</p>
+      <p class="text-base sm:text-lg mb-8 hero-tagline">{{ 'app.tagline' | translate }}</p>
 
       <div class="flex flex-wrap gap-3 mb-10">
         <a
           routerLink="/on-tap/1"
-          class="inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-xl transition-colors shadow-lg"
-          style="background: #efe7db; color: #3a1b00;"
+          class="inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-xl transition-colors shadow-lg hero-cta-primary"
         >
           <i class="fa-solid fa-book-open"></i>
           {{ 'nav.courses' | translate }}
         </a>
         <a
           routerLink="/thi-thu"
-          class="inline-flex items-center gap-2 px-6 py-3 font-medium rounded-xl transition-colors border"
-          style="border-color: rgba(200,172,137,0.5); color: #efe7db;"
+          class="inline-flex items-center gap-2 px-6 py-3 font-medium rounded-xl transition-colors border hero-cta-secondary"
         >
           <i class="fa-solid fa-file-pen"></i>
           {{ 'nav.mock_test' | translate }}
         </a>
         <a
           routerLink="/news"
-          class="inline-flex items-center gap-2 px-6 py-3 font-medium rounded-xl transition-colors border"
-          style="border-color: rgba(200,172,137,0.4); color: #efe7db;"
+          class="inline-flex items-center gap-2 px-6 py-3 font-medium rounded-xl transition-colors border hero-cta-tertiary"
         >
           <i class="fa-solid fa-newspaper"></i>
           {{ 'nav.news' | translate }}
@@ -50,18 +47,18 @@
 
       <!-- Stats bar -->
       @if (statsTotal().courses > 0 || statsTotal().exams > 0) {
-        <div class="flex flex-wrap gap-6 text-sm" style="color: #c8ac89;">
+        <div class="flex flex-wrap gap-6 text-sm hero-stats">
           @if (statsTotal().courses > 0) {
             <span class="flex items-center gap-1.5">
-              <i class="fa-solid fa-book-open text-xs" style="color: #be9672;"></i>
-              <strong style="color: #efe7db;">{{ statsTotal().courses }}</strong>
+              <i class="fa-solid fa-book-open text-xs hero-stats-icon"></i>
+              <strong class="hero-stats-value">{{ statsTotal().courses }}</strong>
               {{ 'home.stats_courses' | translate }}
             </span>
           }
           @if (statsTotal().exams > 0) {
             <span class="flex items-center gap-1.5">
-              <i class="fa-solid fa-file-pen text-xs" style="color: #be9672;"></i>
-              <strong style="color: #efe7db;">{{ statsTotal().exams }}</strong>
+              <i class="fa-solid fa-file-pen text-xs hero-stats-icon"></i>
+              <strong class="hero-stats-value">{{ statsTotal().exams }}</strong>
               {{ 'home.stats_exams' | translate }}
             </span>
           }
@@ -72,13 +69,13 @@
 </section>
 
 <!-- Skill cards -->
-<section class="border-b" style="background: var(--color-bg-surface); border-color: var(--color-border);">
+<section class="border-b skills-section">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="mb-6 text-center">
-      <h2 class="text-xl sm:text-2xl font-bold mb-1" style="color: var(--color-text)">
+      <h2 class="text-xl sm:text-2xl font-bold mb-1 section-heading">
         {{ 'home.skills_title' | translate }}
       </h2>
-      <p class="text-sm sm:text-base" style="color: var(--color-text-muted)">
+      <p class="text-sm sm:text-base section-subtitle">
         {{ 'home.skills_subtitle' | translate }}
       </p>
     </div>
@@ -88,18 +85,14 @@
         <button
           type="button"
           (click)="toggleSkill(skill.skill)"
-          class="flex flex-col items-center gap-2 p-5 rounded-2xl text-center transition-all cursor-pointer border-2 group"
-          [style.border-color]="activeSkill() === skill.skill ? 'var(--color-primary)' : 'transparent'"
-          [style.background]="activeSkill() === skill.skill ? 'rgba(126,72,10,0.08)' : 'var(--color-bg-surface)'"
+          class="flex flex-col items-center gap-2 p-5 rounded-2xl text-center transition-all cursor-pointer border-2 group skill-btn"
+          [class.skill-active]="activeSkill() === skill.skill"
           [class.shadow-md]="activeSkill() === skill.skill"
         >
-          <div
-            class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
-            [style.background]="activeSkill() === skill.skill ? 'rgba(126,72,10,0.15)' : 'var(--color-bg)'"
-          >
-            <i [class]="skill.icon + ' text-xl'" [style.color]="'var(--color-primary)'"></i>
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors skill-btn-icon">
+            <i [class]="skill.icon + ' text-xl icon-primary'"></i>
           </div>
-          <span class="text-sm font-semibold" style="color: var(--color-text)">{{ skill.key | translate }}</span>
+          <span class="text-sm font-semibold skill-btn-label">{{ skill.key | translate }}</span>
         </button>
       }
     </div>
@@ -108,22 +101,22 @@
     @if (activeSkill()) {
       <div class="mt-8 animate-slide-up">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold text-base" style="color: var(--color-text)">
+          <h3 class="font-semibold text-base skill-panel-heading">
             {{ 'home.lessons_for_skill' | translate }}:
-            <span class="ml-1" style="color: var(--color-primary);">{{ 'skills.' + activeSkill() | translate }}</span>
+            <span class="ml-1 skill-panel-name">{{ 'skills.' + activeSkill() | translate }}</span>
           </h3>
-          <button (click)="activeSkill.set(null); skillLessons.set([])" class="text-xs flex items-center gap-1 transition-colors" style="color: var(--color-text-muted)">
+          <button (click)="activeSkill.set(null); skillLessons.set([])" class="text-xs flex items-center gap-1 transition-colors skill-close-btn">
             <i class="fa-solid fa-xmark"></i>{{ 'common.close' | translate }}
           </button>
         </div>
 
         @if (loadingSkill()) {
           <div class="flex flex-col items-center py-10 gap-3">
-            <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
-            <p class="text-xs" style="color: var(--color-text-muted)">{{ 'common.loading' | translate }}</p>
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent spinner"></div>
+            <p class="text-xs skill-loading-text">{{ 'common.loading' | translate }}</p>
           </div>
         } @else if (skillLessons().length === 0) {
-          <p class="text-sm text-center py-8" style="color: var(--color-text-muted);">{{ 'home.no_lessons_skill' | translate }}</p>
+          <p class="text-sm text-center py-8 empty-state">{{ 'home.no_lessons_skill' | translate }}</p>
         } @else {
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             @for (item of skillLessons(); track item.lesson.id) {
@@ -132,8 +125,8 @@
                 [routerLink]="['/courses', item.courseId]"
                 class="card hover:shadow-md transition-all hover:-translate-y-0.5 group flex flex-col gap-1"
               >
-                <p class="text-xs" style="color: var(--color-text-muted)">{{ item.courseName }}</p>
-                <h4 class="font-medium text-sm transition-colors" style="color: var(--color-text)">{{ item.lesson.title }}</h4>
+                <p class="text-xs skill-lesson-course">{{ item.courseName }}</p>
+                <h4 class="font-medium text-sm transition-colors skill-lesson-title">{{ item.lesson.title }}</h4>
                 @if (result) {
                   <p class="text-xs text-green-600 mt-1">
                     <i class="fa-solid fa-check-circle mr-1"></i>{{ result.correct }}/{{ result.total }} {{ 'home.correct' | translate }}
@@ -151,32 +144,32 @@
 <!-- Latest modules (Học phần) -->
 <section class="page-container">
   <div class="flex items-center justify-between mb-5">
-    <h2 class="text-xl font-bold" style="color: var(--color-text)">{{ 'home.latest_courses' | translate }}</h2>
-    <a routerLink="/on-tap/1" class="text-sm font-medium flex items-center gap-1 transition-colors" style="color: var(--color-primary);">
+    <h2 class="text-xl font-bold section-title">{{ 'home.latest_courses' | translate }}</h2>
+    <a routerLink="/on-tap/1" class="text-sm font-medium flex items-center gap-1 transition-colors view-all-link">
       {{ 'common.view_all' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
     </a>
   </div>
 
   @if (courses().length === 0) {
-    <div class="text-center py-8" style="color: var(--color-text-muted)">{{ 'course.no_courses' | translate }}</div>
+    <div class="text-center py-8 empty-state">{{ 'course.no_courses' | translate }}</div>
   } @else {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       @for (course of courses().slice(0, 4); track course.id; let i = $index) {
         <a [routerLink]="['/on-tap', i + 1]" class="card hover:shadow-lg transition-all hover:-translate-y-0.5 group flex flex-col">
           <div class="flex items-start gap-3 flex-1">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-base" style="background: var(--color-primary); color: #efe7db;">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-base course-icon">
               {{ i + 1 }}
             </div>
             <div class="flex-1 min-w-0">
-              <div class="text-xs mb-0.5" style="color: var(--color-primary);">{{ 'hoc_phan.' + (i + 1) | translate }}</div>
-              <h3 class="font-semibold transition-colors text-sm" style="color: var(--color-text)">{{ course.title }}</h3>
+              <div class="text-xs mb-0.5 course-phan-label">{{ 'hoc_phan.' + (i + 1) | translate }}</div>
+              <h3 class="font-semibold transition-colors text-sm course-title">{{ course.title }}</h3>
               @if (course.description) {
-                <p class="text-xs mt-1 line-clamp-2" style="color: var(--color-text-muted)">{{ course.description }}</p>
+                <p class="text-xs mt-1 line-clamp-2 course-desc">{{ course.description }}</p>
               }
             </div>
           </div>
-          <div class="mt-4 pt-3 border-t flex items-center justify-end" style="border-color: var(--color-border)">
-            <span class="text-xs font-semibold flex items-center gap-1" style="color: var(--color-primary);">
+          <div class="mt-4 pt-3 border-t flex items-center justify-end course-card-footer">
+            <span class="text-xs font-semibold flex items-center gap-1 course-start-label">
               {{ 'home.start_learning' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
             </span>
           </div>
@@ -188,22 +181,22 @@
 
 <!-- Latest news -->
 @if (news().length > 0) {
-  <section class="py-8 sm:py-12" style="background: var(--color-bg-surface);">
+  <section class="py-8 sm:py-12 news-section">
     <div class="page-container">
       <div class="flex items-center justify-between mb-5">
-        <h2 class="text-xl font-bold" style="color: var(--color-text)">{{ 'home.latest_news' | translate }}</h2>
-        <a routerLink="/news" class="text-sm font-medium flex items-center gap-1 transition-colors" style="color: var(--color-primary);">
+        <h2 class="text-xl font-bold section-title">{{ 'home.latest_news' | translate }}</h2>
+        <a routerLink="/news" class="text-sm font-medium flex items-center gap-1 transition-colors view-all-link">
           {{ 'common.view_all' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
         </a>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         @for (item of news().slice(0, 2); track item.id) {
           <a [routerLink]="['/news', item.id]" class="card hover:shadow-lg transition-all hover:-translate-y-0.5 block group">
-            <h3 class="font-semibold transition-colors mb-2" style="color: var(--color-text)">{{ item.title }}</h3>
-            <p class="text-sm line-clamp-2 mb-3" style="color: var(--color-text-muted)">{{ markdownExcerpt(item.content) }}</p>
+            <h3 class="font-semibold transition-colors mb-2 news-title">{{ item.title }}</h3>
+            <p class="text-sm line-clamp-2 mb-3 news-excerpt">{{ markdownExcerpt(item.content) }}</p>
             <div class="flex items-center justify-between">
-              <p class="text-xs" style="color: var(--color-text-muted)">{{ item.publishedAt | date:'dd/MM/yyyy' }}</p>
-              <span class="text-xs font-medium flex items-center gap-1" style="color: var(--color-primary);">
+              <p class="text-xs news-date">{{ item.publishedAt | date:'dd/MM/yyyy' }}</p>
+              <span class="text-xs font-medium flex items-center gap-1 news-read-more">
                 {{ 'news.read_more' | translate }} <i class="fa-solid fa-arrow-right text-xs"></i>
               </span>
             </div>
@@ -215,8 +208,8 @@
 }
 
 <!-- Footer -->
-<footer class="border-t mt-4 py-6" style="background: var(--color-bg); border-color: var(--color-border)">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-sm" style="color: var(--color-text-muted)">
+<footer class="border-t mt-4 py-6 site-footer">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-sm footer-text">
     <span>HÁN NGỮ KÝ &copy; 2026</span>
     <a routerLink="/admin" class="hover:opacity-80 transition-opacity flex items-center gap-1">
       <i class="fa-solid fa-lock text-xs"></i>{{ 'nav.admin' | translate }}

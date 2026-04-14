@@ -27,6 +27,7 @@ const SKILL_OPTIONS: SkillOption[] = [
   standalone: true,
   imports: [RouterLink, TranslateModule],
   templateUrl: './on-tap-detail.component.html',
+  styleUrl: './on-tap-detail.component.scss',
 })
 export class OnTapDetailComponent implements OnInit, OnChanges {
   @Input({ required: true }) phan!: string;

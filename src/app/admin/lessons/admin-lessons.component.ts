@@ -16,6 +16,7 @@ import { ToastService } from '../../shared/components/toast/toast.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule, DragDropModule],
   templateUrl: './admin-lessons.component.html',
+  styleUrl: './admin-lessons.component.scss',
 })
 export class AdminLessonsComponent implements OnInit {
   @Input() courseId!: string;

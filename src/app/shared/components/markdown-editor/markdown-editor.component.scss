@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.cherry-editor-wrapper {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Dark mode overrides for the Cherry Markdown editor (third-party DOM) */
+:host ::ng-deep {
+  .cherry.dark .cherry-editor {
+    background: #1e293b;
+    color: #f1f5f9;
+  }
+
+  .cherry.dark .cherry-toolbar {
+    background: rgb(83, 87, 95);
+    border-color: #334155;
+  }
+
+  .cherry.dark .cherry-previewer {
+    background: #1e293b;
+    color: #f1f5f9;
+  }
+}

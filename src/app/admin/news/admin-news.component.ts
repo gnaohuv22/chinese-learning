@@ -75,11 +75,16 @@ export class AdminNewsComponent implements OnInit {
   }
 
   markdownExcerpt(content: string, maxLength = 150): string {
-    return content
+    const plain = content
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
       .replace(/[#*_`>[\]()!]/g, '')
-      .replace(/\n+/g, ' ')
-      .trim()
-      .slice(0, maxLength) + (content.length > maxLength ? '…' : '');
+      .replace(/\s+/g, ' ')
+      .trim();
+    return plain.slice(0, maxLength) + (plain.length > maxLength ? '…' : '');
   }
 
   async deleteNews(news: News) {

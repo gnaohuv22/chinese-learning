@@ -1,0 +1,43 @@
+.back-link {
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  border-color: var(--color-primary);
+  border-top-color: transparent;
+}
+
+.page-title {
+  color: var(--color-text);
+}
+
+// ─── Skill tab strip ─────────────────────────────────────────────────────────
+
+.skill-tabs {
+  border-color: var(--color-border);
+}
+
+.skill-tab {
+  border-bottom-color: transparent;
+  color: var(--color-text-muted);
+
+  &.tab-active {
+    border-bottom-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+}
+
+// ─── Question card ────────────────────────────────────────────────────────────
+
+.empty-state {
+  color: var(--color-text-muted);
+}
+
+.question-header {
+  border-color: var(--color-border);
+}
+
+.question-number {
+  background: var(--color-primary);
+  color: #efe7db;
+}

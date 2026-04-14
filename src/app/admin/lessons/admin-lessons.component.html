@@ -1,12 +1,12 @@
 <div class="p-4 sm:p-6 w-full">
   <!-- Page header -->
   <div class="flex items-center gap-3 mb-6">
-    <a routerLink="/admin/courses" class="hover:opacity-70 flex-shrink-0" style="color: var(--color-text-muted)">
+    <a routerLink="/admin/courses" class="hover:opacity-70 flex-shrink-0 back-link">
       <i class="fa-solid fa-chevron-left"></i>
     </a>
     <div class="min-w-0 flex-1 overflow-hidden">
-      <p class="text-xs truncate" style="color: var(--color-text-muted)">{{ course()?.title }}</p>
-      <h1 class="text-xl sm:text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.lessons' | translate }}</h1>
+      <p class="text-xs truncate breadcrumb">{{ course()?.title }}</p>
+      <h1 class="text-xl sm:text-2xl font-bold page-title">{{ 'admin.lessons' | translate }}</h1>
     </div>
     <button class="btn-primary text-sm flex-shrink-0 ml-auto" (click)="openForm()">
       <i class="fa-solid fa-plus"></i>
@@ -16,9 +16,9 @@
 
   @if (showForm()) {
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-      <div class="rounded-xl shadow-2xl w-full max-w-md" style="background: var(--color-bg-surface)">
+      <div class="rounded-xl shadow-2xl w-full max-w-md modal-panel">
         <div class="p-6">
-          <h2 class="text-lg font-semibold mb-4" style="color: var(--color-text)">
+          <h2 class="text-lg font-semibold mb-4 form-heading">
             {{ editingLesson() ? ('common.edit' | translate) : ('common.create' | translate) }}
             — {{ 'lesson.title' | translate }}
           </h2>
@@ -31,7 +31,7 @@
             <div class="form-field">
               <label class="form-label">{{ 'admin.skills' | translate }}</label>
               @if (loadingSkills()) {
-                <div class="flex items-center gap-2 mt-1 text-sm" style="color: var(--color-text-muted)">
+                <div class="flex items-center gap-2 mt-1 text-sm loading-skills">
                   <i class="fa-solid fa-spinner animate-spin"></i>{{ 'common.loading' | translate }}
                 </div>
               } @else if (derivedSkills().length > 0) {
@@ -41,7 +41,7 @@
                   }
                 </div>
               } @else {
-                <p class="text-xs mt-1" style="color: var(--color-text-muted)">
+                <p class="text-xs mt-1 loading-skills">
                   <i class="fa-solid fa-circle-info mr-1"></i>{{ 'admin.skills_auto_derived' | translate }}
                 </p>
               }
@@ -61,12 +61,12 @@
 
   @if (loading()) {
     <div class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent spinner"></div>
     </div>
   } @else if (lessons().length === 0) {
-    <div class="card text-center py-12 text-sm" style="color: var(--color-text-muted)">{{ 'lesson.no_lessons' | translate }}</div>
+    <div class="card text-center py-12 text-sm empty-state">{{ 'lesson.no_lessons' | translate }}</div>
   } @else {
-    <p class="text-xs mb-3 flex items-center gap-1" style="color: var(--color-text-muted)">
+    <p class="text-xs mb-3 flex items-center gap-1 drag-hint">
       <i class="fa-solid fa-grip-lines"></i>{{ 'admin.drag_to_reorder' | translate }}
     </p>
     <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3">
@@ -74,11 +74,11 @@
         <div cdkDrag class="card flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <!-- Drag handle + title -->
           <div class="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
-            <span cdkDragHandle class="drag-handle flex-shrink-0 cursor-grab" style="color: var(--color-text-muted);">
+            <span cdkDragHandle class="drag-handle flex-shrink-0 cursor-grab list-drag-handle">
               <i class="fa-solid fa-grip-vertical"></i>
             </span>
             <div class="min-w-0 overflow-hidden flex-1">
-              <h3 class="font-semibold truncate" style="color: var(--color-text)">{{ lesson.title }}</h3>
+              <h3 class="font-semibold truncate item-title">{{ lesson.title }}</h3>
               <div class="flex flex-wrap gap-1 mt-1">
                 @for (skill of lesson.skills; track skill) {
                   <span class="chip skill-{{ skill }} text-xs">{{ 'skills.' + skill | translate }}</span>
@@ -106,7 +106,7 @@
             </button>
           </div>
 
-          <div *cdkDragPlaceholder class="card h-14 border-dashed border-2" style="border-color: var(--color-border); background: transparent"></div>
+          <div *cdkDragPlaceholder class="card h-14 border-dashed border-2 drag-placeholder"></div>
         </div>
       }
     </div>

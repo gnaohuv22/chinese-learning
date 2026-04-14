@@ -38,6 +38,7 @@ interface SectionResult {
   standalone: true,
   imports: [CommonModule, RouterLink, TranslateModule],
   templateUrl: './exam.component.html',
+  styleUrl: './exam.component.scss',
 })
 export class ExamComponent implements OnInit, OnDestroy {
   @Input({ required: true }) examId!: string;

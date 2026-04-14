@@ -1,0 +1,131 @@
+// ─── Ready state ─────────────────────────────────────────────────────────────
+
+.page-title {
+  color: var(--color-text);
+}
+
+.exam-info {
+  color: var(--color-text-muted);
+}
+
+// ─── Sticky timer bar ─────────────────────────────────────────────────────────
+
+.timer-bar {
+  background: var(--color-bg-surface);
+  border-color: var(--color-border);
+}
+
+.timer-exam-title {
+  color: var(--color-text-muted);
+}
+
+// When timer is above warning thresholds its colour falls back to normal text
+.timer-normal {
+  color: var(--color-text);
+}
+
+.progress-track {
+  background: var(--color-border);
+}
+
+// ─── Section tabs ─────────────────────────────────────────────────────────────
+
+.section-tabs {
+  border-color: var(--color-border);
+}
+
+// Inactive tab (active variant uses Tailwind text-red-700 / border-red-700)
+.tab-inactive {
+  color: var(--color-text-muted);
+}
+
+// ─── Question card ────────────────────────────────────────────────────────────
+
+.question-header {
+  border-color: var(--color-border);
+}
+
+.question-number {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.question-prompt {
+  color: var(--color-text);
+}
+
+// ─── MCQ option label ─────────────────────────────────────────────────────────
+
+.option-label {
+  border-color: var(--color-border);
+  background: var(--color-bg-surface);
+
+  &.option-selected {
+    border-color: var(--color-primary);
+    background: rgba(126, 72, 10, 0.12);
+  }
+}
+
+.option-text {
+  color: var(--color-text);
+}
+
+// ─── Submit area ─────────────────────────────────────────────────────────────
+
+.answered-count {
+  color: var(--color-text-muted);
+}
+
+// Tooltip that appears when participant name is missing
+.submit-tooltip {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+// ─── Submitted / result state ─────────────────────────────────────────────────
+
+.auto-submit-note {
+  color: var(--color-primary);
+}
+
+.result-title {
+  color: var(--color-text);
+}
+
+.participant-name {
+  color: var(--color-text-muted);
+}
+
+.score-value {
+  color: var(--color-primary);
+}
+
+.score-label {
+  color: var(--color-text-muted);
+}
+
+.section-score {
+  color: var(--color-text);
+}
+
+.review-heading {
+  color: var(--color-text);
+}
+
+// ─── Per-question review ──────────────────────────────────────────────────────
+
+.answer-question {
+  color: var(--color-text);
+}
+
+.answer-label {
+  color: var(--color-text-muted);
+}
+
+.correct-text {
+  color: #16a34a;
+}
+
+.incorrect-text {
+  color: #dc2626;
+}

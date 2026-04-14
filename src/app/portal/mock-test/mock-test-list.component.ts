@@ -9,6 +9,7 @@ import { MockTest, HocPhan } from '../../core/models';
   standalone: true,
   imports: [RouterLink, TranslateModule],
   templateUrl: './mock-test-list.component.html',
+  styleUrl: './mock-test-list.component.scss',
 })
 export class MockTestListComponent implements OnInit {
   private mockTestService = inject(MockTestService);

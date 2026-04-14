@@ -4,15 +4,10 @@
     @for (n of hocPhanItems; track n) {
       <a
         [routerLink]="['/on-tap', n]"
-        class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all"
-        [style.background]="phanNumber() === n ? 'var(--color-primary)' : 'var(--color-bg-surface)'"
-        [style.color]="phanNumber() === n ? '#efe7db' : 'var(--color-text-muted)'"
-        [style.border-color]="phanNumber() === n ? 'var(--color-primary)' : 'var(--color-border)'"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all tab-btn"
+        [class.tab-active]="phanNumber() === n"
       >
-        <span
-          class="w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold"
-          [style.background]="phanNumber() === n ? 'rgba(255,255,255,0.2)' : 'var(--color-border)'"
-        >{{ n }}</span>
+        <span class="w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold tab-badge">{{ n }}</span>
         {{ 'hoc_phan.' + n | translate }}
       </a>
     }
@@ -20,41 +15,32 @@
 
   @if (loading()) {
     <div class="flex justify-center py-16">
-      <div
-        class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent"
-        style="border-color: var(--color-primary); border-top-color: transparent;"
-      ></div>
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
     </div>
   } @else if (notFound()) {
     <div class="card text-center py-16">
-      <div class="text-5xl mb-4" style="color: var(--color-border);">书</div>
-      <p class="text-lg font-semibold mb-2" style="color: var(--color-text);">{{ 'course.no_courses' | translate }}</p>
-      <p class="text-sm" style="color: var(--color-text-muted);">{{ 'course.choose_course' | translate }}</p>
+      <div class="text-5xl mb-4 not-found-char">书</div>
+      <p class="text-lg font-semibold mb-2 not-found-title">{{ 'course.no_courses' | translate }}</p>
+      <p class="text-sm not-found-subtitle">{{ 'course.choose_course' | translate }}</p>
     </div>
   } @else if (course()) {
     <!-- Course header card -->
-    <div class="card mb-6" style="border-left: 4px solid var(--color-primary);">
+    <div class="card mb-6 course-header-card">
       <div class="flex items-start gap-4">
-        <div
-          class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl font-bold flex-shrink-0"
-          style="background: var(--color-primary); color: #efe7db;"
-        >
+        <div class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl font-bold flex-shrink-0 course-number-badge">
           {{ phanNumber() }}
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2 mb-1">
-            <span
-              class="text-xs font-semibold px-2 py-0.5 rounded-full"
-              style="background: var(--color-border); color: var(--color-primary);"
-            >
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full course-label-badge">
               {{ 'hoc_phan.' + phanNumber() | translate }}
             </span>
           </div>
-          <h1 class="text-xl sm:text-2xl font-bold leading-tight" style="color: var(--color-text);">
+          <h1 class="text-xl sm:text-2xl font-bold leading-tight page-title">
             {{ course()!.title }}
           </h1>
           @if (course()!.description) {
-            <p class="mt-1.5 text-sm leading-relaxed" style="color: var(--color-text-muted);">
+            <p class="mt-1.5 text-sm leading-relaxed page-subtitle">
               {{ course()!.description }}
             </p>
           }
@@ -66,10 +52,10 @@
     <div>
       <!-- Section header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <h2 class="text-base font-semibold flex items-center gap-2" style="color: var(--color-text);">
-          <i class="fa-solid fa-list-ul text-sm" style="color: var(--color-primary);"></i>
+        <h2 class="text-base font-semibold flex items-center gap-2 section-heading">
+          <i class="fa-solid fa-list-ul text-sm section-icon"></i>
           {{ 'course.lessons' | translate }}
-          <span class="text-sm font-normal" style="color: var(--color-text-muted);">
+          <span class="text-sm font-normal lessons-count">
             ({{ filteredLessons().length }}{{ activeSkillFilter() !== 'all' ? '/' + lessons().length : '' }})
           </span>
         </h2>
@@ -80,10 +66,8 @@
             <button
               type="button"
               (click)="activeSkillFilter.set(opt.value)"
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all"
-              [style.background]="activeSkillFilter() === opt.value ? 'var(--color-primary)' : 'var(--color-bg-surface)'"
-              [style.color]="activeSkillFilter() === opt.value ? '#efe7db' : 'var(--color-text-muted)'"
-              [style.border-color]="activeSkillFilter() === opt.value ? 'var(--color-primary)' : 'var(--color-border)'"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all filter-btn"
+              [class.filter-active]="activeSkillFilter() === opt.value"
             >
               <i [class]="opt.icon + ' text-xs'"></i>
               {{ opt.labelKey | translate }}
@@ -93,8 +77,8 @@
       </div>
 
       @if (filteredLessons().length === 0) {
-        <div class="card text-center py-10" style="color: var(--color-text-muted);">
-          <i class="fa-solid fa-filter text-2xl mb-3 block" style="color: var(--color-border);"></i>
+        <div class="card text-center py-10 empty-state">
+          <i class="fa-solid fa-filter text-2xl mb-3 block empty-icon"></i>
           {{ 'lesson.no_lessons' | translate }}
         </div>
       } @else {
@@ -102,17 +86,13 @@
           @for (lesson of filteredLessons(); track lesson.id; let i = $index) {
             <a
               [routerLink]="['/courses', course()!.id, 'lessons', lesson.id]"
-              class="card flex items-center gap-4 hover:shadow-md transition-all hover:-translate-y-0.5 group"
-              style="padding: 1rem 1.25rem;"
+              class="card flex items-center gap-4 hover:shadow-md transition-all hover:-translate-y-0.5 group lesson-card"
             >
-              <div
-                class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-                style="background: var(--color-border); color: var(--color-text-muted);"
-              >
+              <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 lesson-number">
                 {{ lesson.order }}
               </div>
               <div class="flex-1 min-w-0">
-                <h3 class="font-medium transition-colors" style="color: var(--color-text);">
+                <h3 class="font-medium transition-colors lesson-title">
                   {{ lesson.title }}
                 </h3>
                 <div class="flex flex-wrap gap-1 mt-1">
@@ -121,10 +101,7 @@
                   }
                 </div>
               </div>
-              <i
-                class="fa-solid fa-chevron-right text-xs flex-shrink-0 transition-colors"
-                style="color: var(--color-text-muted);"
-              ></i>
+              <i class="fa-solid fa-chevron-right text-xs flex-shrink-0 transition-colors list-chevron"></i>
             </a>
           }
         </div>

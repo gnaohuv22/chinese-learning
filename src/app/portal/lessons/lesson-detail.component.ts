@@ -11,6 +11,7 @@ import { ExerciseRendererComponent } from '../../shared/exercises/exercise-rende
   standalone: true,
   imports: [RouterLink, TranslateModule, ExerciseRendererComponent],
   templateUrl: './lesson-detail.component.html',
+  styleUrl: './lesson-detail.component.scss',
 })
 export class LessonDetailComponent implements OnInit {
   @Input({ required: true }) courseId!: string;

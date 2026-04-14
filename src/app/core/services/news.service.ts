@@ -7,8 +7,8 @@ import { News, NewsCreatePayload } from '../models';
 export class NewsService extends FirestoreBaseService<News> {
   private readonly path = 'news';
 
-  getNewsList(): Observable<News[]> {
-    return this.getAll(this.path, 'publishedAt');
+  getNewsList(limitCount = 100): Observable<News[]> {
+    return this.getOnce(this.path, 'publishedAt', limitCount);
   }
 
   getNews(id: string): Observable<News | undefined> {

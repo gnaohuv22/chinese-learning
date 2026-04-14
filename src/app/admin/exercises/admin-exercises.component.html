@@ -1,12 +1,12 @@
 <div class="p-4 sm:p-6 w-full">
   <!-- Page header -->
   <div class="flex items-center gap-3 mb-6 flex-wrap">
-    <a [routerLink]="['/admin/courses', courseId, 'lessons']" class="hover:opacity-70 flex-shrink-0" style="color: var(--color-text-muted)">
+    <a [routerLink]="['/admin/courses', courseId, 'lessons']" class="hover:opacity-70 flex-shrink-0 back-link">
       <i class="fa-solid fa-chevron-left"></i>
     </a>
     <div class="min-w-0 flex-1 overflow-hidden">
-      <p class="text-xs truncate" style="color: var(--color-text-muted)">{{ lessonTitle() }}</p>
-      <h1 class="text-xl sm:text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.questions' | translate }}</h1>
+      <p class="text-xs truncate breadcrumb">{{ lessonTitle() }}</p>
+      <h1 class="text-xl sm:text-2xl font-bold page-title">{{ 'admin.questions' | translate }}</h1>
     </div>
     <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-auto">
       <label class="flex items-center gap-1.5 cursor-pointer select-none" [title]="'admin.shuffle_hint' | translate">
@@ -16,7 +16,7 @@
           (change)="shuffleDefault.set($any($event.target).checked)"
           class="rounded accent-amber-500"
         />
-        <span class="text-xs sm:text-sm flex items-center gap-1" style="color: var(--color-text)">
+        <span class="text-xs sm:text-sm flex items-center gap-1 shuffle-label">
           <i class="fa-solid fa-shuffle text-amber-500"></i>
           <span class="hidden sm:inline">{{ 'admin.shuffle' | translate }}</span>
         </span>
@@ -30,12 +30,12 @@
 
   @if (loading()) {
     <div class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent spinner"></div>
     </div>
   } @else {
     <!-- Question list with drag & drop -->
     @if (exercises().length > 0) {
-      <p class="text-xs mb-3 flex items-center gap-1" style="color: var(--color-text-muted)">
+      <p class="text-xs mb-3 flex items-center gap-1 drag-hint">
         <i class="fa-solid fa-grip-lines"></i>{{ 'admin.drag_to_reorder' | translate }}
       </p>
       <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3 mb-6">
@@ -44,7 +44,7 @@
             <div class="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
               <!-- Content row -->
               <div class="flex items-start gap-3 min-w-0 flex-1 overflow-hidden">
-                <span cdkDragHandle class="drag-handle mt-1 flex-shrink-0 cursor-grab" style="color: var(--color-text-muted)">
+                <span cdkDragHandle class="drag-handle mt-1 flex-shrink-0 cursor-grab list-drag-handle">
                   <i class="fa-solid fa-grip-vertical"></i>
                 </span>
                 <div class="flex-1 min-w-0 overflow-hidden">
@@ -60,7 +60,7 @@
                       </span>
                     }
                   </div>
-                  <p class="text-sm line-clamp-2" style="color: var(--color-text)">{{ ex.prompt }}</p>
+                  <p class="text-sm line-clamp-2 item-desc">{{ ex.prompt }}</p>
                 </div>
               </div>
 
@@ -76,22 +76,22 @@
                 </button>
               </div>
             </div>
-            <div *cdkDragPlaceholder class="h-16 border-dashed border-2 rounded-xl" style="border-color: var(--color-border); background: transparent"></div>
+            <div *cdkDragPlaceholder class="h-16 border-dashed border-2 rounded-xl drag-placeholder"></div>
           </div>
         }
       </div>
     } @else {
-      <div class="card text-center py-12 mb-6 text-sm" style="color: var(--color-text-muted)">{{ 'admin.no_questions' | translate }}</div>
+      <div class="card text-center py-12 mb-6 text-sm empty-state">{{ 'admin.no_questions' | translate }}</div>
     }
 
     <!-- Inline exercise form -->
     @if (showForm()) {
-      <div #formPanel class="card animate-slide-up mb-6" style="border: 2px solid var(--color-primary);">
+      <div #formPanel class="card animate-slide-up mb-6 form-panel">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-base sm:text-lg font-semibold" style="color: var(--color-text)">
+          <h2 class="text-base sm:text-lg font-semibold form-heading">
             {{ editingExercise() ? ('admin.edit_question' | translate) : ('admin.new_question' | translate) }}
           </h2>
-          <button type="button" (click)="closeForm()" class="hover:opacity-70" style="color: var(--color-text-muted)">
+          <button type="button" (click)="closeForm()" class="hover:opacity-70 close-btn">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
         </div>
@@ -160,7 +160,7 @@
             <div class="form-field" data-field="options">
               <div class="flex items-center justify-between">
                 <label class="form-label">{{ 'admin.options' | translate }} *</label>
-                <span class="text-xs" style="color: var(--color-text-muted)">{{ optionsArray.length }}/10</span>
+                <span class="text-xs options-count">{{ optionsArray.length }}/10</span>
               </div>
               <div formArrayName="options" class="space-y-2">
                 @for (opt of optionsArray.controls; track $index) {
@@ -190,7 +190,7 @@
             <div class="form-field">
               <label class="form-label">{{ 'admin.answer' | translate }}</label>
               @if (form.value.type === 'scramble') {
-                <p class="text-xs mb-1" style="color: var(--color-text-muted)">{{ 'admin.scramble_hint' | translate }}</p>
+                <p class="text-xs mb-1 scramble-hint">{{ 'admin.scramble_hint' | translate }}</p>
               }
               <input formControlName="answer" class="form-input" [placeholder]="'admin.answer_placeholder' | translate" />
             </div>
@@ -238,7 +238,7 @@
             </div>
           }
 
-          <div class="flex justify-end gap-3 pt-2 border-t" style="border-color: var(--color-border)">
+          <div class="flex justify-end gap-3 pt-2 border-t form-footer">
             <button type="button" class="btn-secondary" (click)="closeForm()">{{ 'common.cancel' | translate }}</button>
             <button type="submit" class="btn-primary" [disabled]="saving()">
               @if (saving()) {
