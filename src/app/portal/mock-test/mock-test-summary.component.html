@@ -1,0 +1,90 @@
+<div class="page-container max-w-2xl mx-auto">
+  <a
+    routerLink="/thi-thu"
+    class="inline-flex items-center gap-1.5 text-sm mb-6 transition-colors"
+    style="color: var(--color-text-muted);"
+  >
+    <i class="fa-solid fa-chevron-left text-xs"></i>
+    {{ 'mock_test.back_to_list' | translate }}
+  </a>
+
+  @if (loading()) {
+    <div class="flex justify-center py-20">
+      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+    </div>
+  } @else if (notFound()) {
+    <div class="card text-center py-16">
+      <p class="font-semibold" style="color: var(--color-text);">Không tìm thấy đề thi</p>
+    </div>
+  } @else if (test()) {
+    <div class="card">
+      <!-- Title section -->
+      <div class="flex items-start gap-4 mb-6">
+        <div
+          class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+          style="background: var(--color-primary);"
+        >
+          <i class="fa-solid fa-file-pen text-xl" style="color: #efe7db;"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full mb-2 inline-block" style="background: var(--color-border); color: var(--color-primary);">
+            {{ 'hoc_phan.' + test()!.hocPhan | translate }}
+          </span>
+          <h1 class="text-xl sm:text-2xl font-bold leading-tight" style="color: var(--color-text);">{{ test()!.title }}</h1>
+        </div>
+      </div>
+
+      @if (test()!.description) {
+        <div class="mb-6 p-4 rounded-xl text-sm leading-relaxed" style="background: var(--color-bg); color: var(--color-text);">
+          {{ test()!.description }}
+        </div>
+      }
+
+      <!-- Info grid -->
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <div class="p-4 rounded-xl text-center" style="background: var(--color-bg);">
+          <div class="text-2xl font-bold mb-1" style="color: var(--color-primary);">
+            {{ formatMinutes(test()!.timeLimitSeconds) }}
+          </div>
+          <div class="text-xs" style="color: var(--color-text-muted);">
+            {{ 'mock_test.minutes' | translate }}
+          </div>
+        </div>
+        <div class="p-4 rounded-xl text-center" style="background: var(--color-bg);">
+          <div class="text-2xl font-bold mb-1" style="color: var(--color-primary);">
+            {{ totalExercises() }}
+          </div>
+          <div class="text-xs" style="color: var(--color-text-muted);">
+            {{ 'mock_test.questions' | translate }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills covered -->
+      @if (skillSections().length > 0) {
+        <div class="mb-6">
+          <p class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: var(--color-text-muted);">
+            {{ 'mock_test.skills_covered' | translate }}
+          </p>
+          <div class="flex flex-wrap gap-2">
+            @for (section of skillSections(); track section.key) {
+              <span class="chip skill-{{ section.key }} text-sm flex items-center gap-1.5 px-3 py-1.5">
+                {{ 'skills.' + section.key | translate }}
+                <span class="font-bold">{{ section.count }}</span>
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Start button -->
+      <a
+        [routerLink]="['/thi-thu', testId, 'test']"
+        class="btn-primary w-full justify-center text-base py-3 rounded-xl"
+      >
+        <i class="fa-solid fa-play"></i>
+        {{ 'mock_test.start' | translate }}
+      </a>
+    </div>
+  }
+</div>

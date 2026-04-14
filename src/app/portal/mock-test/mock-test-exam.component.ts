@@ -1,0 +1,330 @@
+import {
+  Component,
+  inject,
+  signal,
+  computed,
+  OnInit,
+  OnDestroy,
+  Input,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { forkJoin } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { MockTestService } from '../../core/services/mock-test.service';
+import { ExerciseService } from '../../core/services/exercise.service';
+import { MockTest, Exercise, Skill } from '../../core/models';
+import { ModalService } from '../../shared/components/modal/modal.service';
+
+type TestState = 'loading' | 'running' | 'submitted';
+
+interface SectionAnswer {
+  exerciseId: string;
+  selected: string | null;
+}
+
+interface SectionResult {
+  skill: Skill;
+  exercises: Exercise[];
+  answers: SectionAnswer[];
+  score: number;
+  total: number;
+}
+
+const STORAGE_PREFIX = 'mock_test_progress_';
+
+@Component({
+  selector: 'app-mock-test-exam',
+  standalone: true,
+  imports: [CommonModule, RouterLink, TranslateModule],
+  templateUrl: './mock-test-exam.component.html',
+})
+export class MockTestExamComponent implements OnInit, OnDestroy {
+  @Input({ required: true }) testId!: string;
+
+  private mockTestService = inject(MockTestService);
+  private exerciseService = inject(ExerciseService);
+  private modalService = inject(ModalService);
+  private translate = inject(TranslateService);
+
+  state = signal<TestState>('loading');
+  test = signal<MockTest | null>(null);
+  exerciseMap = signal<Map<string, Exercise>>(new Map());
+  answerMap = signal<Map<string, string>>(new Map());
+  timeLeft = signal(0);
+  wasAutoSubmitted = signal(false);
+  activeSection = signal<Skill>('listening');
+  sectionResults = signal<SectionResult[]>([]);
+
+  sections: Skill[] = ['listening', 'speaking', 'reading', 'writing'];
+  private timerInterval: ReturnType<typeof setInterval> | null = null;
+
+  totalExercises = computed(() => {
+    const t = this.test();
+    if (!t) return 0;
+    return this.mockTestService.totalExercises(t);
+  });
+
+  totalAnswered = computed(() => this.answerMap().size);
+
+  timerPercent = computed(() => {
+    const total = this.test()?.timeLimitSeconds ?? 1;
+    return Math.max(0, (this.timeLeft() / total) * 100);
+  });
+
+  totalScore = computed(() =>
+    this.sectionResults().reduce((s, r) => s + r.score, 0)
+  );
+
+  scorePercent = computed(() => {
+    const total = this.totalExercises();
+    return total > 0 ? Math.round((this.totalScore() / total) * 100) : 0;
+  });
+
+  private get storageKey(): string {
+    return STORAGE_PREFIX + this.testId;
+  }
+
+  ngOnInit() {
+    this.loadTest();
+  }
+
+  private loadTest() {
+    this.mockTestService.getMockTest(this.testId).pipe(take(1)).subscribe({
+      next: (test) => {
+        if (!test) {
+          this.state.set('running');
+          return;
+        }
+        this.test.set(test);
+        this.loadExercises(test);
+      },
+      error: () => this.state.set('running'),
+    });
+  }
+
+  private loadExercises(test: MockTest) {
+    const allIds = [
+      ...test.sections.listening,
+      ...test.sections.speaking,
+      ...test.sections.reading,
+      ...test.sections.writing,
+    ];
+
+    if (allIds.length === 0) {
+      this.restoreProgress(test);
+      return;
+    }
+
+    const fetches = allIds.map((id) =>
+      this.exerciseService.getFlatExercise(id).pipe(take(1))
+    );
+
+    forkJoin(fetches).subscribe({
+      next: (exercises) => {
+        const map = new Map<string, Exercise>();
+        for (const ex of exercises) {
+          if (ex) map.set(ex.id, ex);
+        }
+        this.exerciseMap.set(map);
+        this.restoreProgress(test);
+      },
+      error: () => this.restoreProgress(test),
+    });
+  }
+
+  private restoreProgress(test: MockTest) {
+    try {
+      const saved = localStorage.getItem(this.storageKey);
+      if (saved) {
+        const { answers, timeLeft } = JSON.parse(saved) as {
+          answers: Array<[string, string]>;
+          timeLeft: number;
+        };
+        this.answerMap.set(new Map(answers));
+        this.timeLeft.set(timeLeft > 0 ? timeLeft : test.timeLimitSeconds);
+      } else {
+        this.timeLeft.set(test.timeLimitSeconds);
+      }
+    } catch {
+      this.timeLeft.set(test.timeLimitSeconds);
+    }
+
+    const firstSection = this.sections.find(
+      (s) => test.sections[s].length > 0
+    );
+    if (firstSection) this.activeSection.set(firstSection);
+
+    this.state.set('running');
+    this.startTimer();
+  }
+
+  private saveProgress() {
+    try {
+      const payload = {
+        answers: Array.from(this.answerMap().entries()),
+        timeLeft: this.timeLeft(),
+      };
+      localStorage.setItem(this.storageKey, JSON.stringify(payload));
+    } catch {
+      // Silently ignore storage errors
+    }
+  }
+
+  private clearProgress() {
+    try {
+      localStorage.removeItem(this.storageKey);
+    } catch {
+      // Silently ignore
+    }
+  }
+
+  private startTimer() {
+    this.timerInterval = setInterval(() => {
+      this.timeLeft.update((t) => {
+        if (t <= 1) {
+          this.clearTimer();
+          this.wasAutoSubmitted.set(true);
+          this.finalizeSubmit();
+          return 0;
+        }
+        const next = t - 1;
+        // Save progress every 5 seconds
+        if (next % 5 === 0) this.saveProgress();
+        return next;
+      });
+    }, 1000);
+  }
+
+  private clearTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  sectionExercises(section: Skill): Exercise[] {
+    const test = this.test();
+    if (!test) return [];
+    return test.sections[section]
+      .map((id) => this.exerciseMap().get(id))
+      .filter((e): e is Exercise => !!e);
+  }
+
+  answeredInSection(section: Skill): number {
+    return this.sectionExercises(section).filter((ex) =>
+      this.answerMap().has(ex.id)
+    ).length;
+  }
+
+  getAnswer(exerciseId: string): string | null {
+    return this.answerMap().get(exerciseId) ?? null;
+  }
+
+  setAnswer(exerciseId: string, value: string) {
+    this.answerMap.update((m) => {
+      const next = new Map(m);
+      next.set(exerciseId, value);
+      return next;
+    });
+    this.saveProgress();
+  }
+
+  async submitTest() {
+    const unanswered = this.totalExercises() - this.totalAnswered();
+    const confirmed = await this.modalService.confirm({
+      title: this.translate.instant('mock_test.confirm_submit_title'),
+      message: this.translate.instant('mock_test.confirm_submit_message', {
+        answered: this.totalAnswered(),
+        total: this.totalExercises(),
+      }),
+      type: unanswered > 0 ? 'warning' : 'info',
+      confirmLabel: this.translate.instant('mock_test.submit'),
+      cancelLabel: this.translate.instant('exam.continue'),
+    });
+    if (!confirmed) return;
+    this.clearTimer();
+    this.finalizeSubmit();
+  }
+
+  private finalizeSubmit() {
+    const results: SectionResult[] = this.sections.map((section) => {
+      const exercises = this.sectionExercises(section);
+      const answers: SectionAnswer[] = exercises.map((ex) => ({
+        exerciseId: ex.id,
+        selected: this.getAnswer(ex.id),
+      }));
+      const score = answers.filter((a, i) =>
+        this.checkAnswer(exercises[i], a.selected)
+      ).length;
+      return { skill: section, exercises, answers, score, total: exercises.length };
+    });
+
+    this.sectionResults.set(results);
+    this.clearProgress();
+    this.state.set('submitted');
+  }
+
+  checkAnswer(ex: Exercise, selected: string | null): boolean {
+    if (!selected) return false;
+    const answer = ex.answer;
+    if (typeof answer === 'string') {
+      const idx = parseInt(answer, 10);
+      if (!isNaN(idx)) return selected === idx.toString();
+      return selected.trim().toLowerCase() === answer.trim().toLowerCase();
+    }
+    return false;
+  }
+
+  displayAnswer(ex: Exercise, selected: string | null): string {
+    if (!selected) return '';
+    const idx = parseInt(selected, 10);
+    if (!isNaN(idx) && ex.options?.[idx]) return ex.options[idx];
+    return selected;
+  }
+
+  displayCorrectAnswer(ex: Exercise): string {
+    const answer = ex.answer;
+    if (typeof answer === 'string') {
+      const idx = parseInt(answer, 10);
+      if (!isNaN(idx) && ex.options?.[idx]) return ex.options[idx];
+      return answer;
+    }
+    if (Array.isArray(answer)) return answer.join(' ');
+    return '';
+  }
+
+  retake() {
+    this.clearTimer();
+    this.clearProgress();
+    this.answerMap.set(new Map());
+    this.sectionResults.set([]);
+    this.wasAutoSubmitted.set(false);
+    const test = this.test();
+    if (test) {
+      this.timeLeft.set(test.timeLimitSeconds);
+      const firstSection = this.sections.find((s) => test.sections[s].length > 0);
+      if (firstSection) this.activeSection.set(firstSection);
+      this.state.set('running');
+      this.startTimer();
+    }
+  }
+
+  formatTime(seconds: number): string {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  /** SVG circle circumference for timer ring (radius 18) */
+  readonly CIRCUMFERENCE = 2 * Math.PI * 18;
+
+  timerDashOffset = computed(
+    () => this.CIRCUMFERENCE * (1 - this.timerPercent() / 100)
+  );
+
+  ngOnDestroy() {
+    this.clearTimer();
+  }
+}

@@ -1,6 +1,10 @@
 <app-header />
-<main class="h-[calc(100vh-4rem)] overflow-y-auto scroll-container" style="background: var(--color-bg); color: var(--color-text)">
+<main
+  class="h-[calc(100vh-4rem)] overflow-y-auto scroll-container pb-24 md:pb-0"
+  style="background: var(--color-bg); color: var(--color-text)"
+>
   <router-outlet />
 </main>
+<app-bottom-nav />
 <app-confirm-modal />
 <app-toast />

@@ -11,11 +11,31 @@
         type="button"
         (click)="selectOption($index)"
         [disabled]="checked()"
-        class="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all"
-        [class]="getOptionClass($index)"
+        class="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all border-2 flex items-center gap-3"
+        [ngStyle]="optionStyle($index)"
       >
-        <span class="font-mono text-gray-500 mr-2">{{ optionLabel($index) }}.</span>
-        {{ option.text }}
+        <!-- Option label badge -->
+        <span
+          class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all"
+          [ngStyle]="{
+            background: optionState($index) === 'correct' ? '#16a34a'
+                      : optionState($index) === 'wrong'   ? '#dc2626'
+                      : optionState($index) === 'selected' ? 'var(--color-primary)'
+                      : 'var(--color-border)',
+            color: optionState($index) === 'neutral' ? 'var(--color-text-muted)' : '#fff'
+          }"
+        >{{ optionLabel($index) }}</span>
+
+        <span class="flex-1">{{ option.text }}</span>
+
+        <!-- Result icon -->
+        @if (checked()) {
+          @if (optionState($index) === 'correct') {
+            <i class="fa-solid fa-circle-check text-base flex-shrink-0" style="color: #16a34a;"></i>
+          } @else if (optionState($index) === 'wrong') {
+            <i class="fa-solid fa-circle-xmark text-base flex-shrink-0" style="color: #dc2626;"></i>
+          }
+        }
       </button>
     }
   </div>
@@ -25,22 +45,27 @@
       {{ 'exercise.check' | translate }}
     </button>
   } @else {
+    <!-- Result banner -->
     <div
-      class="flex items-start gap-2 p-3 rounded-lg text-sm"
-      [class.bg-green-50]="isCorrect()"
-      [class.bg-red-50]="!isCorrect()"
+      class="flex items-start gap-2 p-3 rounded-lg text-sm border"
+      [style.background]="isCorrect() ? 'rgba(22,163,74,0.1)' : 'rgba(220,38,38,0.1)'"
+      [style.border-color]="isCorrect() ? '#16a34a' : '#dc2626'"
     >
       @if (isCorrect()) {
-        <i class="fa-solid fa-circle-check text-green-600 mt-0.5"></i>
-        <span class="text-green-700 font-medium">{{ 'exercise.correct' | translate }}</span>
+        <i class="fa-solid fa-circle-check mt-0.5 flex-shrink-0" style="color: #16a34a;"></i>
+        <span class="font-semibold" style="color: #15803d;">{{ 'exercise.correct' | translate }}</span>
       } @else {
-        <i class="fa-solid fa-circle-xmark text-red-500 mt-0.5"></i>
-        <span class="text-red-700">
+        <i class="fa-solid fa-circle-xmark mt-0.5 flex-shrink-0" style="color: #dc2626;"></i>
+        <span style="color: #dc2626;">
           {{ 'exercise.incorrect' | translate }}
           <strong>{{ correctOptionText() }}</strong>
         </span>
       }
     </div>
-    <button class="btn-secondary text-sm" (click)="reset()">{{ 'exercise.retry' | translate }}</button>
+
+    <button class="btn-secondary text-sm" (click)="reset()">
+      <i class="fa-solid fa-rotate-left text-xs"></i>
+      {{ 'exercise.retry' | translate }}
+    </button>
   }
 </div>

@@ -9,6 +9,9 @@ interface ShuffledOption {
   originalIndex: number;
 }
 
+/** Per-option visual state after checking */
+type OptionState = 'neutral' | 'selected' | 'correct' | 'wrong' | 'faded';
+
 @Component({
   selector: 'app-exercise-mcq',
   standalone: true,
@@ -29,8 +32,7 @@ export class McqComponent implements OnInit {
   private buildOptions() {
     const opts = (this.exercise.options ?? []).map((text, idx) => ({ text, originalIndex: idx }));
     if (this.exercise.shuffle) {
-      const shuffled = [...opts].sort(() => Math.random() - 0.5);
-      this.displayOptions.set(shuffled);
+      this.displayOptions.set([...opts].sort(() => Math.random() - 0.5));
     } else {
       this.displayOptions.set(opts);
     }
@@ -62,11 +64,16 @@ export class McqComponent implements OnInit {
     return -1;
   }
 
+  private getDisplayCorrectIdx(): number {
+    return this.displayOptions().findIndex(
+      (o) => o.originalIndex === this.getCorrectOriginalIndex()
+    );
+  }
+
   isCorrect(): boolean {
     const selected = this.selectedIndex();
     if (selected === null) return false;
-    const selectedOriginal = this.displayOptions()[selected]?.originalIndex ?? -1;
-    return selectedOriginal === this.getCorrectOriginalIndex();
+    return this.displayOptions()[selected]?.originalIndex === this.getCorrectOriginalIndex();
   }
 
   correctOptionText(): string {
@@ -78,24 +85,50 @@ export class McqComponent implements OnInit {
     return String.fromCharCode(65 + i);
   }
 
-  getOptionClass(i: number): string {
-    const base = 'border-2 ';
+  optionState(i: number): OptionState {
     if (!this.checked()) {
-      return (
-        base +
-        (this.selectedIndex() === i
-          ? 'border-red-500 bg-red-50'
-          : 'border-gray-200 bg-white hover:border-gray-300')
-      );
+      return this.selectedIndex() === i ? 'selected' : 'neutral';
     }
+    const displayCorrectIdx = this.getDisplayCorrectIdx();
+    if (i === displayCorrectIdx) return 'correct';
+    if (i === this.selectedIndex()) return 'wrong';
+    return 'faded';
+  }
 
-    const correctOrig = this.getCorrectOriginalIndex();
-    const displayCorrectIdx = this.displayOptions().findIndex(
-      (o) => o.originalIndex === correctOrig
-    );
-
-    if (i === displayCorrectIdx) return base + 'border-green-500 bg-green-50';
-    if (i === this.selectedIndex() && i !== displayCorrectIdx) return base + 'border-red-500 bg-red-50';
-    return base + 'border-gray-200 bg-white opacity-50';
+  optionStyle(i: number): Record<string, string> {
+    const state = this.optionState(i);
+    switch (state) {
+      case 'selected':
+        return {
+          background: 'rgba(126, 72, 10, 0.12)',
+          borderColor: 'var(--color-primary)',
+          color: 'var(--color-text)',
+        };
+      case 'correct':
+        return {
+          background: 'rgba(22, 163, 74, 0.14)',
+          borderColor: '#16a34a',
+          color: '#15803d',
+        };
+      case 'wrong':
+        return {
+          background: 'rgba(220, 38, 38, 0.14)',
+          borderColor: '#dc2626',
+          color: '#dc2626',
+        };
+      case 'faded':
+        return {
+          background: 'var(--color-bg-surface)',
+          borderColor: 'var(--color-border)',
+          color: 'var(--color-text-muted)',
+          opacity: '0.45',
+        };
+      default:
+        return {
+          background: 'var(--color-bg-surface)',
+          borderColor: 'var(--color-border)',
+          color: 'var(--color-text)',
+        };
+    }
   }
 }
