@@ -30,6 +30,7 @@ const NAV_ITEMS = [
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule],
   templateUrl: './admin-layout.component.html',
+  styleUrl: './admin-layout.component.scss',
 })
 export class AdminLayoutComponent {
   navItems = NAV_ITEMS;

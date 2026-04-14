@@ -5,12 +5,14 @@ import {
   OnInit,
   OnDestroy,
   computed,
+  DestroyRef,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { forkJoin, of, switchMap } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CourseService } from '../../core/services/course.service';
 import { NewsService } from '../../core/services/news.service';
 import { LessonService } from '../../core/services/lesson.service';
@@ -38,11 +40,13 @@ export interface PracticeResult {
   standalone: true,
   imports: [CommonModule, RouterLink, TranslateModule, DatePipe],
   templateUrl: './home.component.html',
+  styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private courseService = inject(CourseService);
   private newsService = inject(NewsService);
   private lessonService = inject(LessonService);
+  private destroyRef = inject(DestroyRef);
 
   courses = signal<Course[]>([]);
   news = signal<News[]>([]);
@@ -73,8 +77,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   }));
 
   ngOnInit() {
-    this.courseService.getCourses().subscribe((c) => this.courses.set(c));
-    this.newsService.getNewsList().subscribe((n) => this.news.set(n));
+    this.courseService.getCourses()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((c) => this.courses.set(c));
+    this.newsService.getNewsList()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((n) => this.news.set(n));
     this.startTypingAnimation();
     this.startCursorBlink();
   }
@@ -175,11 +183,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   markdownExcerpt(content: string, maxLength = 120): string {
-    // Strip markdown syntax for list preview
-    return content
+    const plain = content
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
       .replace(/[#*_`>[\]()!]/g, '')
-      .replace(/\n+/g, ' ')
-      .trim()
-      .slice(0, maxLength) + (content.length > maxLength ? '…' : '');
+      .replace(/\s+/g, ' ')
+      .trim();
+    return plain.slice(0, maxLength) + (plain.length > maxLength ? '…' : '');
   }
 }

@@ -10,6 +10,7 @@ import { MockTest } from '../../core/models';
   standalone: true,
   imports: [RouterLink, TranslateModule],
   templateUrl: './mock-test-summary.component.html',
+  styleUrl: './mock-test-summary.component.scss',
 })
 export class MockTestSummaryComponent implements OnInit {
   @Input({ required: true }) testId!: string;

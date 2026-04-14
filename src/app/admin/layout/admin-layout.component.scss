@@ -1,0 +1,53 @@
+// Admin sidebar is intentionally always dark, independent of the app theme.
+// These SCSS variables map to the design-system tokens for the dark palette.
+$sidebar-bg:        #3a1b00;
+$sidebar-border:    #7e480a;
+$sidebar-label:     #c8ac89;
+$sidebar-title:     #efe7db;
+$sidebar-back-link: #be9672;
+$burger-bg:         #7e480a;
+$burger-color:      #efe7db;
+$burger-border:     #be9672;
+
+.admin-sidebar {
+  background: $sidebar-bg;
+}
+
+.admin-sidebar-divider {
+  border-color: $sidebar-border;
+}
+
+.admin-sidebar-label {
+  color: $sidebar-label;
+}
+
+.admin-sidebar-title {
+  color: $sidebar-title;
+}
+
+.admin-sidebar-back-link {
+  color: $sidebar-back-link;
+}
+
+.admin-nav-item {
+  color: $sidebar-label;
+}
+
+.admin-burger-btn {
+  background: $burger-bg;
+  color: $burger-color;
+  border-color: $burger-border;
+}
+
+.admin-burger-wrapper {
+  transition: opacity 0.3s, visibility 0.3s;
+
+  &.hidden-sidebar-open {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.admin-main {
+  background: var(--color-bg);
+}

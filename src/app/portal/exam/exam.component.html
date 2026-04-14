@@ -12,11 +12,11 @@
         <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="fa-solid fa-file-lines text-red-700 text-2xl"></i>
         </div>
-        <h1 class="text-2xl font-bold mb-2" style="color: var(--color-text)">{{ exam()?.title }}</h1>
-        <p class="mb-1" style="color: var(--color-text-muted)">
+        <h1 class="text-2xl font-bold mb-2 page-title">{{ exam()?.title }}</h1>
+        <p class="mb-1 exam-info">
           {{ totalExercises() }} {{ 'exam.questions_count' | translate }}
         </p>
-        <p class="mb-6" style="color: var(--color-text-muted)">
+        <p class="mb-6 exam-info">
           {{ 'exam.time_limit' | translate }}: <strong>{{ formatTime(exam()?.timeLimitSeconds ?? 0) }}</strong>
         </p>
 
@@ -47,22 +47,19 @@
 
     @case ('running') {
       <!-- Sticky timer bar -->
-      <div
-        class="sticky top-16 z-30 -mx-4 px-4 sm:-mx-6 sm:px-6 border-b shadow-sm py-3"
-        style="background: var(--color-bg-surface); border-color: var(--color-border)"
-      >
+      <div class="sticky top-16 z-30 -mx-4 px-4 sm:-mx-6 sm:px-6 border-b shadow-sm py-3 timer-bar">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm font-medium" style="color: var(--color-text-muted)">{{ exam()?.title }}</span>
+          <span class="text-sm font-medium timer-exam-title">{{ exam()?.title }}</span>
           <span
             class="font-mono font-bold text-lg"
             [class.text-red-600]="timeLeft() <= 60"
             [class.text-orange-500]="timeLeft() > 60 && timeLeft() <= 300"
-            [style.color]="timeLeft() > 300 ? 'var(--color-text)' : null"
+            [class.timer-normal]="timeLeft() > 300"
           >
             {{ formatTime(timeLeft()) }}
           </span>
         </div>
-        <div class="w-full rounded-full h-1.5" style="background: var(--color-border)">
+        <div class="w-full rounded-full h-1.5 progress-track">
           <div
             class="h-1.5 rounded-full transition-all duration-1000"
             [class.bg-red-600]="timerPercent() < 20"
@@ -74,7 +71,7 @@
       </div>
 
       <!-- Section tabs -->
-      <div class="flex gap-1 mt-4 mb-6 overflow-x-auto border-b" style="border-color: var(--color-border)">
+      <div class="flex gap-1 mt-4 mb-6 overflow-x-auto border-b section-tabs">
         @for (section of sections; track section) {
           @if (sectionExercises(section).length > 0) {
             <button
@@ -83,7 +80,7 @@
               [class.border-red-700]="activeSection() === section"
               [class.text-red-700]="activeSection() === section"
               [class.border-transparent]="activeSection() !== section"
-              [style.color]="activeSection() !== section ? 'var(--color-text-muted)' : null"
+              [class.tab-inactive]="activeSection() !== section"
             >
               {{ 'skills.' + section | translate }}
               <span class="ml-1 text-xs opacity-70">
@@ -98,26 +95,19 @@
       <div class="space-y-6">
         @for (ex of sectionExercises(activeSection()); track ex.id; let i = $index) {
           <div class="card">
-            <div class="flex items-center gap-2 mb-4 pb-3 border-b" style="border-color: var(--color-border)">
-              <span
-                class="w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0"
-                style="background: var(--color-border); color: var(--color-text-muted)"
-              >
+            <div class="flex items-center gap-2 mb-4 pb-3 border-b question-header">
+              <span class="w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0 question-number">
                 {{ i + 1 }}
               </span>
-              <span class="text-sm" style="color: var(--color-text)">{{ ex.prompt }}</span>
+              <span class="text-sm question-prompt">{{ ex.prompt }}</span>
             </div>
 
             @if (ex.options && ex.options.length > 0) {
               <div class="space-y-2">
                 @for (opt of ex.options; track $index) {
                   <label
-                    class="flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors"
-                    [class.border-red-500]="getAnswer(ex.id) === $index.toString()"
-                    [class.bg-red-50]="getAnswer(ex.id) === $index.toString()"
-                    [class.border-gray-200]="getAnswer(ex.id) !== $index.toString()"
-                    [style.border-color]="getAnswer(ex.id) !== $index.toString() ? 'var(--color-border)' : null"
-                    [style.background]="getAnswer(ex.id) === $index.toString() ? 'rgba(185,28,28,0.08)' : 'var(--color-bg-surface)'"
+                    class="flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors option-label"
+                    [class.option-selected]="getAnswer(ex.id) === $index.toString()"
                   >
                     <input
                       type="radio"
@@ -127,7 +117,7 @@
                       (change)="setAnswer(ex.id, $index.toString())"
                       class="accent-red-700"
                     />
-                    <span class="text-sm" style="color: var(--color-text)">{{ opt }}</span>
+                    <span class="text-sm option-text">{{ opt }}</span>
                   </label>
                 }
               </div>
@@ -146,7 +136,7 @@
 
       <!-- Submit button -->
       <div class="mt-8 flex flex-col items-center gap-2 pb-8">
-        <p class="text-xs" style="color: var(--color-text-muted)">
+        <p class="text-xs answered-count">
           {{ totalAnswered() }}/{{ totalExercises() }} {{ 'exam.answered' | translate }}
         </p>
         <div class="relative group">
@@ -160,10 +150,7 @@
             {{ 'exam.submit' | translate }}
           </button>
           @if (!participantName().trim()) {
-            <span
-              class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
-              style="background: var(--color-text); color: var(--color-bg)"
-            >
+            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity submit-tooltip">
               {{ 'exam.name_required' | translate }}
             </span>
           }
@@ -176,18 +163,18 @@
         <!-- Result summary -->
         <div class="card text-center">
           @if (wasAutoSubmitted()) {
-            <p class="text-sm font-medium text-orange-500 mb-2">
+            <p class="text-sm font-medium mb-2 auto-submit-note">
               <i class="fa-solid fa-clock mr-1"></i>{{ 'exam.auto_submit' | translate }}
             </p>
           }
-          <h1 class="text-2xl font-bold mb-2" style="color: var(--color-text)">
+          <h1 class="text-2xl font-bold mb-2 result-title">
             {{ 'exam.result_title' | translate }}
           </h1>
           @if (participantName()) {
-            <p class="text-sm mb-2" style="color: var(--color-text-muted)">{{ participantName() }}</p>
+            <p class="text-sm mb-2 participant-name">{{ participantName() }}</p>
           }
-          <div class="text-5xl font-bold text-red-700 my-4">{{ totalScore() }}/{{ totalExercises() }}</div>
-          <p style="color: var(--color-text-muted)">{{ 'exam.total_score' | translate }}: {{ scorePercent() | number:'1.0-0' }}%</p>
+          <div class="text-5xl font-bold my-4 score-value">{{ totalScore() }}/{{ totalExercises() }}</div>
+          <p class="score-label">{{ 'exam.total_score' | translate }}: {{ scorePercent() | number:'1.0-0' }}%</p>
         </div>
 
         <!-- Per-section grid -->
@@ -196,7 +183,7 @@
             @if (result.total > 0) {
               <div class="card text-center p-4">
                 <span class="chip skill-{{ result.skill }} mb-2 inline-block">{{ 'skills.' + result.skill | translate }}</span>
-                <div class="text-2xl font-bold" style="color: var(--color-text)">{{ result.score }}/{{ result.total }}</div>
+                <div class="text-2xl font-bold section-score">{{ result.score }}/{{ result.total }}</div>
               </div>
             }
           }
@@ -206,7 +193,7 @@
         @for (result of sectionResults(); track result.skill) {
           @if (result.exercises.length > 0) {
             <div class="card">
-              <h3 class="font-semibold mb-4 flex items-center gap-2" style="color: var(--color-text)">
+              <h3 class="font-semibold mb-4 flex items-center gap-2 review-heading">
                 <span class="chip skill-{{ result.skill }}">{{ 'skills.' + result.skill | translate }}</span>
                 {{ result.score }}/{{ result.total }}
               </h3>
@@ -216,22 +203,21 @@
                   @let isRight = checkAnswer(ex, ans.selected);
                   <div
                     class="p-3 rounded-lg border"
-                    [class.border-green-300]="isRight"
-                    [class.border-red-300]="!isRight"
-                    [style.background]="isRight ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)'"
+                    [class.answer-correct]="isRight"
+                    [class.answer-incorrect]="!isRight"
                   >
-                    <p class="text-sm font-medium mb-2" style="color: var(--color-text)">{{ i + 1 }}. {{ ex.prompt }}</p>
+                    <p class="text-sm font-medium mb-2 answer-question">{{ i + 1 }}. {{ ex.prompt }}</p>
                     <div class="text-xs space-y-1">
                       <div>
-                        <span style="color: var(--color-text-muted)">{{ 'exam.your_answer' | translate }}: </span>
-                        <span [class.text-green-600]="isRight" [class.text-red-600]="!isRight" class="font-medium">
+                        <span class="answer-label">{{ 'exam.your_answer' | translate }}: </span>
+                        <span class="font-medium" [class.correct-text]="isRight" [class.incorrect-text]="!isRight">
                           {{ displayAnswer(ex, ans.selected) || ('exam.no_answer' | translate) }}
                         </span>
                       </div>
                       @if (!isRight) {
                         <div>
-                          <span style="color: var(--color-text-muted)">{{ 'exam.correct_answers' | translate }}: </span>
-                          <span class="font-medium text-green-600">{{ displayCorrectAnswer(ex) }}</span>
+                          <span class="answer-label">{{ 'exam.correct_answers' | translate }}: </span>
+                          <span class="font-medium correct-text">{{ displayCorrectAnswer(ex) }}</span>
                         </div>
                       }
                     </div>

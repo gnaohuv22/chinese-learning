@@ -41,6 +41,7 @@ const SKILLS: Skill[] = ['listening', 'speaking', 'reading', 'writing'];
     DragDropModule,
   ],
   templateUrl: './admin-exercises.component.html',
+  styleUrl: './admin-exercises.component.scss',
 })
 export class AdminExercisesComponent implements OnInit {
   @Input() courseId!: string;

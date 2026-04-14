@@ -20,4 +20,6 @@ export interface SubmittedExam {
   sections: SubmittedSection[];
   submittedAt: Date;
   autoSubmitted: boolean;
+  isMockTest?: boolean;
+  mockTestId?: string;
 }

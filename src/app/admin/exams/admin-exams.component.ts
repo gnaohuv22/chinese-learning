@@ -17,6 +17,7 @@ type Section = 'listening' | 'speaking' | 'reading' | 'writing';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, TranslateModule, DragDropModule],
   templateUrl: './admin-exams.component.html',
+  styleUrl: './admin-exams.component.scss',
 })
 export class AdminExamsComponent implements OnInit {
   private examService = inject(ExamService);

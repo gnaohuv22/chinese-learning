@@ -4,7 +4,9 @@ import {
   query,
   orderBy,
   where,
+  limit,
   onSnapshot,
+  getDocs,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -78,6 +80,46 @@ export class FirestoreBaseService<T extends { id: string }> {
         (error) => subscriber.error(error)
       );
       return () => unsubscribe();
+    });
+  }
+
+  /**
+   * One-time read with optional server-side limit — does NOT set up a real-time listener.
+   * Use this for collections where live updates are not needed (e.g. news list).
+   */
+  getOnce(
+    collectionPath: string,
+    orderByField?: string,
+    limitCount?: number,
+    whereClauses?: WhereClause[]
+  ): Observable<T[]> {
+    const ref = collection(db, collectionPath);
+    const constraints = [];
+
+    if (whereClauses) {
+      for (const clause of whereClauses) {
+        constraints.push(where(clause.field, clause.op, clause.value));
+      }
+    }
+    if (orderByField) {
+      constraints.push(orderBy(orderByField));
+    }
+    if (limitCount) {
+      constraints.push(limit(limitCount));
+    }
+
+    const q = query(ref, ...constraints);
+
+    return new Observable<T[]>((subscriber) => {
+      getDocs(q)
+        .then((snapshot) => {
+          const items = snapshot.docs.map((d) =>
+            this.convertTimestamps({ id: d.id, ...d.data() })
+          ) as T[];
+          subscriber.next(items);
+          subscriber.complete();
+        })
+        .catch((error) => subscriber.error(error));
     });
   }
 

@@ -13,6 +13,7 @@ import { ToastService } from '../../shared/components/toast/toast.service';
   selector: 'app-admin-courses',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule, DragDropModule],
+  styleUrl: './admin-courses.component.scss',
   templateUrl: './admin-courses.component.html',
 })
 export class AdminCoursesComponent implements OnInit {

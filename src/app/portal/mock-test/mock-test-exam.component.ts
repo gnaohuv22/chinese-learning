@@ -14,6 +14,7 @@ import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { MockTestService } from '../../core/services/mock-test.service';
 import { ExerciseService } from '../../core/services/exercise.service';
+import { SubmittedExamService } from '../../core/services/submitted-exam.service';
 import { MockTest, Exercise, Skill } from '../../core/models';
 import { ModalService } from '../../shared/components/modal/modal.service';
 
@@ -39,12 +40,14 @@ const STORAGE_PREFIX = 'mock_test_progress_';
   standalone: true,
   imports: [CommonModule, RouterLink, TranslateModule],
   templateUrl: './mock-test-exam.component.html',
+  styleUrl: './mock-test-exam.component.scss',
 })
 export class MockTestExamComponent implements OnInit, OnDestroy {
   @Input({ required: true }) testId!: string;
 
   private mockTestService = inject(MockTestService);
   private exerciseService = inject(ExerciseService);
+  private submittedExamService = inject(SubmittedExamService);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
 
@@ -263,6 +266,28 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
 
     this.sectionResults.set(results);
     this.clearProgress();
+
+    const test = this.test();
+    if (test) {
+      this.submittedExamService.submitMockTest({
+        examId: test.id,
+        examTitle: test.title,
+        mockTestId: test.id,
+        isMockTest: true,
+        participantName: this.translate.instant('mock_test.anonymous_participant'),
+        totalScore: results.reduce((s, r) => s + r.score, 0),
+        totalExercises: results.reduce((s, r) => s + r.total, 0),
+        sections: results.map((r) => ({
+          skill: r.skill,
+          score: r.score,
+          total: r.total,
+          answers: r.answers.map((a) => ({ exerciseId: a.exerciseId, selected: a.selected })),
+        })),
+        submittedAt: new Date(),
+        autoSubmitted: this.wasAutoSubmitted(),
+      }).subscribe();
+    }
+
     this.state.set('submitted');
   }
 

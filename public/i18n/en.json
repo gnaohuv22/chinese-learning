@@ -157,7 +157,8 @@
     "hoc_phan": "Module",
     "time_limit": "Time Limit",
     "skills_covered": "Skills",
-    "test_summary": "Test Info"
+    "test_summary": "Test Info",
+    "anonymous_participant": "Anonymous User"
   },
   "news": {
     "title": "News",

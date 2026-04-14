@@ -1,0 +1,66 @@
+<div class="wysiwyg-editor-root" [class.dark]="isDark()">
+
+  <!-- Hidden file input for local image upload -->
+  <input
+    #fileInput
+    type="file"
+    accept="image/*"
+    class="hidden"
+    (change)="onImageFileSelected($event)"
+  />
+
+  <!-- Toolbar -->
+  <div class="wysiwyg-toolbar" role="toolbar" aria-label="Text formatting">
+    @for (group of toolbarGroups; track $index) {
+      @for (btn of group; track btn.title) {
+        <button
+          type="button"
+          class="wysiwyg-btn"
+          [title]="btn.title"
+          (mousedown)="onToolbarMousedown($event, btn)"
+        >
+          <i [class]="btn.icon"></i>
+        </button>
+      }
+      @if ($index < toolbarGroups.length - 1) {
+        <span class="wysiwyg-divider"></span>
+      }
+    }
+  </div>
+
+  <!-- Inline link panel — shown when the link button is pressed -->
+  @if (linkPanel()) {
+    <div class="wysiwyg-link-panel">
+      <input
+        type="url"
+        [value]="linkPanel()!.url"
+        placeholder="https://"
+        (input)="updateLinkField('url', $any($event.target).value)"
+      />
+      <input
+        type="text"
+        [value]="linkPanel()!.text"
+        placeholder="Link text (leave empty to use URL)"
+        (input)="updateLinkField('text', $any($event.target).value)"
+      />
+      <div class="wysiwyg-link-actions">
+        <button type="button" class="wysiwyg-link-confirm" (click)="confirmLink()">
+          <i class="fa-solid fa-check mr-1"></i>Insert
+        </button>
+        <button type="button" class="wysiwyg-link-cancel" (click)="cancelLink()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- Editable area -->
+  <div
+    #editorArea
+    class="wysiwyg-body"
+    contenteditable="true"
+    [attr.aria-multiline]="true"
+    [attr.aria-label]="'Content editor'"
+    (input)="onInput()"
+    (paste)="onPaste($event)"
+    (keydown)="onKeydown($event)"
+  ></div>
+</div>

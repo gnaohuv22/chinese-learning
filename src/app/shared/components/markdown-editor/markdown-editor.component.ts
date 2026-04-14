@@ -21,18 +21,8 @@ type CherryInstance = any;
 @Component({
   selector: 'app-markdown-editor',
   standalone: true,
-  template: `<div #editorContainer class="cherry-editor-wrapper"></div>`,
-  styles: [`
-    :host { display: block; }
-    .cherry-editor-wrapper { border-radius: 0.5rem; overflow: hidden; }
-
-    /* Intentionally empty — height overrides live in global styles.css */
-
-    /* Dark mode overrides */
-    :host ::ng-deep .cherry.dark .cherry-editor { background: #1e293b; color: #f1f5f9; }
-    :host ::ng-deep .cherry.dark .cherry-toolbar { background: rgb(83, 87, 95); border-color: #334155; }
-    :host ::ng-deep .cherry.dark .cherry-previewer { background: #1e293b; color: #f1f5f9; }
-  `],
+  templateUrl: './markdown-editor.component.html',
+  styleUrl: './markdown-editor.component.scss',
 })
 export class MarkdownEditorComponent implements AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('editorContainer') containerRef!: ElementRef<HTMLElement>;

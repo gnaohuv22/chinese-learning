@@ -12,6 +12,7 @@ const PAGE_SIZE = 10;
   standalone: true,
   imports: [RouterLink, TranslateModule, PaginationComponent],
   templateUrl: './course-list.component.html',
+  styleUrl: './course-list.component.scss',
 })
 export class CourseListComponent implements OnInit {
   private courseService = inject(CourseService);

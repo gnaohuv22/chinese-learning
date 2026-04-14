@@ -15,6 +15,10 @@ export class SubmittedExamService extends FirestoreBaseService<SubmittedExam> {
     return this.create('submitted_exams', data);
   }
 
+  submitMockTest(data: Omit<SubmittedExam, 'id'>) {
+    return this.create('submitted_exams', { ...data, isMockTest: true });
+  }
+
   deleteSubmission(id: string) {
     return this.delete('submitted_exams', id);
   }

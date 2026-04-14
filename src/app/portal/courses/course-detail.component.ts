@@ -10,6 +10,7 @@ import { Course, Lesson } from '../../core/models';
   standalone: true,
   imports: [RouterLink, TranslateModule],
   templateUrl: './course-detail.component.html',
+  styleUrl: './course-detail.component.scss',
 })
 export class CourseDetailComponent implements OnInit {
   @Input({ required: true }) courseId!: string;

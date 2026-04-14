@@ -1,6 +1,6 @@
 <div class="page-container">
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold" style="color: var(--color-text)">{{ 'admin.exams' | translate }}</h1>
+    <h1 class="text-2xl font-bold page-title">{{ 'admin.exams' | translate }}</h1>
     <button class="btn-primary" (click)="openForm()">
       <i class="fa-solid fa-plus"></i>
       {{ 'common.create' | translate }}
@@ -9,9 +9,9 @@
 
   @if (showForm()) {
     <div class="fixed inset-0 z-50 flex items-start justify-center p-4 pt-6 bg-black/40 overflow-y-auto">
-      <div class="rounded-xl shadow-2xl w-full max-w-2xl mb-10" style="background: var(--color-bg-surface)">
+      <div class="rounded-xl shadow-2xl w-full max-w-2xl mb-10 modal-panel">
         <div class="p-6">
-          <h2 class="text-lg font-semibold mb-4" style="color: var(--color-text)">
+          <h2 class="text-lg font-semibold mb-4 form-heading">
             {{ editingExam() ? ('admin.edit_exam' | translate) : ('admin.create_exam' | translate) }}
           </h2>
 
@@ -25,8 +25,8 @@
               <input formControlName="timeLimitSeconds" type="number" class="form-input" [placeholder]="'admin.time_limit' | translate" />
             </div>
 
-            <div class="border rounded-lg p-4" style="background: var(--color-bg); border-color: var(--color-border)">
-              <h3 class="text-sm font-medium mb-3" style="color: var(--color-text)">{{ 'admin.choose_exercises' | translate }}</h3>
+            <div class="border rounded-lg p-4 exercise-picker">
+              <h3 class="text-sm font-medium mb-3 section-heading">{{ 'admin.choose_exercises' | translate }}</h3>
               <div class="grid grid-cols-2 gap-3 mb-3">
                 <div class="form-field">
                   <label class="form-label text-xs">{{ 'admin.courses' | translate }}</label>
@@ -50,7 +50,7 @@
               @if (availableExercises().length > 0) {
                 <div class="max-h-48 overflow-y-auto space-y-1">
                   @for (ex of availableExercises(); track ex.id) {
-                    <label class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 cursor-pointer text-sm" style="color: var(--color-text)">
+                    <label class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 cursor-pointer text-sm exercise-label">
                       <input type="checkbox" [checked]="isExerciseSelected(ex)" (change)="toggleExercise(ex)" />
                       <span class="chip chip-gray text-xs">{{ 'skills.' + ex.skill | translate }}</span>
                       <span class="truncate">{{ ex.prompt }}</span>
@@ -63,10 +63,10 @@
             <!-- Section summaries — show counts only -->
             <div class="grid grid-cols-2 gap-3">
               @for (section of sections; track section) {
-                <div class="border rounded-lg p-3" style="border-color: var(--color-border)">
+                <div class="border rounded-lg p-3 section-summary">
                   <div class="flex items-center justify-between">
                     <span class="chip skill-{{ section }} text-xs">{{ 'skills.' + section | translate }}</span>
-                    <span class="text-sm font-semibold" style="color: var(--color-text)">
+                    <span class="text-sm font-semibold section-count">
                       {{ getSectionIds(section).length }} {{ 'admin.questions_count' | translate }}
                     </span>
                   </div>
@@ -100,21 +100,21 @@
       <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-700 border-t-transparent"></div>
     </div>
   } @else if (exams().length === 0) {
-    <div class="card text-center py-12" style="color: var(--color-text-muted)">{{ 'admin.no_exams' | translate }}</div>
+    <div class="card text-center py-12 empty-state">{{ 'admin.no_exams' | translate }}</div>
   } @else {
-    <p class="text-xs mb-3 flex items-center gap-1" style="color: var(--color-text-muted)">
+    <p class="text-xs mb-3 flex items-center gap-1 drag-hint">
       <i class="fa-solid fa-grip-lines"></i>{{ 'admin.drag_to_reorder' | translate }}
     </p>
     <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3">
       @for (exam of exams(); track exam.id) {
         <div cdkDrag class="card flex items-center justify-between gap-4">
           <div class="flex items-center gap-3 flex-1 min-w-0">
-            <span cdkDragHandle class="drag-handle flex-shrink-0" style="color: var(--color-text-muted)">
+            <span cdkDragHandle class="drag-handle flex-shrink-0 list-drag-handle">
               <i class="fa-solid fa-grip-vertical"></i>
             </span>
             <div>
-              <h3 class="font-semibold" style="color: var(--color-text)">{{ exam.title }}</h3>
-              <p class="text-sm mt-0.5" style="color: var(--color-text-muted)">
+              <h3 class="font-semibold item-title">{{ exam.title }}</h3>
+              <p class="text-sm mt-0.5 item-desc">
                 {{ 'admin.time_limit' | translate }}: {{ exam.timeLimitSeconds / 60 | number:'1.0-0' }} {{ 'common.minutes' | translate }}
                 &middot; {{ totalExercises(exam) }} {{ 'admin.questions_count' | translate }}
               </p>
@@ -138,7 +138,7 @@
               <i class="fa-solid fa-trash text-xs"></i>{{ 'common.delete' | translate }}
             </button>
           </div>
-          <div *cdkDragPlaceholder class="card h-16 border-dashed border-2" style="border-color: var(--color-border); background: transparent"></div>
+          <div *cdkDragPlaceholder class="card h-16 border-dashed border-2 drag-placeholder"></div>
         </div>
       }
     </div>

@@ -1,0 +1,212 @@
+// Hero section is always dark regardless of app theme.
+// These SCSS variables map to the design-system dark-palette tokens.
+$hero-bg-start:   #3a1b00;
+$hero-bg-mid:     #7e480a;
+$hero-bg-end:     #be9672;
+$hero-text:       #efe7db;
+$hero-text-muted: #c8ac89;
+$hero-text-faint: rgba(239, 231, 219, 0.8);
+
+// ─── Hero section ───────────────────────────────────────────────────────────
+
+.hero {
+  background: linear-gradient(135deg, $hero-bg-start 0%, $hero-bg-mid 60%, $hero-bg-end 100%);
+}
+
+.hero-blob-top {
+  background: #c8ac89;
+}
+
+.hero-blob-bottom {
+  background: $hero-bg-start;
+}
+
+.hero-char {
+  color: $hero-text;
+}
+
+.hero-typed {
+  color: $hero-text;
+}
+
+.hero-title {
+  color: $hero-text;
+}
+
+.hero-subtitle {
+  color: $hero-text-muted;
+}
+
+.hero-tagline {
+  color: $hero-text-faint;
+}
+
+.hero-cta-primary {
+  background: $hero-text;
+  color: $hero-bg-start;
+}
+
+.hero-cta-secondary {
+  border-color: rgba(200, 172, 137, 0.5);
+  color: $hero-text;
+}
+
+.hero-cta-tertiary {
+  border-color: rgba(200, 172, 137, 0.4);
+  color: $hero-text;
+}
+
+.hero-stats {
+  color: $hero-text-muted;
+}
+
+.hero-stats-icon {
+  color: $hero-bg-end;
+}
+
+.hero-stats-value {
+  color: $hero-text;
+}
+
+// ─── Skills section ──────────────────────────────────────────────────────────
+
+.skills-section {
+  background: var(--color-bg-surface);
+  border-color: var(--color-border);
+}
+
+.section-heading {
+  color: var(--color-text);
+}
+
+.section-subtitle {
+  color: var(--color-text-muted);
+}
+
+// Skill toggle button — base (inactive) and active variant
+.skill-btn {
+  background: var(--color-bg-surface);
+  border-color: transparent;
+
+  &.skill-active {
+    border-color: var(--color-primary);
+    background: rgba(126, 72, 10, 0.08);
+  }
+}
+
+.skill-btn-icon {
+  background: var(--color-bg);
+
+  .skill-active & {
+    background: rgba(126, 72, 10, 0.15);
+  }
+}
+
+.icon-primary {
+  color: var(--color-primary);
+}
+
+.skill-btn-label {
+  color: var(--color-text);
+}
+
+.skill-panel-heading {
+  color: var(--color-text);
+}
+
+.skill-panel-name {
+  color: var(--color-primary);
+}
+
+.skill-close-btn {
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  border-color: var(--color-primary);
+  border-top-color: transparent;
+}
+
+.skill-loading-text {
+  color: var(--color-text-muted);
+}
+
+.empty-state {
+  color: var(--color-text-muted);
+}
+
+.skill-lesson-course {
+  color: var(--color-text-muted);
+}
+
+.skill-lesson-title {
+  color: var(--color-text);
+}
+
+// ─── Latest courses section ──────────────────────────────────────────────────
+
+.section-title {
+  color: var(--color-text);
+}
+
+.view-all-link {
+  color: var(--color-primary);
+}
+
+.course-icon {
+  background: var(--color-primary);
+  color: #efe7db;
+}
+
+.course-phan-label {
+  color: var(--color-primary);
+}
+
+.course-title {
+  color: var(--color-text);
+}
+
+.course-desc {
+  color: var(--color-text-muted);
+}
+
+.course-card-footer {
+  border-color: var(--color-border);
+}
+
+.course-start-label {
+  color: var(--color-primary);
+}
+
+// ─── Latest news section ─────────────────────────────────────────────────────
+
+.news-section {
+  background: var(--color-bg-surface);
+}
+
+.news-title {
+  color: var(--color-text);
+}
+
+.news-excerpt {
+  color: var(--color-text-muted);
+}
+
+.news-date {
+  color: var(--color-text-muted);
+}
+
+.news-read-more {
+  color: var(--color-primary);
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+
+.site-footer {
+  background: var(--color-bg);
+  border-color: var(--color-border);
+}
+
+.footer-text {
+  color: var(--color-text-muted);
+}

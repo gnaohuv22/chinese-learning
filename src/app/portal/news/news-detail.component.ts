@@ -11,6 +11,7 @@ import { MarkdownViewerComponent } from '../../shared/components/markdown-viewer
   standalone: true,
   imports: [CommonModule, DatePipe, RouterLink, TranslateModule, MarkdownViewerComponent],
   templateUrl: './news-detail.component.html',
+  styleUrl: './news-detail.component.scss',
 })
 export class NewsDetailComponent implements OnInit {
   @Input({ required: true }) newsId!: string;

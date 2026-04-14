@@ -1,0 +1,73 @@
+.page-title {
+  color: var(--color-text);
+}
+
+.page-subtitle {
+  color: var(--color-text-muted);
+}
+
+// ─── Hoc-phan tab strip ───────────────────────────────────────────────────────
+
+.tab-btn {
+  background: var(--color-bg-surface);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+
+  &.tab-active {
+    background: var(--color-primary);
+    color: #efe7db;
+    border-color: var(--color-primary);
+  }
+}
+
+.tab-badge {
+  background: var(--color-border);
+
+  .tab-active & {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+// ─── States ───────────────────────────────────────────────────────────────────
+
+.spinner {
+  border-color: var(--color-primary);
+  border-top-color: transparent;
+}
+
+.empty-char {
+  color: var(--color-border);
+}
+
+.empty-title {
+  color: var(--color-text);
+}
+
+.empty-subtitle {
+  color: var(--color-text-muted);
+}
+
+// ─── Test card ────────────────────────────────────────────────────────────────
+
+.test-icon {
+  background: var(--color-primary);
+  color: #efe7db;
+}
+
+.test-badge {
+  background: var(--color-border);
+  color: var(--color-primary);
+}
+
+.item-title {
+  color: var(--color-text);
+}
+
+.item-desc {
+  color: var(--color-text-muted);
+}
+
+.test-meta {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}

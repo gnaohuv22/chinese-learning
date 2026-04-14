@@ -157,7 +157,8 @@
     "hoc_phan": "Học phần",
     "time_limit": "Thời gian",
     "skills_covered": "Kỹ năng",
-    "test_summary": "Thông tin đề thi"
+    "test_summary": "Thông tin đề thi",
+    "anonymous_participant": "Người dùng ẩn danh"
   },
   "news": {
     "title": "Tin tức",

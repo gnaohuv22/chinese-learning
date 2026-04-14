@@ -1,0 +1,173 @@
+// ─── Floating timer widget (always-dark) ─────────────────────────────────────
+
+$timer-bg:     #3a1b00;
+$timer-border: #7e480a;
+$timer-label:  #c8ac89;
+
+.timer-widget {
+  background: $timer-bg;
+  border-color: $timer-border;
+  min-width: 64px;
+}
+
+.timer-label {
+  color: $timer-label;
+}
+
+// SVG ring classes set in component SCSS so ::ng-deep is not needed
+// (they are inside an SVG, not a child component)
+::ng-deep .timer-ring-track {
+  stroke: rgba(255, 255, 255, 0.15);
+}
+
+::ng-deep .timer-ring-fill {
+  stroke: #be9672;
+}
+
+// ─── Spinner ─────────────────────────────────────────────────────────────────
+
+.spinner {
+  border-color: var(--color-primary);
+  border-top-color: transparent;
+}
+
+// ─── Running state ────────────────────────────────────────────────────────────
+
+.back-link {
+  color: var(--color-text-muted);
+}
+
+.page-title {
+  color: var(--color-text);
+}
+
+.page-subtitle {
+  color: var(--color-text-muted);
+}
+
+// ─── Section tab strip ────────────────────────────────────────────────────────
+
+.section-tab {
+  background: var(--color-bg-surface);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+
+  &.section-tab-active {
+    background: var(--color-primary);
+    color: #efe7db;
+    border-color: var(--color-primary);
+
+    .section-tab-chip {
+      color: #efe7db;
+    }
+  }
+}
+
+.section-tab-badge {
+  background: var(--color-border);
+
+  .section-tab-active & {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+// ─── Question card ────────────────────────────────────────────────────────────
+
+.q-number {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.q-prompt {
+  color: var(--color-text);
+}
+
+// ─── MCQ option button ────────────────────────────────────────────────────────
+
+.option-btn {
+  border-color: var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-weight: 400;
+
+  &.option-selected {
+    border-color: var(--color-primary);
+    background: rgba(126, 72, 10, 0.12);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+}
+
+.option-label {
+  color: var(--color-text-muted);
+}
+
+// ─── Auto-submit notice ───────────────────────────────────────────────────────
+
+.auto-submit-notice {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+}
+
+// ─── Score card ───────────────────────────────────────────────────────────────
+
+.result-heading {
+  color: var(--color-text);
+}
+
+.score-ring {
+  border-color: var(--color-primary);
+}
+
+.score-percent {
+  color: var(--color-primary);
+}
+
+.score-detail {
+  color: var(--color-text-muted);
+}
+
+// ─── Section result cards ─────────────────────────────────────────────────────
+
+.section-result-card {
+  padding: 1rem 1.25rem;
+}
+
+.section-score {
+  color: var(--color-text);
+}
+
+.progress-track {
+  background: var(--color-border);
+}
+
+.progress-fill {
+  background: var(--color-primary);
+}
+
+// ─── Exercise review ─────────────────────────────────────────────────────────
+
+.review-heading {
+  color: var(--color-text);
+}
+
+.review-card {
+  padding: 1rem;
+}
+
+.review-question {
+  color: var(--color-text);
+}
+
+.review-label {
+  color: var(--color-text-muted);
+}
+
+.correct-text {
+  color: #16a34a;
+}
+
+.incorrect-text {
+  color: #dc2626;
+}
