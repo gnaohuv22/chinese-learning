@@ -8,7 +8,8 @@
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "api": "node scripts/dev-api.mjs"
+    "api": "node scripts/dev-api.mjs",
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"npm run api\" \"ng serve\""
   },
   "private": true,
   "engines": {
@@ -32,6 +33,7 @@
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "cherry-markdown": "^0.10.3",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "firebase": "^12.11.0",
     "formidable": "^3.5.4",
@@ -49,6 +51,7 @@
     "@types/formidable": "^3.5.0",
     "@types/node": "^20.19.39",
     "@vercel/node": "^5.7.1",
+    "concurrently": "^9.2.1",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.3",
     "prettier": "^3.8.1",
