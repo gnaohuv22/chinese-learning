@@ -73,6 +73,7 @@
     "speaking_topic": "Speaking Topic",
     "reflex_speaking": "Reflex Speaking",
     "audio_mcq": "Audio MCQ",
+    "dictation": "Listen and write (dictation)",
     "interactive_video": "Interactive Video",
     "speaking_record": "Voice Recording"
   },
@@ -90,7 +91,9 @@
     "time_up": "Time's Up!",
     "drag_hint": "Drag to arrange",
     "keyword_hint": "Keyword hints:",
-    "retry": "Retry"
+    "retry": "Retry",
+    "dictation_placeholder": "Enter the Chinese text",
+    "dictation_input_label": "Your answer"
   },
   "course": {
     "title": "Practice",
@@ -238,6 +241,10 @@
     "mock_test_description": "Description",
     "mock_test_hoc_phan": "Module",
     "mock_test_preview": "Preview",
+    "error_dictation_media": "Upload an audio or video file",
+    "error_dictation_media_type": "Choose audio or video (not image)",
+    "error_dictation_answer": "Enter the correct Chinese answer",
+    "dictation_answer_hint": "Exact text learners must type (Chinese)",
     "news_form": "News Info",
     "news_title": "Title",
     "news_content": "Content",

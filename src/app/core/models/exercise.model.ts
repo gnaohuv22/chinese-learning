@@ -7,6 +7,7 @@ export type ExerciseType =
   | 'speaking_topic'
   | 'reflex_speaking'
   | 'audio_mcq'
+  | 'dictation'
   | 'interactive_video'
   | 'speaking_record';
 

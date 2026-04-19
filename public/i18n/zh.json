@@ -73,6 +73,7 @@
     "speaking_topic": "口语话题",
     "reflex_speaking": "即兴口语",
     "audio_mcq": "听力选择",
+    "dictation": "听写",
     "interactive_video": "互动视频",
     "speaking_record": "录音"
   },
@@ -90,7 +91,9 @@
     "time_up": "时间到！",
     "drag_hint": "拖拽排序",
     "keyword_hint": "关键词提示：",
-    "retry": "重试"
+    "retry": "重试",
+    "dictation_placeholder": "请输入中文",
+    "dictation_input_label": "你的答案"
   },
   "course": {
     "title": "温习",
@@ -238,6 +241,10 @@
     "mock_test_description": "描述",
     "mock_test_hoc_phan": "单元",
     "mock_test_preview": "预览",
+    "error_dictation_media": "请上传音频或视频文件",
+    "error_dictation_media_type": "请选择音频或视频（不能使用图片）",
+    "error_dictation_answer": "请输入正确的中文答案",
+    "dictation_answer_hint": "学习者必须输入的准确文本（中文）",
     "news_form": "新闻信息",
     "news_title": "标题",
     "news_content": "内容",

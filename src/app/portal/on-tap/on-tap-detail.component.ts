@@ -68,7 +68,8 @@ export class OnTapDetailComponent implements OnInit, OnChanges {
     this.lessons.set([]);
     this.activeSkillFilter.set('all');
 
-    this.courseService.getCourseByOrder(phanNum).pipe(take(1)).subscribe({
+    // URL phan 1–4 maps to zero-based course.order (see admin-courses drag/reorder).
+    this.courseService.getCourseByOrder(phanNum - 1).pipe(take(1)).subscribe({
       next: (course) => {
         if (!course) {
           this.notFound.set(true);

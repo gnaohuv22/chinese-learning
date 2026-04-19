@@ -3,6 +3,7 @@
     "target": "http://localhost:3100",
     "secure": false,
     "logLevel": "info",
-    "changeOrigin": true
+    "changeOrigin": true,
+    "timeout": 600000
   }
 }

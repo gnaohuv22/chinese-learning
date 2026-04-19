@@ -17,6 +17,7 @@ import { ExerciseService } from '../../core/services/exercise.service';
 import { SubmittedExamService } from '../../core/services/submitted-exam.service';
 import { MockTest, Exercise, Skill } from '../../core/models';
 import { ModalService } from '../../shared/components/modal/modal.service';
+import { DriveService } from '../../core/services/drive.service';
 
 type TestState = 'loading' | 'running' | 'submitted';
 
@@ -50,6 +51,7 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
   private submittedExamService = inject(SubmittedExamService);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
+  readonly drive = inject(DriveService);
 
   state = signal<TestState>('loading');
   test = signal<MockTest | null>(null);
@@ -295,6 +297,9 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
     if (!selected) return false;
     const answer = ex.answer;
     if (typeof answer === 'string') {
+      if (ex.type === 'dictation') {
+        return selected.trim() === answer.trim();
+      }
       const idx = parseInt(answer, 10);
       if (!isNaN(idx)) return selected === idx.toString();
       return selected.trim().toLowerCase() === answer.trim().toLowerCase();

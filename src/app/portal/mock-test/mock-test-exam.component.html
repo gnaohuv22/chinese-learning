@@ -95,6 +95,29 @@
                 </button>
               }
             </div>
+          } @else if (ex.type === 'dictation' && ex.mediaUrl) {
+            <div class="space-y-3 pl-10">
+              @if (ex.mediaType === 'audio') {
+                <audio controls class="w-full" [src]="drive.getDirectUrl(ex.mediaUrl)"></audio>
+              }
+              @if (ex.mediaType === 'video') {
+                <div class="relative w-full rounded-lg overflow-hidden" style="padding-top: 56.25%">
+                  <iframe
+                    [src]="drive.getEmbedUrl(ex.mediaUrl)"
+                    class="absolute inset-0 w-full h-full border-0"
+                    allow="autoplay"
+                    allowfullscreen
+                  ></iframe>
+                </div>
+              }
+              <input
+                type="text"
+                class="form-input max-w-md"
+                [placeholder]="'exercise.dictation_placeholder' | translate"
+                [value]="getAnswer(ex.id) ?? ''"
+                (change)="setAnswer(ex.id, $any($event.target).value)"
+              />
+            </div>
           } @else {
             <!-- Free text answer -->
             <div class="pl-10">

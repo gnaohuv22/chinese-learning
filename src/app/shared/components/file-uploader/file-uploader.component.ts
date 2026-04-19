@@ -47,9 +47,16 @@ export class FileUploaderComponent implements OnInit, OnChanges {
         this.uploaded.emit(response);
         input.value = '';
       },
-      error: (err) => {
+      error: (err: { status?: number; message?: string; error?: unknown }) => {
         this.uploading.set(false);
-        this.error.set('Tải lên thất bại: ' + (err?.message ?? 'Lỗi không xác định'));
+        const base = err?.message ?? 'Lỗi không xác định';
+        const connectionFailed =
+          err?.status === 0 ||
+          /failed|network|reset|refused|Unknown Error/i.test(String(base));
+        const devHint = connectionFailed
+          ? ' Chạy API local: `npm run api` trong terminal thứ hai, hoặc dùng `npm run dev` (web + API).'
+          : '';
+        this.error.set('Tải lên thất bại: ' + base + devHint);
       },
     });
   }

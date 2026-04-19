@@ -73,6 +73,7 @@
     "speaking_topic": "Chủ đề nói",
     "reflex_speaking": "Phản xạ nói",
     "audio_mcq": "Nghe trắc nghiệm",
+    "dictation": "Nghe chép chính tả",
     "interactive_video": "Video tương tác",
     "speaking_record": "Ghi âm"
   },
@@ -90,7 +91,9 @@
     "time_up": "Hết giờ!",
     "drag_hint": "Kéo thả để sắp xếp",
     "keyword_hint": "Gợi ý từ khóa:",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "dictation_placeholder": "Nhập chữ Hán",
+    "dictation_input_label": "Câu trả lời của bạn"
   },
   "course": {
     "title": "Ôn tập",
@@ -238,6 +241,10 @@
     "mock_test_description": "Mô tả",
     "mock_test_hoc_phan": "Học phần",
     "mock_test_preview": "Xem trước",
+    "error_dictation_media": "Tải lên tệp âm thanh hoặc video",
+    "error_dictation_media_type": "Chọn âm thanh hoặc video (không phải hình ảnh)",
+    "error_dictation_answer": "Nhập đáp án đúng bằng chữ Hán",
+    "dictation_answer_hint": "Chuỗi chính xác học viên phải gõ (chữ Hán)",
     "news_form": "Thông tin tin tức",
     "news_title": "Tiêu đề",
     "news_content": "Nội dung",

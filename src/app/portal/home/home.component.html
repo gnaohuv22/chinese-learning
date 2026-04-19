@@ -154,14 +154,14 @@
     <div class="text-center py-8 empty-state">{{ 'course.no_courses' | translate }}</div>
   } @else {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      @for (course of courses().slice(0, 4); track course.id; let i = $index) {
-        <a [routerLink]="['/on-tap', i + 1]" class="card hover:shadow-lg transition-all hover:-translate-y-0.5 group flex flex-col">
+      @for (course of courses().slice(0, 4); track course.id) {
+        <a [routerLink]="['/on-tap', course.order + 1]" class="card hover:shadow-lg transition-all hover:-translate-y-0.5 group flex flex-col">
           <div class="flex items-start gap-3 flex-1">
             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-base course-icon">
-              {{ i + 1 }}
+              {{ course.order + 1 }}
             </div>
             <div class="flex-1 min-w-0">
-              <div class="text-xs mb-0.5 course-phan-label">{{ 'hoc_phan.' + (i + 1) | translate }}</div>
+              <div class="text-xs mb-0.5 course-phan-label">{{ 'hoc_phan.' + (course.order + 1) | translate }}</div>
               <h3 class="font-semibold transition-colors text-sm course-title">{{ course.title }}</h3>
               @if (course.description) {
                 <p class="text-xs mt-1 line-clamp-2 course-desc">{{ course.description }}</p>
