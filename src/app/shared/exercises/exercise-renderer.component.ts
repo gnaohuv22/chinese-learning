@@ -8,6 +8,7 @@ import { SpeakingTopicComponent } from './speaking-topic/speaking-topic.componen
 import { AudioMcqComponent } from './audio-mcq/audio-mcq.component';
 import { VideoExerciseComponent } from './video-exercise/video-exercise.component';
 import { SpeakingRecordComponent } from './speaking-record/speaking-record.component';
+import { DictationComponent } from './dictation/dictation.component';
 
 @Component({
   selector: 'app-exercise-renderer',
@@ -19,6 +20,7 @@ import { SpeakingRecordComponent } from './speaking-record/speaking-record.compo
     GuidedWritingComponent,
     SpeakingTopicComponent,
     AudioMcqComponent,
+    DictationComponent,
     VideoExerciseComponent,
     SpeakingRecordComponent,
   ],

@@ -135,14 +135,19 @@
           </div>
 
           @if (needsMedia) {
-            <div class="form-field">
+            <div class="form-field" data-field="media" [class.error]="validationErrors()['media']">
               <label class="form-label">{{ 'admin.media_type' | translate }}</label>
               <select formControlName="mediaType" class="form-input form-select">
                 <option value="">— {{ 'admin.no_media' | translate }} —</option>
                 <option value="video">Video</option>
                 <option value="audio">Audio</option>
-                <option value="image">{{ 'admin.image' | translate }}</option>
+                @if (form.value.type !== 'dictation') {
+                  <option value="image">{{ 'admin.image' | translate }}</option>
+                }
               </select>
+              @if (validationErrors()['media']) {
+                <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['media'] | translate }}</p>
+              }
             </div>
             <div class="form-field">
               <label class="form-label">{{ 'admin.media_upload' | translate }}</label>
@@ -187,12 +192,18 @@
           }
 
           @if (needsAnswer) {
-            <div class="form-field">
+            <div class="form-field" data-field="answer" [class.error]="validationErrors()['answer']">
               <label class="form-label">{{ 'admin.answer' | translate }}</label>
               @if (form.value.type === 'scramble') {
                 <p class="text-xs mb-1 scramble-hint">{{ 'admin.scramble_hint' | translate }}</p>
               }
+              @if (form.value.type === 'dictation') {
+                <p class="text-xs mb-1 dictation-hint">{{ 'admin.dictation_answer_hint' | translate }}</p>
+              }
               <input formControlName="answer" class="form-input" [placeholder]="'admin.answer_placeholder' | translate" />
+              @if (validationErrors()['answer']) {
+                <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['answer'] | translate }}</p>
+              }
             </div>
           }
 

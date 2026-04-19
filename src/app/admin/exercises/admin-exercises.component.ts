@@ -25,6 +25,7 @@ const EXERCISE_TYPES: ExerciseType[] = [
   'speaking_record',
   'reflex_speaking',
   'audio_mcq',
+  'dictation',
   'interactive_video',
 ];
 const SKILLS: Skill[] = ['listening', 'speaking', 'reading', 'writing'];
@@ -93,7 +94,7 @@ export class AdminExercisesComponent implements OnInit {
   }
 
   get needsMedia(): boolean {
-    return ['mcq', 'audio_mcq', 'interactive_video', 'reflex_speaking'].includes(
+    return ['mcq', 'audio_mcq', 'dictation', 'interactive_video', 'reflex_speaking'].includes(
       this.form.value.type ?? ''
     );
   }
@@ -103,7 +104,7 @@ export class AdminExercisesComponent implements OnInit {
   }
 
   get needsAnswer(): boolean {
-    return ['mcq', 'audio_mcq', 'scramble'].includes(this.form.value.type ?? '');
+    return ['mcq', 'audio_mcq', 'dictation', 'scramble'].includes(this.form.value.type ?? '');
   }
 
   get needsKeywords(): boolean {
@@ -235,6 +236,15 @@ export class AdminExercisesComponent implements OnInit {
     if (this.form.controls.type.invalid) errors['type'] = 'admin.error_required';
     if (this.form.controls.skill.invalid) errors['skill'] = 'admin.error_required';
     if (this.needsOptions && this.optionsArray.length < 2) errors['options'] = 'admin.error_min_options';
+
+    const vPre = this.form.value;
+    const typePre = vPre.type as ExerciseType;
+    if (typePre === 'dictation') {
+      const mt = vPre.mediaType;
+      if (!vPre.mediaUrl?.trim()) errors['media'] = 'admin.error_dictation_media';
+      else if (mt !== 'audio' && mt !== 'video') errors['media'] = 'admin.error_dictation_media_type';
+      if (!(vPre.answer?.trim() ?? '')) errors['answer'] = 'admin.error_dictation_answer';
+    }
 
     this.validationErrors.set(errors);
 
