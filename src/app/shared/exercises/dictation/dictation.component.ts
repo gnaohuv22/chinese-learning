@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { Exercise } from '../../../core/models';
-import { DriveService } from '../../../core/services/drive.service';
+import { MediaEmbedComponent } from '../../components/media-embed/media-embed.component';
 
 @Component({
   selector: 'app-exercise-dictation',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MediaEmbedComponent],
   templateUrl: './dictation.component.html',
 })
 export class DictationComponent {
@@ -17,19 +17,9 @@ export class DictationComponent {
   userInput = signal('');
   checked = signal(false);
 
-  constructor(private drive: DriveService) {}
+  constructor() {}
 
-  get audioSrc(): string {
-    return this.exercise.mediaUrl ? this.drive.getDirectUrl(this.exercise.mediaUrl) : '';
-  }
-
-  get embedUrl(): string {
-    return this.exercise.mediaUrl ? this.drive.getEmbedUrl(this.exercise.mediaUrl) : '';
-  }
-
-  get directUrl(): string {
-    return this.exercise.mediaUrl ? this.drive.getDirectUrl(this.exercise.mediaUrl) : '';
-  }
+  // Media logic is now handled by app-media-embed
 
   check() {
     this.checked.set(true);

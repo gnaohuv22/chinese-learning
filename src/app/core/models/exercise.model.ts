@@ -9,7 +9,8 @@ export type ExerciseType =
   | 'audio_mcq'
   | 'dictation'
   | 'interactive_video'
-  | 'speaking_record';
+  | 'speaking_record'
+  | 'scramble_dnd';
 
 export type MediaType = 'video' | 'audio' | 'image';
 

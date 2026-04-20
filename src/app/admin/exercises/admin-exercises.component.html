@@ -158,6 +158,11 @@
                 [accept]="mediaAccept()"
                 [disabled]="!form.value.mediaType"
               />
+              @if (form.value.mediaUrl && form.value.mediaType) {
+                <div class="mt-4 max-w-sm rounded-lg overflow-hidden border">
+                  <app-media-embed [fileId]="form.value.mediaUrl" [mediaType]="$any(form.value).mediaType" />
+                </div>
+              }
             </div>
           }
 
@@ -194,7 +199,7 @@
           @if (needsAnswer) {
             <div class="form-field" data-field="answer" [class.error]="validationErrors()['answer']">
               <label class="form-label">{{ 'admin.answer' | translate }}</label>
-              @if (form.value.type === 'scramble') {
+              @if (form.value.type === 'scramble' || form.value.type === 'scramble_dnd') {
                 <p class="text-xs mb-1 scramble-hint">{{ 'admin.scramble_hint' | translate }}</p>
               }
               @if (form.value.type === 'dictation') {

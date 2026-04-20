@@ -75,12 +75,16 @@
     "audio_mcq": "Audio MCQ",
     "dictation": "Listen and write (dictation)",
     "interactive_video": "Interactive Video",
-    "speaking_record": "Voice Recording"
+    "speaking_record": "Voice Recording",
+    "scramble_dnd": "Word Scramble (drag and drop)"
   },
   "exercise": {
+    "type_answer": "Type your answer",
+    "type_answer_hint": "Enter the full sentence",
     "check": "Check",
     "correct": "Correct!",
     "incorrect": "Incorrect. Correct answer:",
+    "playback_complete": "Playback Complete",
     "start_recording": "Start Recording",
     "stop_recording": "Stop Recording",
     "recording": "Recording...",

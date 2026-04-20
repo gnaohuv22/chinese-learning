@@ -1,24 +1,37 @@
 <div class="exercise-scramble space-y-4">
   <p class="text-base font-medium" style="color: var(--color-text)">{{ exercise.prompt }}</p>
-
+  
   @if (exercise.mediaUrl && exercise.mediaType) {
     <app-media-embed [fileId]="exercise.mediaUrl" [mediaType]="exercise.mediaType" />
   }
+  
+  <p class="text-xs" style="color: var(--color-text-muted)">{{ 'exercise.drag_hint' | translate }}</p>
 
-  <div class="space-y-2">
-    <label class="block text-sm font-medium" style="color: var(--color-text-muted)">{{ 'exercise.type_answer_hint' | translate }}</label>
-    <input
-      type="text"
-      class="form-input w-full"
-      [disabled]="checked()"
-      [ngModel]="userInput()"
-      (ngModelChange)="userInput.set($event)"
-      [placeholder]="'exercise.type_answer' | translate"
-    />
+  <div
+    cdkDropList
+    cdkDropListOrientation="horizontal"
+    (cdkDropListDropped)="drop($event)"
+    class="flex flex-wrap gap-2 min-h-[48px] p-3 border-2 border-dashed rounded-lg"
+    style="border-color: var(--color-border); background: var(--color-bg)"
+  >
+    @for (word of arrangedWords(); track $index) {
+      <div
+        cdkDrag
+        [cdkDragDisabled]="checked()"
+        class="px-4 py-2 border-2 rounded-lg text-sm font-medium cursor-grab shadow-sm transition-all select-none"
+        style="background: var(--color-bg-surface); color: var(--color-text)"
+        [class.border-gray-300]="!checked()"
+        [class.border-green-400]="checked() && isCorrect()"
+        [class.border-red-400]="checked() && !isCorrect()"
+      >
+        {{ word }}
+        <ng-template cdkDragPreview></ng-template>
+      </div>
+    }
   </div>
 
   @if (!checked()) {
-    <button class="btn-primary" [disabled]="!userInput().trim()" (click)="check()">
+    <button class="btn-primary" (click)="check()">
       {{ 'exercise.check' | translate }}
     </button>
   } @else {

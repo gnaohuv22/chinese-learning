@@ -75,12 +75,16 @@
     "audio_mcq": "听力选择",
     "dictation": "听写",
     "interactive_video": "互动视频",
-    "speaking_record": "录音"
+    "speaking_record": "录音",
+    "scramble_dnd": "词语排序（拖拽）"
   },
   "exercise": {
+    "type_answer": "输入答案",
+    "type_answer_hint": "输入完整句子",
     "check": "检查",
     "correct": "正确！",
-    "incorrect": "错误，正确答案：",
+    "incorrect": "错误。正确答案：",
+    "playback_complete": "播放完成",
     "start_recording": "开始录音",
     "stop_recording": "停止录音",
     "recording": "录音中...",

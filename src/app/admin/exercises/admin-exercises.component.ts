@@ -16,6 +16,7 @@ import { Exercise, ExerciseType, Skill } from '../../core/models';
 import { DriveUploadResponse } from '../../core/services/drive.service';
 import { ModalService } from '../../shared/components/modal/modal.service';
 import { ToastService } from '../../shared/components/toast/toast.service';
+import { MediaEmbedComponent } from '../../shared/components/media-embed/media-embed.component';
 
 const EXERCISE_TYPES: ExerciseType[] = [
   'mcq',
@@ -27,6 +28,7 @@ const EXERCISE_TYPES: ExerciseType[] = [
   'audio_mcq',
   'dictation',
   'interactive_video',
+  'scramble_dnd',
 ];
 const SKILLS: Skill[] = ['listening', 'speaking', 'reading', 'writing'];
 
@@ -40,6 +42,7 @@ const SKILLS: Skill[] = ['listening', 'speaking', 'reading', 'writing'];
     TranslateModule,
     FileUploaderComponent,
     DragDropModule,
+    MediaEmbedComponent,
   ],
   templateUrl: './admin-exercises.component.html',
   styleUrl: './admin-exercises.component.scss',
@@ -104,7 +107,7 @@ export class AdminExercisesComponent implements OnInit {
   }
 
   get needsAnswer(): boolean {
-    return ['mcq', 'audio_mcq', 'dictation', 'scramble'].includes(this.form.value.type ?? '');
+    return ['mcq', 'audio_mcq', 'dictation', 'scramble', 'scramble_dnd'].includes(this.form.value.type ?? '');
   }
 
   get needsKeywords(): boolean {
@@ -267,7 +270,7 @@ export class AdminExercisesComponent implements OnInit {
 
     const answerRaw = v.answer?.trim() ?? '';
     const answer: string | string[] =
-      type === 'scramble' ? answerRaw.split(/\s+/).filter(Boolean) : answerRaw;
+      (type === 'scramble' || type === 'scramble_dnd') ? answerRaw.split(/\s+/).filter(Boolean) : answerRaw;
 
     const payload: Omit<Exercise, 'id' | 'courseId' | 'lessonId'> = {
       type,

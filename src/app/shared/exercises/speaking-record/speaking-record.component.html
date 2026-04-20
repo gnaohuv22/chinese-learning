@@ -1,11 +1,11 @@
 <div class="exercise-speaking-record space-y-4">
-  <p class="text-base font-medium text-gray-800">{{ exercise.prompt }}</p>
+  <p class="text-base font-medium" style="color: var(--color-text)">{{ exercise.prompt }}</p>
 
   @if (exercise.outline && exercise.outline.length > 0) {
     <ul class="space-y-1">
       @for (pt of exercise.outline; track $index) {
-        <li class="text-sm text-gray-600 flex items-start gap-1.5">
-          <span class="text-red-500 mt-1">•</span> {{ pt }}
+        <li class="text-sm flex items-start gap-1.5" style="color: var(--color-text-muted)">
+          <span style="color: var(--color-primary)" class="mt-1">•</span> {{ pt }}
         </li>
       }
     </ul>
@@ -31,7 +31,7 @@
         </span>
       }
       @case ('uploading') {
-        <div class="flex items-center gap-2 text-sm text-gray-600">
+        <div class="flex items-center gap-2 text-sm" style="color: var(--color-text-muted)">
           <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
@@ -59,8 +59,8 @@
   </div>
 
   @if (recordedUrl()) {
-    <div class="bg-gray-50 rounded-lg p-3">
-      <p class="text-xs text-gray-500 mb-2">{{ 'exercise.play_recording' | translate }}</p>
+    <div class="rounded-lg p-3 border" style="background: var(--color-bg-surface); border-color: var(--color-border)">
+      <p class="text-xs mb-2" style="color: var(--color-text-muted)">{{ 'exercise.play_recording' | translate }}</p>
       <audio controls [src]="recordedUrl()!" class="w-full"></audio>
       <button class="btn-secondary text-xs mt-2" (click)="reset()">Ghi lại</button>
     </div>

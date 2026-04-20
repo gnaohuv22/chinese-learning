@@ -75,12 +75,16 @@
     "audio_mcq": "Nghe trắc nghiệm",
     "dictation": "Nghe chép chính tả",
     "interactive_video": "Video tương tác",
-    "speaking_record": "Ghi âm"
+    "speaking_record": "Ghi âm",
+    "scramble_dnd": "Sắp xếp câu (kéo thả)"
   },
   "exercise": {
+    "type_answer": "Nhập câu trả lời",
+    "type_answer_hint": "Nhập câu hoàn chỉnh",
     "check": "Kiểm tra",
     "correct": "Chính xác!",
     "incorrect": "Sai rồi. Đáp án đúng:",
+    "playback_complete": "Đã phát xong",
     "start_recording": "Bắt đầu ghi âm",
     "stop_recording": "Dừng ghi âm",
     "recording": "Đang ghi âm...",

@@ -11,40 +11,22 @@
   } @else if (lesson()) {
     <div class="mb-6">
       <h1 class="text-2xl font-bold page-title">{{ lesson()!.title }}</h1>
-      <div class="flex flex-wrap gap-2 mt-2">
-        @for (skill of lesson()!.skills; track skill) {
-          <span class="chip skill-{{ skill }}">{{ 'skills.' + skill | translate }}</span>
-        }
-      </div>
     </div>
 
-    @if (lesson()!.skills.length > 1) {
-      <div class="flex gap-1 mb-6 overflow-x-auto border-b skill-tabs">
-        @for (skill of lesson()!.skills; track skill) {
-          <button
-            (click)="activeSkill.set(skill)"
-            class="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px skill-tab"
-            [class.tab-active]="activeSkill() === skill"
-          >
-            {{ 'skills.' + skill | translate }}
-          </button>
-        }
-      </div>
-    }
-
     <div class="space-y-6">
-      @if (exercisesForActiveSkill().length === 0) {
+      @if (exercises().length === 0) {
         <div class="card text-center py-12 empty-state">
           {{ 'lesson.no_exercises' | translate }}
         </div>
       } @else {
-        @for (ex of exercisesForActiveSkill(); track ex.id; let i = $index) {
+        @for (ex of exercises(); track ex.id; let i = $index) {
           <div class="card">
             <div class="flex items-center gap-2 mb-4 pb-3 border-b question-header">
               <span class="w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0 question-number">
                 {{ i + 1 }}
               </span>
               <span class="chip chip-gray text-xs">{{ 'exercise_types.' + ex.type | translate }}</span>
+              <span class="chip skill-{{ ex.skill }} text-xs">{{ 'skills.' + ex.skill | translate }}</span>
             </div>
             <app-exercise-renderer [exercise]="ex" />
           </div>

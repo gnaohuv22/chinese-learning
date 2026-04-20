@@ -11,22 +11,6 @@
   color: var(--color-text);
 }
 
-// ─── Skill tab strip ─────────────────────────────────────────────────────────
-
-.skill-tabs {
-  border-color: var(--color-border);
-}
-
-.skill-tab {
-  border-bottom-color: transparent;
-  color: var(--color-text-muted);
-
-  &.tab-active {
-    border-bottom-color: var(--color-primary);
-    color: var(--color-primary);
-  }
-}
-
 // ─── Question card ────────────────────────────────────────────────────────────
 
 .empty-state {
