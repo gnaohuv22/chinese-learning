@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { Exercise } from '../../../core/models';
+import { MediaEmbedComponent } from '../../components/media-embed/media-embed.component';
 
 @Component({
   selector: 'app-exercise-guided-writing',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MediaEmbedComponent],
   templateUrl: './guided-writing.component.html',
 })
 export class GuidedWritingComponent {

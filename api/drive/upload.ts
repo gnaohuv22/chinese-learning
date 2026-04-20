@@ -1,8 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { google } from 'googleapis';
+import { v2 as cloudinary } from 'cloudinary';
 import formidable from 'formidable';
 import fs from 'fs';
-import path from 'path';
 
 export const config = {
   api: {
@@ -10,28 +9,26 @@ export const config = {
   },
 };
 
-function getServiceAccountCredentials() {
-  const keyJson = process.env['GOOGLE_SERVICE_ACCOUNT_KEY'];
-  if (keyJson) {
-    return JSON.parse(keyJson);
+function initCloudinary() {
+  const url = process.env['CLOUDINARY_URL'];
+  if (url) {
+    // Cloudinary automatically picks up CLOUDINARY_URL from env, but we can call config to be safe
+    cloudinary.config(true);
+  } else {
+    // Fallback if they provided separate keys
+    cloudinary.config({
+      cloud_name: process.env['CLOUDINARY_CLOUD_NAME'],
+      api_key: process.env['CLOUDINARY_API_KEY'],
+      api_secret: process.env['CLOUDINARY_API_SECRET'],
+    });
   }
-
-  const keyPath = process.env['GOOGLE_SERVICE_ACCOUNT_KEY_PATH'];
-  if (keyPath) {
-    const resolvedPath = path.resolve(process.cwd(), keyPath);
-    return JSON.parse(fs.readFileSync(resolvedPath, 'utf-8'));
-  }
-
-  throw new Error(
-    'No service account credentials found. Set GOOGLE_SERVICE_ACCOUNT_KEY or GOOGLE_SERVICE_ACCOUNT_KEY_PATH.'
-  );
 }
 
 function parseForm(
   req: VercelRequest
 ): Promise<{ fields: formidable.Fields; files: formidable.Files }> {
   return new Promise((resolve, reject) => {
-    const form = formidable({ maxFileSize: 100 * 1024 * 1024 });
+    const form = formidable({ maxFileSize: 250 * 1024 * 1024 }); // 250MB limit
     form.parse(req as unknown as Parameters<typeof form.parse>[0], (err, fields, files) => {
       if (err) reject(err);
       else resolve({ fields, files });
@@ -45,18 +42,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const credentials = getServiceAccountCredentials();
-    const folderId = process.env['GOOGLE_DRIVE_FOLDER_ID'];
+    initCloudinary();
 
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      scopes: ['https://www.googleapis.com/auth/drive'],
-    });
-
-    const drive = google.drive({ version: 'v3', auth });
-
-    const { fields, files } = await parseForm(req);
-
+    const { files } = await parseForm(req);
     const fileField = files['file'];
     const uploadedFile = Array.isArray(fileField) ? fileField[0] : fileField;
 
@@ -64,48 +52,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'No file provided' });
     }
 
-    const filenameField = fields['filename'];
-    const mimeTypeField = fields['mimeType'];
-    const filename = Array.isArray(filenameField)
-      ? filenameField[0]
-      : filenameField ?? uploadedFile.originalFilename ?? 'upload';
-    const mimeType = Array.isArray(mimeTypeField)
-      ? mimeTypeField[0]
-      : mimeTypeField ?? uploadedFile.mimetype ?? 'application/octet-stream';
-
-    const fileStream = fs.createReadStream(uploadedFile.filepath);
-
-    const driveResponse = await drive.files.create({
-      requestBody: {
-        name: filename,
-        parents: folderId ? [folderId] : undefined,
-      },
-      media: {
-        mimeType,
-        body: fileStream,
-      },
-      fields: 'id,name',
-    });
-
-    const fileId = driveResponse.data.id!;
-
-    await drive.permissions.create({
-      fileId,
-      requestBody: {
-        role: 'reader',
-        type: 'anyone',
-      },
+    // Determine resource_type based on mimetype
+    // Cloudinary 'auto' handles almost everything automatically
+    const uploadRes = await cloudinary.uploader.upload(uploadedFile.filepath, {
+      resource_type: 'auto',
     });
 
     fs.unlinkSync(uploadedFile.filepath);
 
+    // Replace the fileId/embedUrl logic with direct secure_url
     return res.status(200).json({
-      fileId,
-      embedUrl: `https://drive.google.com/file/d/${fileId}/preview`,
-      thumbnailUrl: `https://drive.google.com/thumbnail?id=${fileId}`,
+      fileId: uploadRes.secure_url,
+      embedUrl: uploadRes.secure_url,
+      thumbnailUrl: uploadRes.secure_url.replace(/\.[^/.]+$/, '.jpg'), // basic thumbnail extension replacement (works if it's a video)
     });
   } catch (error) {
-    console.error('Drive upload error:', error);
+    console.error('Cloudinary upload error:', error);
     return res.status(500).json({ error: 'Upload failed', details: String(error) });
   }
 }

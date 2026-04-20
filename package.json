@@ -33,6 +33,7 @@
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "cherry-markdown": "^0.10.3",
+    "cloudinary": "^2.9.0",
     "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "firebase": "^12.11.0",

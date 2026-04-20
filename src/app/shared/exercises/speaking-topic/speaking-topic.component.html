@@ -1,6 +1,10 @@
 <div class="exercise-speaking-topic space-y-4">
   <p class="text-base font-medium" style="color: var(--color-text);">{{ exercise.prompt }}</p>
 
+  @if (exercise.mediaUrl && exercise.mediaType) {
+    <app-media-embed [fileId]="exercise.mediaUrl" [mediaType]="exercise.mediaType" />
+  }
+
   @if (exercise.outline && exercise.outline.length > 0) {
     <ul class="space-y-2">
       @for (point of exercise.outline; track $index) {

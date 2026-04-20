@@ -20,6 +20,7 @@ export class FileUploaderComponent implements OnInit, OnChanges {
   private drive = inject(DriveService);
 
   uploading = signal(false);
+  progress = signal<number | null>(null);
   error = signal('');
   currentFileId = signal('');
 
@@ -38,17 +39,21 @@ export class FileUploaderComponent implements OnInit, OnChanges {
     if (!file) return;
 
     this.uploading.set(true);
+    this.progress.set(0);
     this.error.set('');
 
-    this.drive.uploadFile(file, file.name, file.type).subscribe({
-      next: (response) => {
+    this.drive.uploadFileWithProgress(file, file.name, file.type).subscribe({
+      next: (event) => {
+        this.progress.set(event.progress);
+        if (!event.response) return;
         this.uploading.set(false);
-        this.currentFileId.set(response.fileId);
-        this.uploaded.emit(response);
+        this.currentFileId.set(event.response.fileId);
+        this.uploaded.emit(event.response);
         input.value = '';
       },
       error: (err: { status?: number; message?: string; error?: unknown }) => {
         this.uploading.set(false);
+        this.progress.set(null);
         const base = err?.message ?? 'Lỗi không xác định';
         const connectionFailed =
           err?.status === 0 ||
@@ -57,6 +62,9 @@ export class FileUploaderComponent implements OnInit, OnChanges {
           ? ' Chạy API local: `npm run api` trong terminal thứ hai, hoặc dùng `npm run dev` (web + API).'
           : '';
         this.error.set('Tải lên thất bại: ' + base + devHint);
+      },
+      complete: () => {
+        this.progress.set(null);
       },
     });
   }

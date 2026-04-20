@@ -1,20 +1,20 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TranslateModule } from '@ngx-translate/core';
 import { Exercise } from '../../../core/models';
 import { MediaEmbedComponent } from '../../components/media-embed/media-embed.component';
 
 @Component({
-  selector: 'app-exercise-scramble',
+  selector: 'app-exercise-scramble-dnd',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, MediaEmbedComponent],
-  templateUrl: './scramble.component.html',
+  imports: [CommonModule, DragDropModule, TranslateModule, MediaEmbedComponent],
+  templateUrl: './scramble-dnd.component.html',
 })
-export class ScrambleComponent implements OnInit {
+export class ScrambleDndComponent implements OnInit {
   @Input({ required: true }) exercise!: Exercise;
 
-  userInput = signal('');
+  arrangedWords = signal<string[]>([]);
   checked = signal(false);
 
   get correctWords(): string[] {
@@ -33,8 +33,15 @@ export class ScrambleComponent implements OnInit {
   }
 
   reset() {
-    this.userInput.set('');
+    const shuffled = [...this.correctWords].sort(() => Math.random() - 0.5);
+    this.arrangedWords.set(shuffled);
     this.checked.set(false);
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    const words = [...this.arrangedWords()];
+    moveItemInArray(words, event.previousIndex, event.currentIndex);
+    this.arrangedWords.set(words);
   }
 
   check() {
@@ -42,8 +49,8 @@ export class ScrambleComponent implements OnInit {
   }
 
   isCorrect(): boolean {
-    const userStr = this.userInput().replace(/\s+/g, '').toLowerCase();
-    const correctStr = this.correctSentence.replace(/\s+/g, '').toLowerCase();
-    return userStr === correctStr;
+    return (
+      JSON.stringify(this.arrangedWords()) === JSON.stringify(this.correctWords)
+    );
   }
 }

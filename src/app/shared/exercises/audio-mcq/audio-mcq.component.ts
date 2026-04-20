@@ -24,9 +24,9 @@ export class AudioMcqComponent {
   constructor(private drive: DriveService) {}
 
   get audioSrc(): string {
-    return this.exercise.mediaUrl
-      ? this.drive.getDirectUrl(this.exercise.mediaUrl)
-      : '';
+    const url = this.exercise.mediaUrl || '';
+    if (url.startsWith('http')) return url; // Cloudinary or full URL
+    return url ? this.drive.getDirectUrl(url) : '';
   }
 
   setSpeed(speed: number) {

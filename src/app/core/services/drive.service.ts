@@ -1,5 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpEvent,
+  HttpEventType,
+  HttpRequest,
+} from '@angular/common/http';
+import { map, filter } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -18,13 +24,38 @@ export class DriveService {
     filename: string,
     mimeType: string
   ): Observable<DriveUploadResponse> {
+    return this.uploadFileWithProgress(file, filename, mimeType).pipe(
+      filter((e): e is { progress: number; response: DriveUploadResponse } => !!e.response),
+      map((e) => e.response)
+    );
+  }
+
+  uploadFileWithProgress(
+    file: File | Blob,
+    filename: string,
+    mimeType: string
+  ): Observable<{ progress: number; response?: DriveUploadResponse }> {
     const formData = new FormData();
     formData.append('file', file, filename);
     formData.append('filename', filename);
     formData.append('mimeType', mimeType);
-    return this.http.post<DriveUploadResponse>(
-      environment.driveUploadUrl,
-      formData
+
+    const req = new HttpRequest('POST', environment.driveUploadUrl, formData, {
+      reportProgress: true,
+    });
+
+    return this.http.request<DriveUploadResponse>(req).pipe(
+      map((event: HttpEvent<DriveUploadResponse>) => {
+        if (event.type === HttpEventType.UploadProgress) {
+          const total = event.total ?? 0;
+          const progress = total > 0 ? Math.round((event.loaded / total) * 100) : 0;
+          return { progress };
+        }
+        if (event.type === HttpEventType.Response) {
+          return { progress: 100, response: event.body as DriveUploadResponse };
+        }
+        return { progress: 0 };
+      })
     );
   }
 

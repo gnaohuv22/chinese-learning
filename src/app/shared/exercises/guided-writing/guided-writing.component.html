@@ -1,6 +1,10 @@
 <div class="exercise-guided-writing space-y-4">
   <p class="text-base font-medium" style="color: var(--color-text)">{{ exercise.prompt }}</p>
 
+  @if (exercise.mediaUrl && exercise.mediaType) {
+    <app-media-embed [fileId]="exercise.mediaUrl" [mediaType]="exercise.mediaType" />
+  }
+
   <textarea
     [(ngModel)]="userText"
     rows="6"

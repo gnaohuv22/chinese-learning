@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { LessonService } from '../../core/services/lesson.service';
 import { ExerciseService } from '../../core/services/exercise.service';
-import { Lesson, Exercise, Skill } from '../../core/models';
+import { Lesson, Exercise } from '../../core/models';
 import { ExerciseRendererComponent } from '../../shared/exercises/exercise-renderer.component';
 
 @Component({
@@ -21,25 +21,18 @@ export class LessonDetailComponent implements OnInit {
   private exerciseService = inject(ExerciseService);
 
   lesson = signal<Lesson | null>(null);
-  allExercises = signal<Exercise[]>([]);
-  activeSkill = signal<Skill>('listening');
+  /** All exercises sorted by `order` exactly as set in admin. */
+  exercises = signal<Exercise[]>([]);
   loading = signal(true);
-
-  exercisesForActiveSkill() {
-    return this.allExercises().filter((e) => e.skill === this.activeSkill());
-  }
 
   ngOnInit() {
     this.lessonService.getLesson(this.courseId, this.lessonId).subscribe((l) => {
-      if (l) {
-        this.lesson.set(l);
-        this.activeSkill.set(l.skills[0] ?? 'listening');
-      }
+      if (l) this.lesson.set(l);
       this.loading.set(false);
     });
 
-    this.exerciseService.getExercises(this.courseId, this.lessonId).subscribe((exs) =>
-      this.allExercises.set(exs)
-    );
+    this.exerciseService
+      .getExercises(this.courseId, this.lessonId)
+      .subscribe((exs) => this.exercises.set(exs));
   }
 }

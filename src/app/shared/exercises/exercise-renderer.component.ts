@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Exercise } from '../../core/models';
 import { McqComponent } from './mcq/mcq.component';
 import { ScrambleComponent } from './scramble/scramble.component';
+import { ScrambleDndComponent } from './scramble-dnd/scramble-dnd.component';
 import { GuidedWritingComponent } from './guided-writing/guided-writing.component';
 import { SpeakingTopicComponent } from './speaking-topic/speaking-topic.component';
 import { AudioMcqComponent } from './audio-mcq/audio-mcq.component';
@@ -17,6 +18,7 @@ import { DictationComponent } from './dictation/dictation.component';
     CommonModule,
     McqComponent,
     ScrambleComponent,
+    ScrambleDndComponent,
     GuidedWritingComponent,
     SpeakingTopicComponent,
     AudioMcqComponent,

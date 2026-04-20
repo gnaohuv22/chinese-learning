@@ -14,12 +14,12 @@
         left: 50%;
         transform: translateX(-50%);
         width: min(95vw, 520px);
-        background: #3a1b00;
-        border-color: #7e480a;
+        background: var(--color-bg-surface);
+        border-color: var(--color-border);
       "
     >
-      <div class="px-4 py-3 border-b" style="border-color: #7e480a;">
-        <p class="text-xs font-semibold tracking-wider uppercase" style="color: #c8ac89;">
+      <div class="px-4 py-3 border-b" style="border-color: var(--color-border);">
+        <p class="text-xs font-semibold tracking-wider uppercase" style="color: var(--color-primary);">
           {{ 'nav.courses' | translate }}
         </p>
       </div>
@@ -28,11 +28,11 @@
           type="button"
           (click)="navigate(['/on-tap', n])"
           class="w-full flex items-center gap-3 px-4 py-3.5 text-sm font-medium border-b last:border-b-0 transition-colors active:opacity-80 text-left"
-          style="color: #efe7db; border-color: #7e480a;"
+          style="color: var(--color-text); border-color: var(--color-border);"
         >
           <span
             class="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0"
-            style="background: #7e480a; color: #efe7db;"
+            style="background: var(--color-border); color: var(--color-primary);"
           >{{ n }}</span>
           {{ 'hoc_phan.' + n | translate }}
         </button>
@@ -41,18 +41,17 @@
   }
 
   <!-- Floating pill nav bar -->
-  <!-- The outer nav handles safe-area padding; the inner row contains the buttons
-       so the active-pill highlight is scoped to the button area only. -->
   <nav
-    class="fixed z-40 rounded-full shadow-2xl border"
+    class="fixed z-40 rounded-2xl shadow-xl border"
     style="
       bottom: 0.5rem;
       left: 50%;
       transform: translateX(-50%);
       width: min(95vw, 520px);
+      background: color-mix(in srgb, var(--color-bg) 85%, transparent);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-color: rgba(200, 172, 137, 0.3);
+      border-color: var(--color-border);
       margin-bottom: calc(max(0.5rem, env(safe-area-inset-bottom)) + 0.6rem);
     "
   >
@@ -63,9 +62,9 @@
       <button
         type="button"
         (click)="navigate('/')"
-        class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-full flex-1 py-2 text-xs font-medium transition-all"
+        class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url === '/'"
-        [style.color]="router.url === '/' ? '#c8ac89' : 'rgba(239,231,219,0.7)'"
+        [style.color]="router.url === '/' ? 'var(--color-primary)' : 'var(--color-text-muted)'"
       >
         <i class="fa-solid fa-house text-sm"></i>
         <span>{{ 'nav.home' | translate }}</span>
@@ -75,9 +74,9 @@
       <button
         type="button"
         (click)="navigate('/news')"
-        class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-full flex-1 py-2 text-xs font-medium transition-all"
+        class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url.startsWith('/news')"
-        [style.color]="router.url.startsWith('/news') ? '#c8ac89' : 'rgba(239,231,219,0.7)'"
+        [style.color]="router.url.startsWith('/news') ? 'var(--color-primary)' : 'var(--color-text-muted)'"
       >
         <i class="fa-solid fa-newspaper text-sm"></i>
         <span>{{ 'nav.news' | translate }}</span>
@@ -87,9 +86,9 @@
       <button
         type="button"
         (click)="toggleOntapSheet($event)"
-        class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-full flex-1 py-2 text-xs font-medium transition-all"
+        class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="ontapSheetOpen() || router.url.startsWith('/on-tap')"
-        [style.color]="ontapSheetOpen() || router.url.startsWith('/on-tap') ? '#c8ac89' : 'rgba(239,231,219,0.7)'"
+        [style.color]="ontapSheetOpen() || router.url.startsWith('/on-tap') ? 'var(--color-primary)' : 'var(--color-text-muted)'"
       >
         <i class="fa-solid fa-book-open text-sm"></i>
         <span>{{ 'nav.courses' | translate }}</span>
@@ -99,9 +98,9 @@
       <button
         type="button"
         (click)="navigate('/thi-thu')"
-        class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-full flex-1 py-2 text-xs font-medium transition-all"
+        class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url.startsWith('/thi-thu')"
-        [style.color]="router.url.startsWith('/thi-thu') ? '#c8ac89' : 'rgba(239,231,219,0.7)'"
+        [style.color]="router.url.startsWith('/thi-thu') ? 'var(--color-primary)' : 'var(--color-text-muted)'"
       >
         <i class="fa-solid fa-file-pen text-sm"></i>
         <span>{{ 'nav.mock_test' | translate }}</span>

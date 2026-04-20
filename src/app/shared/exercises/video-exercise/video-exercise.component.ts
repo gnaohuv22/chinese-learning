@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { Exercise } from '../../../core/models';
 import { DriveService } from '../../../core/services/drive.service';
+import { MediaEmbedComponent } from '../../components/media-embed/media-embed.component';
 
 @Component({
   selector: 'app-exercise-video',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, MediaEmbedComponent],
   templateUrl: './video-exercise.component.html',
 })
 export class VideoExerciseComponent implements OnDestroy {
@@ -17,19 +18,9 @@ export class VideoExerciseComponent implements OnDestroy {
   silenceProgress = signal(100);
   private silenceInterval: ReturnType<typeof setInterval> | null = null;
 
-  constructor(private drive: DriveService) {}
+  constructor() {}
 
-  get embedUrl(): string {
-    return this.exercise.mediaUrl
-      ? this.drive.getEmbedUrl(this.exercise.mediaUrl)
-      : '';
-  }
-
-  get directUrl(): string {
-    return this.exercise.mediaUrl
-      ? this.drive.getDirectUrl(this.exercise.mediaUrl)
-      : '';
-  }
+  // Removed embedUrl and directUrl as they are handled by app-media-embed
 
   triggerOverlay() {
     this.showPromptOverlay.set(true);

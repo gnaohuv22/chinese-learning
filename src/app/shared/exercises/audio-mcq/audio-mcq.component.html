@@ -1,21 +1,20 @@
 <div class="exercise-audio-mcq space-y-4">
-  <p class="text-base font-medium text-gray-800">{{ exercise.prompt }}</p>
+  <p class="text-base font-medium" style="color: var(--color-text)">{{ exercise.prompt }}</p>
 
   @if (exercise.mediaUrl) {
-    <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+    <div class="rounded-lg p-4 space-y-3 border shadow-sm" style="background: var(--color-bg-surface); border-color: var(--color-border)">
       <audio #audioEl controls class="w-full" [src]="audioSrc"></audio>
 
       <div class="flex items-center gap-2">
-        <span class="text-xs text-gray-500">Tốc độ:</span>
+        <span class="text-xs" style="color: var(--color-text-muted)">Tốc độ:</span>
         @for (speed of speeds; track speed) {
           <button
             type="button"
             (click)="setSpeed(speed)"
             class="text-xs px-2 py-1 rounded font-mono transition-colors"
-            [class.bg-red-700]="currentSpeed() === speed"
-            [class.text-white]="currentSpeed() === speed"
-            [class.bg-gray-200]="currentSpeed() !== speed"
-            [class.text-gray-700]="currentSpeed() !== speed"
+            [class.bg-gray-100]="currentSpeed() !== speed"
+            [style.color]="currentSpeed() === speed ? '#fff' : 'var(--color-text)'"
+            style="background: currentSpeed() === speed ? 'var(--color-primary)' : ''"
           >
             {{ speed }}x
           </button>
@@ -33,7 +32,7 @@
         class="w-full text-left px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all"
         [class]="getOptionClass($index)"
       >
-        <span class="font-mono text-gray-500 mr-2">{{ optionLabel($index) }}.</span>
+        <span class="font-mono mr-2" style="color: var(--color-text-muted)">{{ optionLabel($index) }}.</span>
         {{ option }}
       </button>
     }
