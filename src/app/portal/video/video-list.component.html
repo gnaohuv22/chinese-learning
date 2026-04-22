@@ -16,10 +16,10 @@
         <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(255,255,255,0.15);">
           <i class="fa-solid fa-film text-white text-lg"></i>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-white">Video Tương Tác</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white">{{ 'admin.interactive_videos' | translate }}</h1>
       </div>
       <p class="text-sm" style="color: rgba(255,255,255,0.75);">
-        Học qua video — trả lời câu hỏi ngay trong khi xem
+        {{ 'admin.interactive_video_desc' | translate }}
       </p>
     </div>
   </div>
@@ -29,14 +29,14 @@
       <div class="flex justify-center py-20">
         <div class="flex flex-col items-center gap-3">
           <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
-          <p class="text-sm" style="color: var(--color-text-muted);">Đang tải...</p>
+          <p class="text-sm" style="color: var(--color-text-muted);">{{ 'common.loading' | translate }}</p>
         </div>
       </div>
     } @else if (videos().length === 0) {
       <div class="flex flex-col items-center gap-4 py-20 text-center">
         <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl" style="background: var(--color-bg-surface);">🎬</div>
-        <p class="font-semibold text-lg" style="color: var(--color-text);">Chưa có video nào</p>
-        <p class="text-sm" style="color: var(--color-text-muted);">Video tương tác sẽ sớm được thêm vào đây.</p>
+        <p class="font-semibold text-lg" style="color: var(--color-text);">{{ 'admin.portal_no_videos' | translate }}</p>
+        <p class="text-sm" style="color: var(--color-text-muted);">{{ 'admin.portal_no_videos_desc' | translate }}</p>
       </div>
     } @else {
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -108,17 +108,25 @@
               <div class="flex items-center justify-between">
                 <span class="text-xs flex items-center gap-1.5 font-medium" style="color: var(--color-text-muted);">
                   <i class="fa-solid fa-flag-checkered"></i>
-                  {{ video.checkpoints?.length ?? 0 }} câu hỏi
+                  {{ video.checkpoints?.length ?? 0 }} {{ 'admin.question' | translate | lowercase }}
                 </span>
-                @if (getProgressPercent(video) === 100 && getProgress(video).total > 0) {
-                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background: #16a34a22; color: #16a34a;">
-                    <i class="fa-solid fa-check mr-1"></i>Hoàn thành
-                  </span>
-                } @else if (getProgress(video).done > 0) {
-                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background: var(--color-primary-ghost); color: var(--color-primary);">
-                    Đang học
-                  </span>
-                }
+                <div class="flex items-center gap-2">
+                  @if (getProgressPercent(video) === 100 && getProgress(video).total > 0) {
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background: #16a34a22; color: #16a34a;">
+                      <i class="fa-solid fa-check mr-1"></i>{{ 'admin.completed' | translate }}
+                    </span>
+                  } @else if (getProgress(video).done > 0) {
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background: var(--color-primary-ghost); color: var(--color-primary);">
+                      {{ 'admin.learning' | translate }}
+                    </span>
+                  } @else if (video.checkpoints && video.checkpoints.length > 0) {
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full transition-all flex items-center gap-1 hover:opacity-80" 
+                      style="background: var(--color-primary); color: white;">
+                      {{ 'admin.try_now' | translate }}
+                      <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </span>
+                  }
+                </div>
               </div>
             </div>
           </button>
