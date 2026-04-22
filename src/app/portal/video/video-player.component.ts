@@ -51,6 +51,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   // Modal state
   showQuestionModal = false;
   showHelperModal = false;
+  showInfoModal = false;
   currentCheckpoint: VideoCheckpoint | null = null;
   selectedOption: string | null = null;
   answerResult: 'correct' | 'wrong' | null = null;
@@ -217,7 +218,26 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     const vid = this.videoData();
     if (!vid) return;
     this.completedCheckpoints.add(id);
+    this.completedCheckpoints = new Set(this.completedCheckpoints);
     this.checkpointState.markDone(vid.id, id);
+  }
+
+  resetProgress() {
+    const vid = this.videoData();
+    if (!vid) return;
+    this.checkpointState.reset(vid.id);
+    this.completedCheckpoints = new Set();
+  }
+
+  openInfoModal() {
+    this.showInfoModal = true;
+    if (!this.isLocked && !this.videoRef.nativeElement.paused) {
+      this.togglePlay(); // Pause while reading info
+    }
+  }
+
+  closeInfoModal() {
+    this.showInfoModal = false;
   }
 
   togglePlay() {
