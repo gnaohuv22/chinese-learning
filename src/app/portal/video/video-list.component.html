@@ -1,0 +1,129 @@
+<div class="min-h-screen" style="background: var(--color-bg);">
+  <!-- Header banner -->
+  <div class="relative overflow-hidden" style="background: linear-gradient(135deg, #3a1b00 0%, #7e480a 60%, #c8861a 100%);">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+      @for (char of ['影','视','学','语','汉','记']; track $index) {
+        <span
+          class="absolute font-bold opacity-10 text-white"
+          [style.font-size.rem]="4 + $index * 1.2"
+          [style.right.%]="$index * 16"
+          [style.bottom.rem]="-1"
+        >{{ char }}</span>
+      }
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(255,255,255,0.15);">
+          <i class="fa-solid fa-film text-white text-lg"></i>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white">Video Tương Tác</h1>
+      </div>
+      <p class="text-sm" style="color: rgba(255,255,255,0.75);">
+        Học qua video — trả lời câu hỏi ngay trong khi xem
+      </p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    @if (loading()) {
+      <div class="flex justify-center py-20">
+        <div class="flex flex-col items-center gap-3">
+          <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+          <p class="text-sm" style="color: var(--color-text-muted);">Đang tải...</p>
+        </div>
+      </div>
+    } @else if (videos().length === 0) {
+      <div class="flex flex-col items-center gap-4 py-20 text-center">
+        <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl" style="background: var(--color-bg-surface);">🎬</div>
+        <p class="font-semibold text-lg" style="color: var(--color-text);">Chưa có video nào</p>
+        <p class="text-sm" style="color: var(--color-text-muted);">Video tương tác sẽ sớm được thêm vào đây.</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        @for (video of videos(); track video.id) {
+          <button
+            type="button"
+            (click)="openVideo(video.id)"
+            id="video-card-{{ video.id }}"
+            class="group text-left rounded-2xl overflow-hidden border transition-all duration-200 hover:scale-[1.02] hover:shadow-2xl focus:outline-none focus:ring-2"
+            style="background: var(--color-bg-surface); border-color: var(--color-border); focus-ring-color: var(--color-primary);"
+          >
+            <!-- Thumbnail -->
+            <div class="relative aspect-video overflow-hidden" style="background: #1a0d00;">
+              @if (video.thumbnailUrl) {
+                <img [src]="video.thumbnailUrl" [alt]="video.title" class="w-full h-full object-cover" />
+              } @else {
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
+                    style="background: rgba(200,172,137,0.2); border: 2px solid rgba(200,172,137,0.4);">
+                    <i class="fa-solid fa-play text-2xl" style="color: #c8ac89; margin-left: 3px;"></i>
+                  </div>
+                </div>
+                <!-- Decorative chars -->
+                <span class="absolute top-3 right-4 text-4xl font-bold opacity-10" style="color: #c8ac89;">影</span>
+              }
+
+              <!-- Checkpoint progress badge -->
+              <div class="absolute top-2.5 left-2.5">
+                @if (getProgress(video).total > 0) {
+                  <span
+                    class="text-xs font-semibold px-2 py-1 rounded-lg"
+                    style="background: rgba(0,0,0,0.65); color: #c8ac89; backdrop-filter: blur(4px);"
+                  >
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    {{ getProgress(video).done }}/{{ getProgress(video).total }}
+                  </span>
+                }
+              </div>
+
+              <!-- Progress bar overlay -->
+              @if (getProgress(video).total > 0) {
+                <div class="absolute bottom-0 left-0 right-0 h-1" style="background: rgba(0,0,0,0.4);">
+                  <div
+                    class="h-full transition-all duration-500"
+                    [style.width.%]="getProgressPercent(video)"
+                    style="background: linear-gradient(90deg, #c8861a, #c8ac89);"
+                  ></div>
+                </div>
+              }
+
+              <!-- Play overlay on hover -->
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                style="background: rgba(0,0,0,0.35);">
+                <div class="w-14 h-14 rounded-full flex items-center justify-center"
+                  style="background: rgba(200,172,137,0.9);">
+                  <i class="fa-solid fa-play text-xl" style="color: #3a1b00; margin-left: 3px;"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card content -->
+            <div class="p-4">
+              <h2 class="font-semibold text-base line-clamp-2 mb-1.5 group-hover:opacity-80 transition-opacity" style="color: var(--color-text);">
+                {{ video.title }}
+              </h2>
+              @if (video.description) {
+                <p class="text-sm line-clamp-2 mb-3" style="color: var(--color-text-muted);">{{ video.description }}</p>
+              }
+              <div class="flex items-center justify-between">
+                <span class="text-xs flex items-center gap-1.5 font-medium" style="color: var(--color-text-muted);">
+                  <i class="fa-solid fa-flag-checkered"></i>
+                  {{ video.checkpoints?.length ?? 0 }} câu hỏi
+                </span>
+                @if (getProgressPercent(video) === 100 && getProgress(video).total > 0) {
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background: #16a34a22; color: #16a34a;">
+                    <i class="fa-solid fa-check mr-1"></i>Hoàn thành
+                  </span>
+                } @else if (getProgress(video).done > 0) {
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background: var(--color-primary-ghost); color: var(--color-primary);">
+                    Đang học
+                  </span>
+                }
+              </div>
+            </div>
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

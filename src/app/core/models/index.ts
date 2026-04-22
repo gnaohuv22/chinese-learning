@@ -5,3 +5,4 @@ export * from './exam.model';
 export * from './mock-test.model';
 export * from './news.model';
 export * from './submitted-exam.model';
+export * from './interactive-video.model';

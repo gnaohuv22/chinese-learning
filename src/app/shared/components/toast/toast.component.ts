@@ -12,14 +12,14 @@ export class ToastComponent {
   readonly toastService = inject(ToastService);
 
   toastClasses(toast: Toast): string {
-    const base = 'border';
+    const base = 'border backdrop-blur-md';
     switch (toast.type) {
       case 'success':
-        return `${base} bg-green-50 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700`;
+        return `${base} bg-green-50/90 text-green-800 border-green-200/50 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700/50`;
       case 'error':
-        return `${base} bg-red-50 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700`;
+        return `${base} bg-red-50/90 text-red-800 border-red-200/50 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700/50`;
       case 'info':
-        return `${base} bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700`;
+        return `${base} bg-blue-50/90 text-blue-800 border-blue-200/50 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700/50`;
     }
   }
 

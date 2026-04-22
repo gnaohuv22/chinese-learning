@@ -1,0 +1,323 @@
+<div class="min-h-screen" style="background: var(--color-bg);">
+
+  @if (loading()) {
+  <div class="flex justify-center items-center min-h-screen">
+    <div class="flex flex-col items-center gap-3">
+      <div class="animate-spin rounded-full h-10 w-10 border-2"
+        style="border-color: var(--color-primary); border-top-color: transparent;"></div>
+      <p class="text-sm" style="color: var(--color-text-muted);">Đang tải video...</p>
+    </div>
+  </div>
+  } @else if (notFound()) {
+  <div class="flex flex-col items-center gap-4 py-32 text-center px-4">
+    <div class="text-5xl">🎬</div>
+    <h2 class="text-xl font-bold" style="color: var(--color-text);">Không tìm thấy video</h2>
+    <button class="btn-primary" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left mr-2"></i>Quay lại
+    </button>
+  </div>
+  } @else if (videoData(); as vid) {
+
+  <!-- Back + title bar -->
+  <div class="top-16 z-30 border-b" style="background: var(--color-bg); border-color: var(--color-border);">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+      <button type="button" (click)="goBack()"
+        class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:opacity-70"
+        style="background: var(--color-bg-surface); color: var(--color-text);" id="player-back-btn">
+        <i class="fa-solid fa-chevron-left text-sm"></i>
+      </button>
+      <div class="min-w-0 flex-1 overflow-hidden">
+        <h1 class="text-sm sm:text-base font-semibold truncate" style="color: var(--color-text);">{{ vid.title }}</h1>
+      </div>
+      <!-- Checkpoint progress -->
+      @if (vid.checkpoints?.length) {
+      <div class="flex-shrink-0 flex items-center gap-2">
+        <span class="text-xs font-medium" style="color: var(--color-text-muted);">
+          {{ getCompletedCount() }}/{{ vid.checkpoints.length }}
+        </span>
+        <div class="w-20 h-1.5 rounded-full overflow-hidden" style="background: var(--color-border);">
+          <div class="h-full rounded-full transition-all duration-500" [style.width.%]="getProgressPercent()"
+            style="background: linear-gradient(90deg, #c8861a, #c8ac89);"></div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Player area -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+
+    <!-- Video wrapper — position:relative is THE container for all overlays -->
+    <div class="relative rounded-2xl overflow-hidden shadow-2xl" [class.ring-2]="isLocked" style="background: #0a0a0a;"
+      [style.ring-color]="isLocked ? '#c8861a' : 'transparent'">
+      <!-- Interaction blocker — sits above video, below modals, blocks click when locked -->
+      @if (isLocked) {
+      <div class="absolute inset-0 z-10" style="cursor: not-allowed; background: transparent;"></div>
+      }
+
+      <!-- VIDEO ELEMENT — no controls attribute -->
+      <video #videoEl [src]="vid.videoUrl" class="w-full block"
+        [style.filter]="isLocked ? 'brightness(0.35)' : 'brightness(1)'"
+        style="transition: filter 0.3s ease; max-height: 70vh; object-fit: contain;" playsinline webkit-playsinline
+        preload="metadata" (loadedmetadata)="onVideoReady()" (durationchange)="onDurationChange()"
+        (timeupdate)="onTimeUpdate()" (play)="onPlay()" (pause)="onPause()" (ended)="onEnded()"
+        id="interactive-video-main"></video>
+
+      <!-- Locked dimmed overlay text -->
+      @if (isLocked && !showQuestionModal && !showHelperModal) {
+      <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+        <div class="flex flex-col items-center gap-2">
+          <i class="fa-solid fa-lock text-3xl" style="color: #c8ac89;"></i>
+          <p class="text-sm font-medium" style="color: #c8ac89;">Video đang tạm dừng</p>
+        </div>
+      </div>
+      }
+
+      <!-- QUESTION MODAL -->
+      @if (showQuestionModal && currentCheckpoint) {
+      <div class="absolute inset-0 z-30 flex items-center justify-center p-4"
+        style="background: rgba(0,0,0,0.75); backdrop-filter: blur(2px);" id="question-modal-overlay">
+        <div class="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-slide-up"
+          style="background: var(--color-bg-surface); border: 1px solid var(--color-border);">
+          <!-- Modal header -->
+          <div class="px-5 pt-5 pb-3 border-b" style="border-color: var(--color-border);">
+            <div class="flex items-center gap-2 mb-1">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                style="background: linear-gradient(135deg, #c8861a, #c8ac89);">
+                <i class="fa-solid fa-circle-question text-white text-sm"></i>
+              </div>
+              <span class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-primary);">Câu
+                hỏi</span>
+            </div>
+            <p class="text-base font-semibold leading-snug" style="color: var(--color-text);">
+              {{ currentCheckpoint.question }}
+            </p>
+          </div>
+
+          <!-- Options -->
+          <div class="px-5 py-4 space-y-2.5">
+            @for (option of currentCheckpoint.options; track $index) {
+            <button type="button" (click)="selectOption(option)" [disabled]="selectedOption !== null"
+              id="option-btn-{{ $index }}"
+              class="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-150 text-sm font-medium"
+              [style.background]="
+                      selectedOption === option && answerResult === 'correct' ? '#16a34a22' :
+                      selectedOption === option && answerResult === 'wrong' ? '#dc262622' :
+                      selectedOption === null ? 'var(--color-bg)' :
+                      'var(--color-bg)'
+                    " [style.border-color]="
+                      selectedOption === option && answerResult === 'correct' ? '#16a34a' :
+                      selectedOption === option && answerResult === 'wrong' ? '#dc2626' :
+                      selectedOption !== null && currentCheckpoint.correctAnswers.includes(option) ? '#16a34a55' :
+                      'var(--color-border)'
+                    " [style.color]="
+                      selectedOption === option && answerResult === 'correct' ? '#16a34a' :
+                      selectedOption === option && answerResult === 'wrong' ? '#dc2626' :
+                      'var(--color-text)'
+                    ">
+              <!-- Letter badge -->
+              <span
+                class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-colors"
+                [style.background]="
+                        selectedOption === option && answerResult === 'correct' ? '#16a34a' :
+                        selectedOption === option && answerResult === 'wrong' ? '#dc2626' :
+                        selectedOption !== null && currentCheckpoint.correctAnswers.includes(option) ? '#16a34a33' :
+                        'var(--color-border)'
+                      " [style.color]="
+                        (selectedOption === option && answerResult !== null) ? '#fff' :
+                        'var(--color-text-muted)'
+                      ">{{ getOptionLetter($index) }}</span>
+
+              <span class="flex-1">{{ option }}</span>
+
+              <!-- Result icon -->
+              @if (selectedOption === option && answerResult === 'correct') {
+              <i class="fa-solid fa-check flex-shrink-0" style="color: #16a34a;"></i>
+              } @else if (selectedOption === option && answerResult === 'wrong') {
+              <i class="fa-solid fa-xmark flex-shrink-0" style="color: #dc2626;"></i>
+              } @else if (selectedOption !== null && currentCheckpoint.correctAnswers.includes(option)) {
+              <i class="fa-solid fa-check flex-shrink-0 opacity-50" style="color: #16a34a;"></i>
+              }
+            </button>
+            }
+          </div>
+
+          <!-- Action -->
+          <div class="px-5 pb-5">
+            @if (selectedOption === null) {
+            <p class="text-center text-xs" style="color: var(--color-text-muted);">Chọn một đáp án để tiếp tục</p>
+            } @else {
+            <button type="button" (click)="confirmAnswer()" id="confirm-answer-btn"
+              class="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
+              [style.background]="answerResult === 'correct' ? '#16a34a' : '#dc2626'" style="color: white;">
+              @if (answerResult === 'correct') {
+              <i class="fa-solid fa-play mr-2"></i>Tiếp tục xem
+              } @else {
+              <i class="fa-solid fa-arrow-right mr-2"></i>Xem giải thích
+              }
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- HELPER MODAL (wrong answer) -->
+      @if (showHelperModal && currentCheckpoint) {
+      <div class="absolute inset-0 z-30 flex items-center justify-center p-4"
+        style="background: rgba(0,0,0,0.75); backdrop-filter: blur(2px);" id="helper-modal-overlay">
+        <div class="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-slide-up"
+          style="background: var(--color-bg-surface); border: 1px solid var(--color-border);">
+          <!-- Header -->
+          <div class="px-5 pt-5 pb-3 border-b" style="border-color: var(--color-border);">
+            <div class="flex items-center gap-2 mb-1">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                style="background: #f59e0b;">
+                <i class="fa-solid fa-lightbulb text-white text-sm"></i>
+              </div>
+              <span class="text-xs font-semibold uppercase tracking-wider" style="color: #f59e0b;">Gợi ý</span>
+            </div>
+            <p class="text-base font-semibold" style="color: var(--color-text);">Chưa đúng rồi!</p>
+          </div>
+
+          <!-- Helper content -->
+          <div class="px-5 py-4">
+            @if (currentCheckpoint.helperContent) {
+            <div class="rounded-xl p-4 mb-4 text-sm leading-relaxed"
+              style="background: var(--color-bg); color: var(--color-text);">
+              {{ currentCheckpoint.helperContent }}
+            </div>
+            }
+
+            <!-- Lesson link -->
+            @if (currentCheckpoint.lessonLink) {
+            <a [routerLink]="['/courses', currentCheckpoint.lessonLink.courseId, 'lessons', currentCheckpoint.lessonLink.lessonId]"
+              id="lesson-link-btn"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl border mb-4 text-sm font-medium transition-all hover:opacity-80"
+              style="border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-ghost);">
+              <i class="fa-solid fa-book-open"></i>
+              <span>Ôn lại: {{ currentCheckpoint.lessonLink.label }}</span>
+              <i class="fa-solid fa-arrow-right ml-auto text-xs"></i>
+            </a>
+            }
+          </div>
+
+          <!-- Actions -->
+          <div class="px-5 pb-5 flex flex-col gap-2.5">
+            <button type="button" (click)="retryQuestion()" id="retry-question-btn"
+              class="w-full py-3 rounded-xl font-semibold text-sm border transition-all hover:opacity-80"
+              style="border-color: var(--color-primary); color: var(--color-primary); background: transparent;">
+              <i class="fa-solid fa-rotate-left mr-2"></i>Thử lại
+            </button>
+            <button type="button" (click)="onHelperContinue()" id="helper-continue-btn"
+              class="w-full py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
+              style="background: var(--color-bg-surface); color: var(--color-text-muted); border: 1px solid var(--color-border);">
+              <i class="fa-solid fa-forward mr-2"></i>Bỏ qua, tiếp tục xem
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- CUSTOM CONTROLS -->
+      <div class="px-4 py-3 flex flex-col gap-2"
+        style="background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); margin-top: -1px;"
+        [style.opacity]="isLocked ? '0.4' : '1'">
+        <!-- Seek bar -->
+        <div class="flex items-center gap-2 text-xs" style="color: #c8ac89;">
+          <span class="tabular-nums w-8 text-right">{{ formatTime(currentTime) }}</span>
+          <div class="relative flex-1 h-5 flex items-center group">
+            <div class="absolute inset-x-0 h-1.5 rounded-full" style="background: rgba(255,255,255,0.2);">
+              <div class="h-full rounded-full" [style.width.%]="duration > 0 ? (currentTime / duration * 100) : 0"
+                style="background: linear-gradient(90deg, #c8861a, #c8ac89);"></div>
+            </div>
+            <input type="range" [value]="currentTime" [max]="duration || 1" step="0.5" (input)="onSeek($event)"
+              [disabled]="isLocked"
+              class="absolute inset-0 w-full opacity-0 h-4 cursor-pointer disabled:cursor-not-allowed"
+              id="video-seekbar" />
+          </div>
+          <span class="tabular-nums w-8">{{ formatTime(duration) }}</span>
+        </div>
+
+        <!-- Buttons row -->
+        <div class="flex items-center gap-2">
+          <!-- Play/Pause -->
+          <button type="button" (click)="togglePlay()" [disabled]="isLocked" id="play-pause-btn"
+            class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
+            style="background: rgba(255,255,255,0.12); color: white;">
+            @if (isPlaying) {
+            <i class="fa-solid fa-pause text-sm"></i>
+            } @else {
+            <i class="fa-solid fa-play text-sm" style="margin-left: 2px;"></i>
+            }
+          </button>
+
+          <!-- Volume -->
+          <button type="button" (click)="toggleMute()" [disabled]="isLocked"
+            class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all hover:opacity-80 disabled:opacity-40"
+            style="color: #c8ac89;">
+            @if (isMuted || volume === 0) {
+            <i class="fa-solid fa-volume-xmark text-sm"></i>
+            } @else {
+            <i class="fa-solid fa-volume-high text-sm"></i>
+            }
+          </button>
+
+          <!-- Spacer -->
+          <div class="flex-1"></div>
+
+          <!-- Checkpoint progress pill -->
+          @if (vid.checkpoints?.length) {
+          <span class="text-xs font-medium px-2.5 py-1 rounded-full"
+            style="background: rgba(200,172,137,0.15); color: #c8ac89;">
+            <i class="fa-solid fa-flag-checkered mr-1"></i>
+            {{ getCompletedCount() }}/{{ vid.checkpoints.length }}
+          </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    @if (vid.description) {
+    <div class="mt-5 rounded-xl p-4 border"
+      style="background: var(--color-bg-surface); border-color: var(--color-border);">
+      <p class="text-sm leading-relaxed" style="color: var(--color-text);">{{ vid.description }}</p>
+    </div>
+    }
+
+    <!-- Checkpoints list -->
+    @if (vid.checkpoints?.length) {
+    <div class="mt-5">
+      <h2 class="text-sm font-semibold mb-3 flex items-center gap-2" style="color: var(--color-text);">
+        <i class="fa-solid fa-flag-checkered" style="color: var(--color-primary);"></i>
+        Các câu hỏi trong video
+      </h2>
+      <div class="space-y-2">
+        @for (cp of vid.checkpoints; track cp.id) {
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm"
+          style="background: var(--color-bg-surface); border-color: var(--color-border);">
+          <div class="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
+            [style.background]="completedCheckpoints.has(cp.id) ? '#16a34a' : 'var(--color-border)'"
+            [style.color]="completedCheckpoints.has(cp.id) ? '#fff' : 'var(--color-text-muted)'">
+            @if (completedCheckpoints.has(cp.id)) {
+            <i class="fa-solid fa-check"></i>
+            } @else {
+            {{ formatTime(cp.timestamp) }}
+            }
+          </div>
+          <span class="flex-1 line-clamp-1"
+            [style.color]="completedCheckpoints.has(cp.id) ? 'var(--color-text-muted)' : 'var(--color-text)'"
+            [style.text-decoration]="completedCheckpoints.has(cp.id) ? 'line-through' : 'none'">{{ cp.question }}</span>
+          @if (!completedCheckpoints.has(cp.id)) {
+          <span class="text-xs flex-shrink-0" style="color: var(--color-text-muted);">{{ formatTime(cp.timestamp)
+            }}</span>
+          }
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>
