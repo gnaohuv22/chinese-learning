@@ -1,0 +1,346 @@
+<div class="p-4 sm:p-6 w-full">
+
+  <!-- Page header -->
+  <div class="flex items-center gap-3 mb-6 flex-wrap">
+    <div class="min-w-0 flex-1">
+      <h1 class="text-xl sm:text-2xl font-bold page-title">{{ 'admin.interactive_videos' | translate }}</h1>
+      <p class="text-xs mt-0.5 breadcrumb">{{ 'admin.manage_interactive_videos' | translate }}</p>
+    </div>
+    <button class="btn-primary text-sm flex-shrink-0" (click)="openCreate()" id="add-video-btn">
+      <i class="fa-solid fa-plus"></i>
+      <span class="hidden sm:inline">{{ 'admin.add_video' | translate }}</span>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent spinner"></div>
+    </div>
+  } @else {
+
+    <!-- Video list -->
+    @if (videos().length === 0 && !showForm()) {
+      <div class="card text-center py-12 empty-state text-sm">
+        {{ 'admin.no_videos' | translate }}
+      </div>
+    } @else {
+      <div class="space-y-3 mb-6">
+        @for (vid of videos(); track vid.id) {
+          <div class="card">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+              <!-- Info -->
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <div class="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center"
+                  style="background: var(--color-border);">
+                  <i class="fa-solid fa-film" style="color: var(--color-primary);"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span class="font-semibold text-sm item-desc truncate">{{ vid.title }}</span>
+                    @if (vid.published) {
+                      <span class="chip chip-green text-xs">{{ 'admin.published' | translate }}</span>
+                    } @else {
+                      <span class="chip chip-gray text-xs">{{ 'admin.draft' | translate }}</span>
+                    }
+                  </div>
+                  <p class="text-xs breadcrumb">
+                    {{ vid.checkpoints?.length ?? 0 }} {{ 'admin.questions_count' | translate }}
+                    @if (vid.description) { · {{ vid.description | slice:0:60 }}{{ vid.description.length > 60 ? '…' : '' }} }
+                  </p>
+                </div>
+              </div>
+              <!-- Actions -->
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button class="btn-secondary text-xs py-1.5 px-2.5" (click)="openEdit(vid)" [id]="'edit-video-' + vid.id">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i>
+                  <span class="hidden sm:inline">{{ 'common.edit' | translate }}</span>
+                </button>
+                <button class="btn-danger text-xs py-1.5 px-2.5" (click)="deleteVideo(vid)" [id]="'delete-video-' + vid.id">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                  <span class="hidden sm:inline">{{ 'common.delete' | translate }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ══ FORM PANEL ══ -->
+    @if (showForm()) {
+      <div class="card animate-slide-up mb-6 form-panel">
+
+        <!-- Form header -->
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-base sm:text-lg font-semibold form-heading">
+            {{ editingVideo() ? ('admin.edit_video' | translate) : ('admin.create_video' | translate) }}
+          </h2>
+          <button type="button" (click)="closeForm()" class="hover:opacity-70 close-btn">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="save()" class="space-y-5">
+
+          <!-- Title -->
+          <div class="form-field">
+            <label class="form-label">{{ 'admin.video_title' | translate }} *</label>
+            <input formControlName="title" class="form-input" id="video-title-input" />
+            @if (form.controls.title.invalid && form.controls.title.touched) {
+              <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ 'admin.error_required' | translate }}</p>
+            }
+          </div>
+
+          <!-- Description -->
+          <div class="form-field">
+            <label class="form-label">{{ 'admin.description' | translate }}</label>
+            <textarea formControlName="description" class="form-input form-textarea" rows="2"></textarea>
+          </div>
+
+          <!-- Video upload -->
+          <div class="form-field">
+            <label class="form-label">{{ 'admin.video_upload' | translate }} *</label>
+            <p class="text-xs mb-2" style="color: var(--color-text-muted);">{{ 'admin.video_upload_hint' | translate }}</p>
+            <app-file-uploader
+              [fileId]="form.value.videoUrl ?? undefined"
+              (uploaded)="onVideoUploaded($event)"
+              (cleared)="onVideoClear()"
+              accept="video/*"
+              id="video-uploader"
+            />
+            @if (form.controls.videoUrl.invalid && form.controls.videoUrl.touched) {
+              <p class="form-error mt-1"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ 'admin.video_required' | translate }}</p>
+            }
+          </div>
+
+          <!-- ── VIDEO PREVIEW + TIMESTAMP EDITOR ── -->
+          @if (form.value.videoUrl) {
+            <div class="rounded-xl border overflow-hidden" style="border-color: var(--color-border);">
+              <div class="px-4 py-2.5 border-b flex items-center gap-2" style="border-color: var(--color-border); background: var(--color-bg);">
+                <i class="fa-solid fa-location-pin-lock" style="color: var(--color-primary);"></i>
+                <span class="text-sm font-semibold" style="color: var(--color-text);">{{ 'admin.pin_timestamp_title' | translate }}</span>
+              </div>
+
+              <!-- Preview video -->
+              <div class="relative" style="background: #0a0a0a;">
+                <video
+                  #previewVideoEl
+                  [src]="form.value.videoUrl || ''"
+                  class="w-full max-h-64 object-contain block"
+                  playsinline
+                  preload="metadata"
+                  (loadedmetadata)="onPreviewLoaded()"
+                  (timeupdate)="onPreviewTimeUpdate()"
+                  (ended)="previewPlaying.set(false)"
+                  id="preview-video-el"
+                ></video>
+                <!-- Time badge -->
+                <div class="absolute top-2 left-2 text-xs font-bold px-2 py-1 rounded-lg"
+                  style="background: rgba(0,0,0,0.7); color: #c8ac89;">
+                  {{ formatTime(previewTime()) }} / {{ formatTime(previewDuration()) }}
+                </div>
+              </div>
+
+              <!-- Preview controls -->
+              <div class="px-4 py-3 space-y-2" style="background: var(--color-bg-surface);">
+                <!-- Seek bar -->
+                <input
+                  type="range"
+                  [value]="previewTime()"
+                  [max]="previewDuration() || 1"
+                  step="0.1"
+                  (input)="seekPreview($event)"
+                  class="w-full accent-amber-600 cursor-pointer h-1.5"
+                  id="preview-seekbar"
+                />
+                <div class="flex items-center gap-2">
+                  <button type="button" (click)="togglePreviewPlay()"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 btn-secondary"
+                    id="preview-play-btn">
+                    @if (previewPlaying()) {
+                      <i class="fa-solid fa-pause text-xs"></i>
+                    } @else {
+                      <i class="fa-solid fa-play text-xs" style="margin-left:1px"></i>
+                    }
+                  </button>
+                  <div class="flex-1"></div>
+                  <button
+                    type="button"
+                    (click)="pinCurrentTime()"
+                    class="btn-primary text-xs py-1.5 px-3"
+                    id="pin-timestamp-btn"
+                  >
+                    <i class="fa-solid fa-map-pin mr-1.5"></i>
+                    {{ 'admin.pin_question_at' | translate }} {{ formatTime(previewTime()) }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Checkpoint sub-form -->
+              @if (showCheckpointForm()) {
+                <div class="border-t p-4 space-y-3 animate-slide-up" style="border-color: var(--color-border); background: var(--color-bg);">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold flex items-center gap-1.5" style="color: var(--color-primary);">
+                      <i class="fa-solid fa-location-pin"></i>
+                      {{ formatTime(pinnedTimestamp() ?? 0) }}
+                      @if (editingCheckpointIndex() !== null) { <span class="chip chip-gray text-xs">{{ 'admin.editing' | translate }}</span> }
+                    </p>
+                    <button type="button" (click)="cancelCheckpoint()" class="text-xs hover:opacity-60 breadcrumb">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+
+                  <!-- Question -->
+                  <div class="form-field">
+                    <label class="form-label text-xs">{{ 'admin.questions' | translate }} *</label>
+                    <input [formControl]="$any(cpForm.get('question'))" class="form-input text-sm" id="cp-question-input" />
+                    @if (cpForm.controls.question.invalid && cpForm.controls.question.touched) {
+                      <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ 'admin.error_required' | translate }}</p>
+                    }
+                  </div>
+
+                  <!-- Options -->
+                  <div class="form-field">
+                    <label class="form-label text-xs">{{ 'admin.options' | translate }} *</label>
+                    <div class="space-y-2">
+                      @for (key of ['option0','option1','option2','option3']; track key; let i = $index) {
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0"
+                              style="background: var(--color-border); color: var(--color-text-muted);">
+                              {{ ['A','B','C','D'][i] }}
+                            </span>
+                            <input
+                              [formControl]="$any(cpForm.get(key))"
+                              class="form-input flex-1 text-sm"
+                              [class.error]="cpForm.get(key)?.invalid && cpForm.get(key)?.touched"
+                              [placeholder]="(i > 1) ? '(' + ('admin.optional' | translate) + ')' : ''"
+                              [id]="'cp-opt-' + key"
+                            />
+                            <!-- Mark correct toggle -->
+                            @if ($any(cpForm.value)[key]) {
+                              <button
+                                type="button"
+                                (click)="toggleCorrectAnswer($any(cpForm.value)[key]!)"
+                                class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border transition-colors text-xs"
+                                [style.background]="isCorrectAnswer($any(cpForm.value)[key]!) ? '#16a34a' : 'var(--color-bg-surface)'"
+                                [style.border-color]="isCorrectAnswer($any(cpForm.value)[key]!) ? '#16a34a' : 'var(--color-border)'"
+                                [style.color]="isCorrectAnswer($any(cpForm.value)[key]!) ? '#fff' : 'var(--color-text-muted)'"
+                                [title]="'admin.answer' | translate"
+                                [id]="'cp-correct-' + key"
+                              >
+                                <i class="fa-solid fa-check"></i>
+                              </button>
+                            }
+                          </div>
+                          @if (cpForm.get(key)?.invalid && cpForm.get(key)?.touched) {
+                            <p class="form-error mt-1 ml-8"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ 'admin.error_required' | translate }}</p>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <p class="text-xs mt-1" style="color: var(--color-text-muted);" [innerHTML]="'admin.mark_correct_hint' | translate">
+                    </p>
+                    @if (cpForm.controls.correctAnswers.invalid && cpForm.controls.correctAnswers.touched) {
+                      <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ 'admin.error_min_correct' | translate }}</p>
+                    }
+                  </div>
+
+                  <!-- Helper content -->
+                  <div class="form-field">
+                    <label class="form-label text-xs">{{ 'admin.helper_content' | translate }}</label>
+                    <textarea [formControl]="$any(cpForm.get('helperContent'))" class="form-input form-textarea text-sm" rows="2"
+                      [placeholder]="'admin.helper_content_placeholder' | translate"></textarea>
+                  </div>
+
+                  <!-- Lesson link -->
+                  <div class="form-field">
+                    <label class="form-label text-xs">{{ 'admin.lesson_link' | translate }} ({{ 'admin.optional' | translate }})</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <select [formControl]="$any(cpForm.get('lessonLinkCourseId'))" class="form-input text-sm" id="cp-course-id" (change)="onCourseChange($any($event.target).value)">
+                        <option value="">-- {{ 'mock_test.select_hoc_phan' | translate }} --</option>
+                        @for (c of courses(); track c.id) {
+                          <option [value]="c.id">{{ c.title }}</option>
+                        }
+                      </select>
+                      @if (cpForm.value.lessonLinkCourseId) {
+                        <select [formControl]="$any(cpForm.get('lessonLinkLessonId'))" class="form-input text-sm animate-slide-up" id="cp-lesson-id">
+                          <option value="">-- {{ 'common.select' | translate }} {{ 'lesson.title' | translate | lowercase }} --</option>
+                          @for (l of selectedCourseLessons(); track l.id) {
+                            <option [value]="l.id">{{ l.title }}</option>
+                          }
+                        </select>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="flex gap-2 pt-1">
+                    <button type="button" (click)="saveCheckpoint()" class="btn-primary text-sm py-2" id="save-checkpoint-btn">
+                      <i class="fa-solid fa-plus mr-1"></i>
+                      {{ editingCheckpointIndex() !== null ? ('admin.update_question' | translate) : ('admin.add_question' | translate) }}
+                    </button>
+                    <button type="button" (click)="cancelCheckpoint()" class="btn-secondary text-sm py-2">{{ 'common.cancel' | translate }}</button>
+                  </div>
+                </div>
+              }
+
+              <!-- Checkpoints list -->
+              @if (checkpoints().length > 0) {
+                <div class="border-t" style="border-color: var(--color-border);">
+                  <div class="px-4 py-2 text-xs font-semibold" style="color: var(--color-text-muted); background: var(--color-bg-surface);">
+                    {{ checkpoints().length }} {{ 'admin.questions_count' | translate }}
+                  </div>
+                  <div class="divide-y" style="divide-color: var(--color-border);">
+                    @for (cp of checkpoints(); track cp.id; let i = $index) {
+                      <div class="px-4 py-3 flex items-center gap-3" style="background: var(--color-bg-surface);">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-md flex-shrink-0"
+                          style="background: var(--color-border); color: var(--color-primary);">
+                          {{ formatTime(cp.timestamp) }}
+                        </span>
+                        <p class="flex-1 text-sm line-clamp-1" style="color: var(--color-text);">{{ cp.question }}</p>
+                        <span class="text-xs breadcrumb flex-shrink-0">{{ cp.options.length }} đáp án</span>
+                        <button type="button" (click)="openEditCheckpoint(i)" class="text-xs hover:opacity-70 flex-shrink-0" style="color: var(--color-primary);">
+                          <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button type="button" (click)="removeCheckpoint(i)" class="text-xs hover:opacity-70 flex-shrink-0" style="color: #dc2626;">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Published + Order -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.order' | translate }}</label>
+              <input formControlName="order" type="number" class="form-input" placeholder="0" />
+            </div>
+            <div class="form-field flex items-end pb-1">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" formControlName="published" class="rounded accent-amber-500" id="video-published-check" />
+                <span class="text-sm form-label mb-0">{{ 'admin.published' | translate }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex justify-end gap-3 pt-2 border-t form-footer">
+            <button type="button" class="btn-secondary" (click)="closeForm()">{{ 'common.cancel' | translate }}</button>
+            <button type="submit" class="btn-primary" [disabled]="saving()" id="save-video-btn">
+              @if (saving()) {
+                <i class="fa-solid fa-spinner animate-spin"></i> {{ 'common.loading' | translate }}
+              } @else {
+                <i class="fa-solid fa-floppy-disk"></i> {{ 'common.save' | translate }}
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  }
+</div>

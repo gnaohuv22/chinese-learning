@@ -1,0 +1,365 @@
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { InteractiveVideoService } from '../../core/services/interactive-video.service';
+import { CourseService } from '../../core/services/course.service';
+import { LessonService } from '../../core/services/lesson.service';
+import { FileUploaderComponent } from '../../shared/components/file-uploader/file-uploader.component';
+import { ModalService } from '../../shared/components/modal/modal.service';
+import { ToastService } from '../../shared/components/toast/toast.service';
+import { DriveUploadResponse } from '../../core/services/drive.service';
+import { InteractiveVideo, VideoCheckpoint, Course, Lesson } from '../../core/models';
+
+@Component({
+  selector: 'app-admin-interactive-videos',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterLink,
+    TranslateModule,
+    FileUploaderComponent,
+  ],
+  templateUrl: './admin-interactive-videos.component.html',
+})
+export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
+  @ViewChild('previewVideoEl') previewVideoRef?: ElementRef<HTMLVideoElement>;
+
+  private videoService = inject(InteractiveVideoService);
+  private modalService = inject(ModalService);
+  private toast = inject(ToastService);
+  private translate = inject(TranslateService);
+  private fb = inject(FormBuilder);
+  private courseService = inject(CourseService);
+  private lessonService = inject(LessonService);
+
+  courses = signal<Course[]>([]);
+  selectedCourseLessons = signal<Lesson[]>([]);
+
+  videos = signal<InteractiveVideo[]>([]);
+  loading = signal(true);
+  saving = signal(false);
+  showForm = signal(false);
+  editingVideo = signal<InteractiveVideo | null>(null);
+
+  // Timestamp editor state
+  previewTime = signal(0);
+  previewDuration = signal(0);
+  previewPlaying = signal(false);
+  showCheckpointForm = signal(false);
+  editingCheckpointIndex = signal<number | null>(null);
+
+  // Checkpoints being built
+  checkpoints = signal<VideoCheckpoint[]>([]);
+
+  // Checkpoint sub-form
+  cpForm = this.fb.group({
+    question: ['', Validators.required],
+    option0: ['', Validators.required],
+    option1: ['', Validators.required],
+    option2: [''],
+    option3: [''],
+    correctAnswers: [[] as string[], Validators.required],
+    helperContent: [''],
+    lessonLinkCourseId: [''],
+    lessonLinkLessonId: [''],
+  });
+
+  pinnedTimestamp = signal<number | null>(null);
+
+  form = this.fb.group({
+    title: ['', Validators.required],
+    description: [''],
+    videoUrl: ['', Validators.required],
+    published: [false],
+    order: [0],
+  });
+
+  ngOnInit() {
+    this.videoService.getAllVideos().subscribe({
+      next: (vids) => {
+        this.videos.set(vids);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
+
+    this.courseService.getCourses().subscribe(c => this.courses.set(c));
+  }
+
+  ngOnDestroy() {}
+
+  // ─── Form open/close ──────────────────────────────────────────────────────
+
+  openCreate() {
+    this.editingVideo.set(null);
+    this.checkpoints.set([]);
+    this.showCheckpointForm.set(false);
+    this.editingCheckpointIndex.set(null);
+    this.pinnedTimestamp.set(null);
+    this.form.reset({ title: '', description: '', videoUrl: '', published: false, order: this.videos().length });
+    this.showForm.set(true);
+  }
+
+  openEdit(video: InteractiveVideo) {
+    this.editingVideo.set(video);
+    this.checkpoints.set([...(video.checkpoints ?? [])]);
+    this.showCheckpointForm.set(false);
+    this.editingCheckpointIndex.set(null);
+    this.pinnedTimestamp.set(null);
+    this.form.patchValue({
+      title: video.title,
+      description: video.description ?? '',
+      videoUrl: video.videoUrl,
+      published: video.published,
+      order: video.order ?? 0,
+    });
+    this.showForm.set(true);
+  }
+
+  closeForm() {
+    this.showForm.set(false);
+    this.editingVideo.set(null);
+    this.showCheckpointForm.set(false);
+  }
+
+  // ─── Video upload ──────────────────────────────────────────────────────────
+
+  onVideoUploaded(resp: DriveUploadResponse) {
+    // resp.fileId for cloudinary is the full URL
+    this.form.patchValue({ videoUrl: resp.fileId });
+  }
+
+  onVideoClear() {
+    this.form.patchValue({ videoUrl: '' });
+  }
+
+  // ─── Preview controls ─────────────────────────────────────────────────────
+
+  onPreviewLoaded() {
+    const v = this.previewVideoRef?.nativeElement;
+    if (v) this.previewDuration.set(v.duration || 0);
+  }
+
+  onPreviewTimeUpdate() {
+    const v = this.previewVideoRef?.nativeElement;
+    if (v) this.previewTime.set(v.currentTime);
+  }
+
+  togglePreviewPlay() {
+    const v = this.previewVideoRef?.nativeElement;
+    if (!v) return;
+    if (v.paused) { v.play(); this.previewPlaying.set(true); }
+    else { v.pause(); this.previewPlaying.set(false); }
+  }
+
+  seekPreview(event: Event) {
+    const val = +(event.target as HTMLInputElement).value;
+    const v = this.previewVideoRef?.nativeElement;
+    if (v) { v.currentTime = val; this.previewTime.set(val); }
+  }
+
+  pinCurrentTime() {
+    this.pinnedTimestamp.set(this.previewTime());
+    this.previewVideoRef?.nativeElement?.pause();
+    this.previewPlaying.set(false);
+    this.cpForm.reset({ correctAnswers: [], lessonLinkCourseId: '', lessonLinkLessonId: '' });
+    this.selectedCourseLessons.set([]);
+    this.editingCheckpointIndex.set(null);
+    this.showCheckpointForm.set(true);
+  }
+
+  formatTime(sec: number): string {
+    if (!sec || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  onCourseChange(courseId: string) {
+    this.selectedCourseLessons.set([]);
+    this.cpForm.patchValue({ lessonLinkLessonId: '' });
+    if (courseId) {
+      this.lessonService.getLessons(courseId).subscribe(l => {
+        this.selectedCourseLessons.set(l);
+      });
+    }
+  }
+
+  // ─── Checkpoint sub-form ──────────────────────────────────────────────────
+
+  getOptionsForForm(): string[] {
+    const v = this.cpForm.value;
+    return [v.option0, v.option1, v.option2, v.option3].filter(Boolean) as string[];
+  }
+
+  toggleCorrectAnswer(option: string) {
+    const current = (this.cpForm.value.correctAnswers as string[]) || [];
+    const idx = current.indexOf(option);
+    if (idx === -1) {
+      this.cpForm.patchValue({ correctAnswers: [...current, option] });
+    } else {
+      this.cpForm.patchValue({ correctAnswers: current.filter((o) => o !== option) });
+    }
+  }
+
+  isCorrectAnswer(option: string): boolean {
+    return ((this.cpForm.value.correctAnswers as string[]) || []).includes(option);
+  }
+
+  openEditCheckpoint(index: number) {
+    const cp = this.checkpoints()[index];
+    this.editingCheckpointIndex.set(index);
+    this.pinnedTimestamp.set(cp.timestamp);
+    this.cpForm.patchValue({
+      question: cp.question,
+      option0: cp.options[0] ?? '',
+      option1: cp.options[1] ?? '',
+      option2: cp.options[2] ?? '',
+      option3: cp.options[3] ?? '',
+      correctAnswers: [...cp.correctAnswers],
+      helperContent: cp.helperContent ?? '',
+      lessonLinkCourseId: cp.lessonLink?.courseId ?? '',
+      lessonLinkLessonId: cp.lessonLink?.lessonId ?? '',
+    });
+    
+    if (cp.lessonLink?.courseId) {
+      this.lessonService.getLessons(cp.lessonLink.courseId).subscribe(l => {
+        this.selectedCourseLessons.set(l);
+      });
+    } else {
+      this.selectedCourseLessons.set([]);
+    }
+
+    this.showCheckpointForm.set(true);
+  }
+
+  saveCheckpoint() {
+    this.cpForm.markAllAsTouched();
+    const v = this.cpForm.value;
+    const options = this.getOptionsForForm();
+    const correctAnswers = (v.correctAnswers as string[]).filter((a) => options.includes(a));
+    
+    if (correctAnswers.length === 0 && this.cpForm.controls.correctAnswers.touched) {
+      this.cpForm.controls.correctAnswers.setErrors({ required: true });
+    }
+
+    if (this.cpForm.invalid) return;
+
+    let lessonLink: { courseId: string; lessonId: string; label: string } | undefined;
+    if (v.lessonLinkCourseId && v.lessonLinkLessonId) {
+      const c = this.courses().find(x => x.id === v.lessonLinkCourseId);
+      const l = this.selectedCourseLessons().find(x => x.id === v.lessonLinkLessonId);
+      if (c && l) {
+        lessonLink = {
+          courseId: c.id,
+          lessonId: l.id,
+          label: `${c.title} - ${l.title}`
+        };
+      }
+    }
+
+    const cp: any = {
+      id: `cp_${Date.now()}`,
+      timestamp: this.pinnedTimestamp() ?? 0,
+      tolerance: 0.5,
+      question: v.question!,
+      options,
+      correctAnswers,
+    };
+    if (v.helperContent) {
+      cp.helperContent = v.helperContent;
+    }
+    if (lessonLink) {
+      cp.lessonLink = lessonLink;
+    }
+
+    const list = [...this.checkpoints()];
+    const editIdx = this.editingCheckpointIndex();
+    if (editIdx !== null) {
+      cp.id = list[editIdx].id; // preserve id
+      list[editIdx] = cp;
+    } else {
+      list.push(cp);
+    }
+    list.sort((a, b) => a.timestamp - b.timestamp);
+    this.checkpoints.set(list);
+    this.showCheckpointForm.set(false);
+    this.editingCheckpointIndex.set(null);
+    this.pinnedTimestamp.set(null);
+    this.cpForm.reset({ correctAnswers: [], lessonLinkCourseId: '', lessonLinkLessonId: '' });
+  }
+
+  cancelCheckpoint() {
+    this.showCheckpointForm.set(false);
+    this.editingCheckpointIndex.set(null);
+  }
+
+  removeCheckpoint(index: number) {
+    const list = [...this.checkpoints()];
+    list.splice(index, 1);
+    this.checkpoints.set(list);
+  }
+
+  // ─── Save video ───────────────────────────────────────────────────────────
+
+  save() {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+
+    this.saving.set(true);
+    const v = this.form.value;
+    const payload: any = {
+      title: v.title!,
+      videoUrl: v.videoUrl!,
+      published: v.published ?? false,
+      order: v.order ?? 0,
+      checkpoints: this.checkpoints(),
+    };
+    if (v.description) {
+      payload.description = v.description;
+    }
+
+    const editing = this.editingVideo();
+    const op$ = (editing
+      ? this.videoService.updateVideo(editing.id, payload)
+      : this.videoService.createVideo(payload)) as import('rxjs').Observable<any>;
+
+    op$.subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.closeForm();
+        this.toast.success(this.translate.instant(editing ? 'admin.updated_success' : 'admin.created_success'));
+      },
+      error: () => {
+        this.saving.set(false);
+        this.toast.error(this.translate.instant('common.error'));
+      },
+    });
+  }
+
+  async deleteVideo(video: InteractiveVideo) {
+    const confirmed = await this.modalService.confirm({
+      title: this.translate.instant('admin.delete_video_title'),
+      message: this.translate.instant('admin.delete_confirm_msg', { name: video.title }),
+      type: 'danger',
+      confirmLabel: this.translate.instant('common.delete'),
+    });
+    if (!confirmed) return;
+    this.videoService.deleteVideo(video.id).subscribe({
+      next: () => this.toast.success(this.translate.instant('admin.deleted_success')),
+      error: () => this.toast.error(this.translate.instant('common.error')),
+    });
+  }
+}

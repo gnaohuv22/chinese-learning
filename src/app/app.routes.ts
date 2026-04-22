@@ -61,6 +61,20 @@ export const routes: Routes = [
       import('./portal/exam/exam.component').then((m) => m.ExamComponent),
   },
   {
+    path: 'video',
+    loadComponent: () =>
+      import('./portal/video/video-list.component').then(
+        (m) => m.VideoListComponent
+      ),
+  },
+  {
+    path: 'video/:videoId',
+    loadComponent: () =>
+      import('./portal/video/video-player.component').then(
+        (m) => m.VideoPlayerComponent
+      ),
+  },
+  {
     path: 'news',
     loadComponent: () =>
       import('./portal/news/news-list.component').then(
@@ -126,6 +140,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./admin/news/admin-news.component').then(
             (m) => m.AdminNewsComponent
+          ),
+      },
+      {
+        path: 'interactive-videos',
+        loadComponent: () =>
+          import('./admin/interactive-videos/admin-interactive-videos.component').then(
+            (m) => m.AdminInteractiveVideosComponent
           ),
       },
       {
