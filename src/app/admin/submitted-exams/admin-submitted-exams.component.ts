@@ -1,6 +1,14 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SubmittedExamService } from '../../core/services/submitted-exam.service';
 import { SubmittedExam } from '../../core/models/submitted-exam.model';
 import { ModalService } from '../../shared/components/modal/modal.service';
@@ -16,6 +24,7 @@ type FilterTab = 'all' | 'exam' | 'mock';
 })
 export class AdminSubmittedExamsComponent implements OnInit {
   private service = inject(SubmittedExamService);
+  private destroyRef = inject(DestroyRef);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
 
@@ -35,13 +44,16 @@ export class AdminSubmittedExamsComponent implements OnInit {
   mockTestCount = computed(() => this.submissions().filter((s) => s.isMockTest).length);
 
   ngOnInit() {
-    this.service.getSubmissions().subscribe({
-      next: (data) => {
-        this.submissions.set(data);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
+    this.service
+      .getSubmissions()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.submissions.set(data);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
   }
 
   setFilter(tab: FilterTab) {

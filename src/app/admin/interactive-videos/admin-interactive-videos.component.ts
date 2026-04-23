@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   ElementRef,
   OnDestroy,
   OnInit,
@@ -9,8 +10,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { take } from 'rxjs/operators';
 import { InteractiveVideoService } from '../../core/services/interactive-video.service';
 import { CourseService } from '../../core/services/course.service';
 import { LessonService } from '../../core/services/lesson.service';
@@ -27,7 +29,6 @@ import { InteractiveVideo, VideoCheckpoint, Course, Lesson } from '../../core/mo
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterLink,
     TranslateModule,
     FileUploaderComponent,
   ],
@@ -43,6 +44,7 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private courseService = inject(CourseService);
   private lessonService = inject(LessonService);
+  private destroyRef = inject(DestroyRef);
 
   courses = signal<Course[]>([]);
   selectedCourseLessons = signal<Lesson[]>([]);
@@ -87,18 +89,26 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit() {
-    this.videoService.getAllVideos().subscribe({
-      next: (vids) => {
-        this.videos.set(vids);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
+    this.videoService
+      .getAllVideos()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (vids) => {
+          this.videos.set(vids);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
 
-    this.courseService.getCourses().subscribe(c => this.courses.set(c));
+    this.courseService
+      .getCourses()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((c) => this.courses.set(c));
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    this.previewVideoRef?.nativeElement?.pause();
+  }
 
   // ─── Form open/close ──────────────────────────────────────────────────────
 
@@ -191,9 +201,12 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
     this.selectedCourseLessons.set([]);
     this.cpForm.patchValue({ lessonLinkLessonId: '' });
     if (courseId) {
-      this.lessonService.getLessons(courseId).subscribe(l => {
-        this.selectedCourseLessons.set(l);
-      });
+      this.lessonService
+        .getLessons(courseId)
+        .pipe(take(1))
+        .subscribe((l) => {
+          this.selectedCourseLessons.set(l);
+        });
     }
   }
 
@@ -235,9 +248,12 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
     });
     
     if (cp.lessonLink?.courseId) {
-      this.lessonService.getLessons(cp.lessonLink.courseId).subscribe(l => {
-        this.selectedCourseLessons.set(l);
-      });
+      this.lessonService
+        .getLessons(cp.lessonLink.courseId)
+        .pipe(take(1))
+        .subscribe((l) => {
+          this.selectedCourseLessons.set(l);
+        });
     } else {
       this.selectedCourseLessons.set([]);
     }

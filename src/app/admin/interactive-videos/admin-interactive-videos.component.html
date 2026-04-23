@@ -45,7 +45,7 @@
                     }
                   </div>
                   <p class="text-xs breadcrumb">
-                    {{ vid.checkpoints?.length ?? 0 }} {{ 'admin.questions_count' | translate }}
+                    {{ vid.checkpoints.length }} {{ 'admin.questions_count' | translate }}
                     @if (vid.description) { · {{ vid.description | slice:0:60 }}{{ vid.description.length > 60 ? '…' : '' }} }
                   </p>
                 </div>

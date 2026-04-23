@@ -1,8 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { take } from 'rxjs/operators';
 import { ExamService } from '../../core/services/exam.service';
 import { CourseService } from '../../core/services/course.service';
 import { LessonService } from '../../core/services/lesson.service';
@@ -24,6 +26,7 @@ export class AdminExamsComponent implements OnInit {
   private courseService = inject(CourseService);
   private lessonService = inject(LessonService);
   private exerciseService = inject(ExerciseService);
+  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
@@ -52,14 +55,21 @@ export class AdminExamsComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.examService.getExams().subscribe({
-      next: (e) => {
-        this.exams.set(e);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
-    this.courseService.getCourses().subscribe((c) => this.courses.set(c));
+    this.examService
+      .getExams()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (e) => {
+          this.exams.set(e);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
+
+    this.courseService
+      .getCourses()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((c) => this.courses.set(c));
   }
 
   drop(event: CdkDragDrop<Exam[]>) {
@@ -77,7 +87,10 @@ export class AdminExamsComponent implements OnInit {
     this.lessons.set([]);
     this.availableExercises.set([]);
     if (id) {
-      this.lessonService.getLessons(id).subscribe((l) => this.lessons.set(l));
+      this.lessonService
+        .getLessons(id)
+        .pipe(take(1))
+        .subscribe((l) => this.lessons.set(l));
     }
   }
 
@@ -88,6 +101,7 @@ export class AdminExamsComponent implements OnInit {
     if (lessonId && courseId) {
       this.exerciseService
         .getExercises(courseId, lessonId)
+        .pipe(take(1))
         .subscribe((exs) => this.availableExercises.set(exs));
     }
   }

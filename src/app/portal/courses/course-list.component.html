@@ -9,11 +9,15 @@
     </p>
   </div>
 
-  @if (loading()) {
+  @if (viewState() === 'loading') {
     <div class="flex justify-center py-20">
       <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
     </div>
-  } @else if (allCourses().length === 0) {
+  } @else if (viewState() === 'error') {
+    <div class="card text-center py-20 text-sm empty-state">
+      {{ 'common.error' | translate }}
+    </div>
+  } @else if (viewState() === 'empty') {
     <div class="card text-center py-20 text-sm empty-state">
       {{ 'course.no_courses' | translate }}
     </div>

@@ -1,9 +1,9 @@
 // Hero section is always dark regardless of app theme.
 // These SCSS variables map to the design-system dark-palette tokens.
-$hero-bg-start:   #3a1b00;
-$hero-bg-mid:     #7e480a;
-$hero-bg-end:     #be9672;
-$hero-text:       #efe7db;
+$hero-bg-start: #3a1b00;
+$hero-bg-mid: #7e480a;
+$hero-bg-end: #be9672;
+$hero-text: #efe7db;
 $hero-text-muted: #c8ac89;
 $hero-text-faint: rgba(239, 231, 219, 0.8);
 
@@ -87,6 +87,11 @@ $hero-text-faint: rgba(239, 231, 219, 0.8);
 .skill-btn {
   background: var(--color-bg-surface);
   border-color: transparent;
+  transform: translateY(0);
+
+  &:hover {
+    transform: translateY(-2px);
+  }
 
   &.skill-active {
     border-color: var(--color-primary);
@@ -108,6 +113,10 @@ $hero-text-faint: rgba(239, 231, 219, 0.8);
 
 .skill-btn-label {
   color: var(--color-text);
+}
+
+.skill-btn:hover .skill-btn-label {
+  color: var(--color-primary);
 }
 
 .skill-panel-heading {
@@ -141,6 +150,87 @@ $hero-text-faint: rgba(239, 231, 219, 0.8);
 
 .skill-lesson-title {
   color: var(--color-text);
+}
+
+// ─── Interactive video intro ────────────────────────────────────────────────
+
+.iv-intro-section {
+  background: var(--color-bg);
+  border-color: var(--color-border);
+}
+
+.iv-intro-card {
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  background:
+    radial-gradient(circle at top right, rgba(200, 134, 26, 0.08), transparent 45%),
+    var(--color-bg-surface);
+}
+
+.iv-intro-chip {
+  color: var(--color-primary);
+  background: var(--color-primary-ghost);
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.iv-intro-title {
+  color: var(--color-text);
+}
+
+.iv-intro-description {
+  color: var(--color-text-muted);
+}
+
+.iv-intro-cta {
+  color: #efe7db;
+  background: linear-gradient(135deg, #7e480a, #c8861a);
+}
+
+.iv-intro-cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.iv-media-link {
+  border: 1px solid var(--color-border);
+}
+
+.iv-media-shell {
+  background: #1a0d00;
+}
+
+.iv-media-image {
+  transition: transform 220ms ease;
+}
+
+.iv-media-link:hover .iv-media-image {
+  transform: scale(1.02);
+}
+
+.iv-media-fallback {
+  background:
+    radial-gradient(circle at top right, rgba(200, 172, 137, 0.45), transparent 40%),
+    linear-gradient(135deg, #3a1b00 0%, #7e480a 65%, #be9672 100%);
+}
+
+.iv-media-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent 55%);
+}
+
+.iv-media-play {
+  background: rgba(200, 172, 137, 0.9);
+  color: #3a1b00;
+}
+
+.iv-media-caption {
+  color: #efe7db;
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
 // ─── Latest courses section ──────────────────────────────────────────────────

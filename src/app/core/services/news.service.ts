@@ -8,7 +8,7 @@ export class NewsService extends FirestoreBaseService<News> {
   private readonly path = 'news';
 
   getNewsList(limitCount = 100): Observable<News[]> {
-    return this.getOnce(this.path, 'publishedAt', limitCount);
+    return this.getOnce(this.path, 'publishedAt:desc', limitCount);
   }
 
   getNews(id: string): Observable<News | undefined> {

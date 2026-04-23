@@ -1,9 +1,11 @@
-import { Component, inject, signal, OnInit, Input } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { take } from 'rxjs/operators';
 import { LessonService } from '../../core/services/lesson.service';
 import { CourseService } from '../../core/services/course.service';
 import { ExerciseService } from '../../core/services/exercise.service';
@@ -24,6 +26,7 @@ export class AdminLessonsComponent implements OnInit {
   private lessonService = inject(LessonService);
   private courseService = inject(CourseService);
   private exerciseService = inject(ExerciseService);
+  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
@@ -41,16 +44,21 @@ export class AdminLessonsComponent implements OnInit {
   form = this.fb.group({ title: ['', Validators.required] });
 
   ngOnInit() {
-    this.courseService.getCourse(this.courseId).subscribe((c) =>
-      this.course.set(c ?? null)
-    );
-    this.lessonService.getLessons(this.courseId).subscribe({
-      next: (lessons) => {
-        this.lessons.set(lessons);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
+    this.courseService
+      .getCourse(this.courseId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((c) => this.course.set(c ?? null));
+
+    this.lessonService
+      .getLessons(this.courseId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lessons) => {
+          this.lessons.set(lessons);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
   }
 
   drop(event: CdkDragDrop<Lesson[]>) {
@@ -69,14 +77,17 @@ export class AdminLessonsComponent implements OnInit {
 
     if (lesson) {
       this.loadingSkills.set(true);
-      this.exerciseService.getExercises(this.courseId, lesson.id).subscribe({
-        next: (exercises) => {
-          const skills = [...new Set(exercises.map((e) => e.skill))] as Skill[];
-          this.derivedSkills.set(skills.length > 0 ? skills : lesson.skills ?? []);
-          this.loadingSkills.set(false);
-        },
-        error: () => this.loadingSkills.set(false),
-      });
+      this.exerciseService
+        .getExercises(this.courseId, lesson.id)
+        .pipe(take(1))
+        .subscribe({
+          next: (exercises) => {
+            const skills = [...new Set(exercises.map((e) => e.skill))] as Skill[];
+            this.derivedSkills.set(skills.length > 0 ? skills : lesson.skills ?? []);
+            this.loadingSkills.set(false);
+          },
+          error: () => this.loadingSkills.set(false),
+        });
     }
 
     this.showForm.set(true);

@@ -1,4 +1,14 @@
-import { Component, inject, signal, OnInit, Input, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -9,6 +19,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { LessonService } from '../../core/services/lesson.service';
 import { FileUploaderComponent } from '../../shared/components/file-uploader/file-uploader.component';
@@ -47,17 +58,22 @@ const SKILLS: Skill[] = ['listening', 'speaking', 'reading', 'writing'];
   templateUrl: './admin-exercises.component.html',
   styleUrl: './admin-exercises.component.scss',
 })
-export class AdminExercisesComponent implements OnInit {
+export class AdminExercisesComponent implements OnInit, OnDestroy {
   @Input() courseId!: string;
   @Input() lessonId!: string;
   @ViewChild('formPanel') formPanelRef?: ElementRef<HTMLElement>;
 
   private exerciseService = inject(ExerciseService);
   private lessonService = inject(LessonService);
+  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
   private toast = inject(ToastService);
+
+  private formScrollTimer: ReturnType<typeof setTimeout> | null = null;
+  private editOpenTimer: ReturnType<typeof setTimeout> | null = null;
+  private validationFocusTimer: ReturnType<typeof setTimeout> | null = null;
 
   exercises = signal<Exercise[]>([]);
   lessonTitle = signal('');
@@ -127,17 +143,27 @@ export class AdminExercisesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.lessonService.getLesson(this.courseId, this.lessonId).subscribe((l) => {
-      this.lessonTitle.set(l?.title ?? '');
-    });
+    this.lessonService
+      .getLesson(this.courseId, this.lessonId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((l) => {
+        this.lessonTitle.set(l?.title ?? '');
+      });
 
-    this.exerciseService.getExercises(this.courseId, this.lessonId).subscribe({
-      next: (exs) => {
-        this.exercises.set(exs);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
+    this.exerciseService
+      .getExercises(this.courseId, this.lessonId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (exs) => {
+          this.exercises.set(exs);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
+  }
+
+  ngOnDestroy() {
+    this.clearDeferredTimers();
   }
 
   drop(event: CdkDragDrop<Exercise[]>) {
@@ -212,16 +238,24 @@ export class AdminExercisesComponent implements OnInit {
     });
 
     this.showForm.set(true);
-    setTimeout(() => {
+    if (this.formScrollTimer) {
+      clearTimeout(this.formScrollTimer);
+    }
+    this.formScrollTimer = setTimeout(() => {
       this.formPanelRef?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      this.formScrollTimer = null;
     }, 50);
   }
 
   editExercise(ex: Exercise) {
     this.fadingOutId.set(ex.id);
-    setTimeout(() => {
+    if (this.editOpenTimer) {
+      clearTimeout(this.editOpenTimer);
+    }
+    this.editOpenTimer = setTimeout(() => {
       this.fadingOutId.set(null);
       this.openForm(ex);
+      this.editOpenTimer = null;
     }, 220);
   }
 
@@ -253,12 +287,16 @@ export class AdminExercisesComponent implements OnInit {
 
     if (Object.keys(errors).length > 0) {
       const firstKey = Object.keys(errors)[0];
-      setTimeout(() => {
+      if (this.validationFocusTimer) {
+        clearTimeout(this.validationFocusTimer);
+      }
+      this.validationFocusTimer = setTimeout(() => {
         const el = document.querySelector<HTMLElement>(`[data-field="${firstKey}"]`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           el.focus();
         }
+        this.validationFocusTimer = null;
       }, 50);
       return;
     }
@@ -339,5 +377,22 @@ export class AdminExercisesComponent implements OnInit {
         next: () => this.toast.success(this.translate.instant('admin.deleted_success')),
         error: () => this.toast.error(this.translate.instant('common.error')),
       });
+  }
+
+  private clearDeferredTimers() {
+    if (this.formScrollTimer) {
+      clearTimeout(this.formScrollTimer);
+      this.formScrollTimer = null;
+    }
+
+    if (this.editOpenTimer) {
+      clearTimeout(this.editOpenTimer);
+      this.editOpenTimer = null;
+    }
+
+    if (this.validationFocusTimer) {
+      clearTimeout(this.validationFocusTimer);
+      this.validationFocusTimer = null;
+    }
   }
 }

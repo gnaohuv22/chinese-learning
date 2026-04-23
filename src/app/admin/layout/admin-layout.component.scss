@@ -51,3 +51,21 @@ $burger-border:     #be9672;
 .admin-main {
   background: var(--color-bg);
 }
+
+.admin-sidebar-height {
+  height: calc(100vh - 64px);
+}
+
+.admin-main-height {
+  min-height: calc(100vh - 64px);
+}
+
+@supports (height: 100dvh) {
+  .admin-sidebar-height {
+    height: calc(100dvh - 64px);
+  }
+
+  .admin-main-height {
+    min-height: calc(100dvh - 64px);
+  }
+}

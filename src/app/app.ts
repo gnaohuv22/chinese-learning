@@ -6,11 +6,12 @@ import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.co
 import { ThemeService } from './core/services/theme.service';
 import { ConfirmModalComponent } from './shared/components/modal/confirm-modal.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { VideoModalHostComponent } from './shared/components/video-modal-host/video-modal-host.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, BottomNavComponent, ConfirmModalComponent, ToastComponent],
+  imports: [RouterOutlet, HeaderComponent, BottomNavComponent, ConfirmModalComponent, ToastComponent, VideoModalHostComponent],
   templateUrl: './app.html',
 })
 export class App implements OnInit {

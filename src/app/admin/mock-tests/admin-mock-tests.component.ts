@@ -1,8 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { take } from 'rxjs/operators';
 import { MockTestService } from '../../core/services/mock-test.service';
 import { CourseService } from '../../core/services/course.service';
 import { LessonService } from '../../core/services/lesson.service';
@@ -23,6 +25,7 @@ export class AdminMockTestsComponent implements OnInit {
   private courseService = inject(CourseService);
   private lessonService = inject(LessonService);
   private exerciseService = inject(ExerciseService);
+  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
@@ -56,14 +59,21 @@ export class AdminMockTestsComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.mockTestService.getMockTests().subscribe({
-      next: (tests) => {
-        this.mockTests.set(tests);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
-    this.courseService.getCourses().subscribe((c) => this.courses.set(c));
+    this.mockTestService
+      .getMockTests()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (tests) => {
+          this.mockTests.set(tests);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
+
+    this.courseService
+      .getCourses()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((c) => this.courses.set(c));
   }
 
   onCourseChange(e: Event) {
@@ -72,7 +82,10 @@ export class AdminMockTestsComponent implements OnInit {
     this.lessons.set([]);
     this.availableExercises.set([]);
     if (id) {
-      this.lessonService.getLessons(id).subscribe((l) => this.lessons.set(l));
+      this.lessonService
+        .getLessons(id)
+        .pipe(take(1))
+        .subscribe((l) => this.lessons.set(l));
     }
   }
 
@@ -82,6 +95,7 @@ export class AdminMockTestsComponent implements OnInit {
     if (lessonId && courseId) {
       this.exerciseService
         .getExercises(courseId, lessonId)
+        .pipe(take(1))
         .subscribe((exs) => this.availableExercises.set(exs));
     } else {
       this.availableExercises.set([]);

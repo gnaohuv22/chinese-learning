@@ -25,14 +25,19 @@
   </div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    @if (loading()) {
+    @if (viewState() === 'loading') {
       <div class="flex justify-center py-20">
         <div class="flex flex-col items-center gap-3">
           <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
           <p class="text-sm" style="color: var(--color-text-muted);">{{ 'common.loading' | translate }}</p>
         </div>
       </div>
-    } @else if (videos().length === 0) {
+    } @else if (viewState() === 'error') {
+      <div class="flex flex-col items-center gap-4 py-20 text-center">
+        <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl" style="background: var(--color-bg-surface);">⚠️</div>
+        <p class="font-semibold text-lg" style="color: var(--color-text);">{{ 'common.error' | translate }}</p>
+      </div>
+    } @else if (viewState() === 'empty') {
       <div class="flex flex-col items-center gap-4 py-20 text-center">
         <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl" style="background: var(--color-bg-surface);">🎬</div>
         <p class="font-semibold text-lg" style="color: var(--color-text);">{{ 'admin.portal_no_videos' | translate }}</p>
@@ -48,19 +53,29 @@
             class="group text-left rounded-2xl overflow-hidden border transition-all duration-200 hover:scale-[1.02] hover:shadow-2xl focus:outline-none focus:ring-2"
             style="background: var(--color-bg-surface); border-color: var(--color-border); focus-ring-color: var(--color-primary);"
           >
-            <!-- Thumbnail -->
+            <!-- Thumbnail only (no hover preview video) -->
             <div class="relative aspect-video overflow-hidden" style="background: #1a0d00;">
-              @if (video.thumbnailUrl) {
-                <img [src]="video.thumbnailUrl" [alt]="video.title" class="w-full h-full object-cover" />
+              @if (resolveThumbnail(video); as thumbnailUrl) {
+                <img
+                  [src]="thumbnailUrl"
+                  [alt]="video.title"
+                  title="Video thumbnail"
+                  width="640"
+                  height="360"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                />
               } @else {
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <div class="w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
+                <div
+                  class="absolute inset-0 flex items-center justify-center"
+                  style="background: radial-gradient(circle at top right, rgba(200,172,137,0.45), transparent 40%), linear-gradient(135deg, #3a1b00 0%, #7e480a 65%, #be9672 100%);"
+                >
+                  <div class="w-16 h-16 rounded-full flex items-center justify-center"
                     style="background: rgba(200,172,137,0.2); border: 2px solid rgba(200,172,137,0.4);">
                     <i class="fa-solid fa-play text-2xl" style="color: #c8ac89; margin-left: 3px;"></i>
                   </div>
                 </div>
-                <!-- Decorative chars -->
-                <span class="absolute top-3 right-4 text-4xl font-bold opacity-10" style="color: #c8ac89;">影</span>
               }
 
               <!-- Checkpoint progress badge -->
@@ -108,7 +123,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-xs flex items-center gap-1.5 font-medium" style="color: var(--color-text-muted);">
                   <i class="fa-solid fa-flag-checkered"></i>
-                  {{ video.checkpoints?.length ?? 0 }} {{ 'admin.question' | translate | lowercase }}
+                  {{ video.checkpoints.length }} {{ 'admin.question' | translate | lowercase }}
                 </span>
                 <div class="flex items-center gap-2">
                   @if (getProgressPercent(video) === 100 && getProgress(video).total > 0) {

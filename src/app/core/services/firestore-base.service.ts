@@ -63,7 +63,8 @@ export class FirestoreBaseService<T extends { id: string }> {
       }
     }
     if (orderByField) {
-      constraints.push(orderBy(orderByField));
+      const [field, direction] = orderByField.split(':');
+      constraints.push(orderBy(field, (direction as 'asc' | 'desc') || 'asc'));
     }
 
     const q = query(ref, ...constraints);
@@ -102,7 +103,8 @@ export class FirestoreBaseService<T extends { id: string }> {
       }
     }
     if (orderByField) {
-      constraints.push(orderBy(orderByField));
+      const [field, direction] = orderByField.split(':');
+      constraints.push(orderBy(field, (direction as 'asc' | 'desc') || 'asc'));
     }
     if (limitCount) {
       constraints.push(limit(limitCount));

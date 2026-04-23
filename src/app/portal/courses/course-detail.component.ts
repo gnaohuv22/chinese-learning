@@ -1,6 +1,7 @@
-import { Component, inject, signal, OnInit, Input } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CourseService } from '../../core/services/course.service';
 import { LessonService } from '../../core/services/lesson.service';
 import { Course, Lesson } from '../../core/models';
@@ -17,18 +18,61 @@ export class CourseDetailComponent implements OnInit {
 
   private courseService = inject(CourseService);
   private lessonService = inject(LessonService);
+  private destroyRef = inject(DestroyRef);
 
   course = signal<Course | null>(null);
   lessons = signal<Lesson[]>([]);
-  loading = signal(true);
+  viewState = signal<'loading' | 'ready' | 'empty' | 'error'>('loading');
+  private emptyStateTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit() {
-    this.courseService.getCourse(this.courseId).subscribe((c) => {
-      this.course.set(c ?? null);
-      this.loading.set(false);
-    });
-    this.lessonService.getLessons(this.courseId).subscribe((l) =>
-      this.lessons.set(l)
-    );
+    this.courseService
+      .getCourse(this.courseId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((c) => {
+        this.course.set(c ?? null);
+      });
+
+    this.lessonService
+      .getLessons(this.courseId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (l) => {
+          this.lessons.set(l);
+          this.resolveViewState(l.length);
+        },
+        error: () => this.viewState.set('error'),
+      });
+  }
+
+  ngOnDestroy() {
+    this.clearEmptyStateTimer();
+  }
+
+  private resolveViewState(itemCount: number) {
+    if (itemCount > 0) {
+      this.clearEmptyStateTimer();
+      this.viewState.set('ready');
+      return;
+    }
+
+    if (this.viewState() === 'ready') {
+      this.viewState.set('empty');
+      return;
+    }
+
+    if (this.emptyStateTimer) return;
+
+    this.emptyStateTimer = setTimeout(() => {
+      this.emptyStateTimer = null;
+      this.viewState.set(this.lessons().length === 0 ? 'empty' : 'ready');
+    }, 320);
+  }
+
+  private clearEmptyStateTimer() {
+    if (this.emptyStateTimer) {
+      clearTimeout(this.emptyStateTimer);
+      this.emptyStateTimer = null;
+    }
   }
 }

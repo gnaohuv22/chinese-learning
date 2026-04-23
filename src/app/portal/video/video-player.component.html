@@ -33,7 +33,7 @@
         </button>
       </div>
       <!-- Checkpoint progress -->
-      @if (vid.checkpoints?.length) {
+      @if (vid.checkpoints.length) {
       <div class="flex-shrink-0 flex items-center gap-2">
         <span class="text-xs font-medium" style="color: var(--color-text-muted);">
           {{ getCompletedCount() }}/{{ vid.checkpoints.length }}
@@ -67,205 +67,11 @@
         id="interactive-video-main"></video>
 
       <!-- Locked dimmed overlay text -->
-      @if (isLocked && !showQuestionModal && !showHelperModal && !showInfoModal) {
+      @if (isLocked && !videoModal.state().open) {
       <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
         <div class="flex flex-col items-center gap-2">
           <i class="fa-solid fa-lock text-3xl" style="color: #c8ac89;"></i>
           <p class="text-sm font-medium" style="color: #c8ac89;">{{ 'admin.video_paused' | translate }}</p>
-        </div>
-      </div>
-      }
-
-      <!-- QUESTION MODAL -->
-      @if (showQuestionModal && currentCheckpoint) {
-      <div class="absolute inset-0 z-30 flex items-center justify-center p-4"
-        style="background: rgba(0,0,0,0.75); backdrop-filter: blur(2px);" id="question-modal-overlay">
-        <div class="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-slide-up"
-          style="background: var(--color-bg-surface); border: 1px solid var(--color-border);">
-          <!-- Modal header -->
-          <div class="px-5 pt-5 pb-3 border-b" style="border-color: var(--color-border);">
-            <div class="flex items-center gap-2 mb-1">
-              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style="background: linear-gradient(135deg, #c8861a, #c8ac89);">
-                <i class="fa-solid fa-circle-question text-white text-sm"></i>
-              </div>
-              <span class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-primary);">{{ 'admin.question' | translate }}</span>
-            </div>
-            <p class="text-base font-semibold leading-snug" style="color: var(--color-text);">
-              {{ currentCheckpoint.question }}
-            </p>
-          </div>
-
-          <!-- Options -->
-          <div class="px-5 py-4 space-y-2.5">
-            @for (option of currentCheckpoint.options; track $index) {
-            <button type="button" (click)="selectOption(option)" [disabled]="selectedOption !== null"
-              id="option-btn-{{ $index }}"
-              class="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-150 text-sm font-medium"
-              [style.background]="
-                      selectedOption === option && answerResult === 'correct' ? '#16a34a22' :
-                      selectedOption === option && answerResult === 'wrong' ? '#dc262622' :
-                      selectedOption === null ? 'var(--color-bg)' :
-                      'var(--color-bg)'
-                    " [style.border-color]="
-                      selectedOption === option && answerResult === 'correct' ? '#16a34a' :
-                      selectedOption === option && answerResult === 'wrong' ? '#dc2626' :
-                      selectedOption !== null && currentCheckpoint.correctAnswers.includes(option) ? '#16a34a55' :
-                      'var(--color-border)'
-                    " [style.color]="
-                      selectedOption === option && answerResult === 'correct' ? '#16a34a' :
-                      selectedOption === option && answerResult === 'wrong' ? '#dc2626' :
-                      'var(--color-text)'
-                    ">
-              <!-- Letter badge -->
-              <span
-                class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-colors"
-                [style.background]="
-                        selectedOption === option && answerResult === 'correct' ? '#16a34a' :
-                        selectedOption === option && answerResult === 'wrong' ? '#dc2626' :
-                        selectedOption !== null && currentCheckpoint.correctAnswers.includes(option) ? '#16a34a33' :
-                        'var(--color-border)'
-                      " [style.color]="
-                        (selectedOption === option && answerResult !== null) ? '#fff' :
-                        'var(--color-text-muted)'
-                      ">{{ getOptionLetter($index) }}</span>
-
-              <span class="flex-1">{{ option }}</span>
-
-              <!-- Result icon -->
-              @if (selectedOption === option && answerResult === 'correct') {
-              <i class="fa-solid fa-check flex-shrink-0" style="color: #16a34a;"></i>
-              } @else if (selectedOption === option && answerResult === 'wrong') {
-              <i class="fa-solid fa-xmark flex-shrink-0" style="color: #dc2626;"></i>
-              } @else if (selectedOption !== null && currentCheckpoint.correctAnswers.includes(option)) {
-              <i class="fa-solid fa-check flex-shrink-0 opacity-50" style="color: #16a34a;"></i>
-              }
-            </button>
-            }
-          </div>
-
-          <!-- Action -->
-          <div class="px-5 pb-5">
-            @if (selectedOption === null) {
-            <p class="text-center text-xs" style="color: var(--color-text-muted);">{{ 'admin.select_answer_continue' | translate }}</p>
-            } @else {
-            <button type="button" (click)="confirmAnswer()" id="confirm-answer-btn"
-              class="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
-              [style.background]="answerResult === 'correct' ? '#16a34a' : '#dc2626'" style="color: white;">
-              @if (answerResult === 'correct') {
-              <i class="fa-solid fa-play mr-2"></i>{{ 'admin.continue_watching' | translate }}
-              } @else {
-              <i class="fa-solid fa-arrow-right mr-2"></i>{{ 'admin.view_explanation' | translate }}
-              }
-            </button>
-            }
-          </div>
-        </div>
-      </div>
-      }
-
-      <!-- HELPER MODAL (wrong answer) -->
-      @if (showHelperModal && currentCheckpoint) {
-      <div class="absolute inset-0 z-30 flex items-center justify-center p-4"
-        style="background: rgba(0,0,0,0.75); backdrop-filter: blur(2px);" id="helper-modal-overlay">
-        <div class="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-slide-up"
-          style="background: var(--color-bg-surface); border: 1px solid var(--color-border);">
-          <!-- Header -->
-          <div class="px-5 pt-5 pb-3 border-b" style="border-color: var(--color-border);">
-            <div class="flex items-center gap-2 mb-1">
-              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style="background: #f59e0b;">
-                <i class="fa-solid fa-lightbulb text-white text-sm"></i>
-              </div>
-              <span class="text-xs font-semibold uppercase tracking-wider" style="color: #f59e0b;">{{ 'admin.hint' | translate }}</span>
-            </div>
-            <p class="text-base font-semibold" style="color: var(--color-text);">{{ 'admin.wrong' | translate }}</p>
-          </div>
-
-          <!-- Helper content -->
-          <div class="px-5 py-4">
-            @if (currentCheckpoint.helperContent) {
-            <div class="rounded-xl p-4 mb-4 text-sm leading-relaxed"
-              style="background: var(--color-bg); color: var(--color-text);">
-              {{ currentCheckpoint.helperContent }}
-            </div>
-            }
-
-            <!-- Lesson link -->
-            @if (currentCheckpoint.lessonLink) {
-            <a [routerLink]="['/courses', currentCheckpoint.lessonLink.courseId, 'lessons', currentCheckpoint.lessonLink.lessonId]"
-              id="lesson-link-btn"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl border mb-4 text-sm font-medium transition-all hover:opacity-80"
-              style="border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-ghost);">
-              <i class="fa-solid fa-book-open"></i>
-              <span>{{ 'admin.review' | translate }}: {{ currentCheckpoint.lessonLink.label }}</span>
-              <i class="fa-solid fa-arrow-right ml-auto text-xs"></i>
-            </a>
-            }
-          </div>
-
-          <!-- Actions -->
-          <div class="px-5 pb-5 flex flex-col gap-2.5">
-            <button type="button" (click)="retryQuestion()" id="retry-question-btn"
-              class="w-full py-3 rounded-xl font-semibold text-sm border transition-all hover:opacity-80"
-              style="border-color: var(--color-primary); color: var(--color-primary); background: transparent;">
-              <i class="fa-solid fa-rotate-left mr-2"></i>{{ 'admin.retry' | translate }}
-            </button>
-            <button type="button" (click)="onHelperContinue()" id="helper-continue-btn"
-              class="w-full py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
-              style="background: var(--color-bg-surface); color: var(--color-text-muted); border: 1px solid var(--color-border);">
-              <i class="fa-solid fa-forward mr-2"></i>{{ 'admin.skip_continue' | translate }}
-            </button>
-          </div>
-        </div>
-      </div>
-      }
-
-      <!-- INFO MODAL -->
-      @if (showInfoModal) {
-      <div class="absolute inset-0 z-40 flex items-center justify-center p-4"
-        style="background: rgba(0,0,0,0.75); backdrop-filter: blur(2px);" id="info-modal-overlay">
-        <div class="w-full max-w-md rounded-2xl shadow-2xl animate-slide-up flex flex-col"
-          style="background: var(--color-bg-surface); border: 1px solid var(--color-border); max-height: 80vh;">
-          <!-- Header -->
-          <div class="px-5 pt-5 pb-3 border-b flex justify-between items-center flex-shrink-0" style="border-color: var(--color-border);">
-            <div class="flex items-center gap-2 mb-1">
-              <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style="background: linear-gradient(135deg, #c8861a, #c8ac89);">
-                <i class="fa-solid fa-circle-info text-white text-sm"></i>
-              </div>
-              <span class="text-sm font-bold tracking-wider" style="color: var(--color-primary);">{{ 'admin.video_info_title' | translate }}</span>
-            </div>
-            <button (click)="closeInfoModal()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/10 transition-colors" style="color: var(--color-text-muted);"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-          <!-- Body -->
-          <div class="px-5 py-4 space-y-4 text-sm overflow-y-auto" style="color: var(--color-text);">
-            <div>
-              <p class="font-semibold text-[15px]" style="color: var(--color-primary);">{{ 'admin.iv_q1' | translate }}</p>
-              <p class="opacity-80 mt-1 leading-relaxed">{{ 'admin.iv_a1' | translate }}</p>
-            </div>
-            <div>
-              <p class="font-semibold text-[15px]" style="color: var(--color-primary);">{{ 'admin.iv_q2' | translate }}</p>
-              <p class="opacity-80 mt-1 leading-relaxed">{{ 'admin.iv_a2' | translate }}</p>
-            </div>
-            <div>
-              <p class="font-semibold text-[15px]" style="color: var(--color-primary);">{{ 'admin.iv_q3' | translate }}</p>
-              <p class="opacity-80 mt-1 leading-relaxed">{{ 'admin.iv_a3' | translate }}</p>
-            </div>
-            <div>
-              <p class="font-semibold text-[15px]" style="color: var(--color-primary);">{{ 'admin.iv_q4' | translate }}</p>
-              <p class="opacity-80 mt-1 leading-relaxed">{{ 'admin.iv_a4' | translate }}</p>
-            </div>
-          </div>
-          <!-- Footer -->
-          <div class="px-5 pb-5 pt-4 border-t flex flex-col gap-2.5 flex-shrink-0" style="border-color: var(--color-border);">
-            @if (completedCheckpoints.size > 0) {
-              <button (click)="resetProgress(); closeInfoModal()" class="w-full py-2.5 rounded-xl font-semibold text-sm transition-all hover:opacity-80 border shadow-sm"
-                style="background: transparent; color: #dc2626; border-color: #dc262622;">
-                <i class="fa-solid fa-rotate-left mr-2"></i>{{ 'admin.reset_progress' | translate }}
-              </button>
-            }
-          </div>
         </div>
       </div>
       }
@@ -318,7 +124,7 @@
           <div class="flex-1"></div>
 
           <!-- Checkpoint progress pill -->
-          @if (vid.checkpoints?.length) {
+          @if (vid.checkpoints.length) {
           <span class="text-xs font-medium px-2.5 py-1 rounded-full"
             style="background: rgba(200,172,137,0.15); color: #c8ac89;">
             <i class="fa-solid fa-flag-checkered mr-1"></i>
@@ -338,7 +144,7 @@
     }
 
     <!-- Checkpoints list -->
-    @if (vid.checkpoints?.length) {
+    @if (vid.checkpoints.length) {
     <div class="mt-5">
       <h2 class="text-sm font-semibold mb-3 flex items-center gap-2" style="color: var(--color-text);">
         <i class="fa-solid fa-flag-checkered" style="color: var(--color-primary);"></i>

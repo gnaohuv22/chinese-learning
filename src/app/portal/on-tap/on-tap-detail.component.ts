@@ -1,7 +1,17 @@
-import { Component, inject, signal, computed, OnInit, Input, OnChanges } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { take } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CourseService } from '../../core/services/course.service';
 import { LessonService } from '../../core/services/lesson.service';
 import { Course, Lesson, Skill } from '../../core/models';
@@ -29,18 +39,19 @@ const SKILL_OPTIONS: SkillOption[] = [
   templateUrl: './on-tap-detail.component.html',
   styleUrl: './on-tap-detail.component.scss',
 })
-export class OnTapDetailComponent implements OnInit, OnChanges {
+export class OnTapDetailComponent implements OnInit, OnChanges, OnDestroy {
   @Input({ required: true }) phan!: string;
 
   private courseService = inject(CourseService);
   private lessonService = inject(LessonService);
+  private destroyRef = inject(DestroyRef);
 
   phanNumber = signal<number>(1);
   course = signal<Course | null>(null);
   lessons = signal<Lesson[]>([]);
-  loading = signal(true);
-  notFound = signal(false);
+  viewState = signal<'loading' | 'ready' | 'empty' | 'error' | 'not-found'>('loading');
   activeSkillFilter = signal<SkillFilter>('all');
+  private emptyStateTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly skillOptions = SKILL_OPTIONS;
 
@@ -58,38 +69,71 @@ export class OnTapDetailComponent implements OnInit, OnChanges {
     this.load();
   }
 
+  ngOnDestroy() {
+    this.clearEmptyStateTimer();
+  }
+
   private load() {
     const n = parseInt(this.phan, 10);
     const phanNum = isNaN(n) || n < 1 || n > 4 ? 1 : n;
     this.phanNumber.set(phanNum);
-    this.loading.set(true);
-    this.notFound.set(false);
+    this.viewState.set('loading');
     this.course.set(null);
     this.lessons.set([]);
     this.activeSkillFilter.set('all');
+    this.clearEmptyStateTimer();
 
-    // URL phan 1–4 maps to zero-based course.order (see admin-courses drag/reorder).
-    this.courseService.getCourseByOrder(phanNum - 1).pipe(take(1)).subscribe({
-      next: (course) => {
-        if (!course) {
-          this.notFound.set(true);
-          this.loading.set(false);
-          return;
-        }
-        this.course.set(course);
-        this.lessonService.getLessons(course.id).pipe(take(1)).subscribe({
-          next: (lessons) => {
-            this.lessons.set(lessons);
-            this.loading.set(false);
-          },
-          error: () => this.loading.set(false),
-        });
-      },
-      error: () => {
-        this.notFound.set(true);
-        this.loading.set(false);
-      },
-    });
+    // URL phan 1–4 maps to zero-based course.order.
+    this.courseService
+      .getCourseByOrder(phanNum - 1)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (course) => {
+          if (!course) {
+            this.viewState.set('not-found');
+            return;
+          }
+          this.course.set(course);
+          this.lessonService
+            .getLessons(course.id)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+              next: (lessons) => {
+                this.lessons.set(lessons);
+                this.resolveViewState(lessons.length);
+              },
+              error: () => this.viewState.set('error'),
+            });
+        },
+        error: () => this.viewState.set('not-found'),
+      });
+  }
+
+  private resolveViewState(itemCount: number) {
+    if (itemCount > 0) {
+      this.clearEmptyStateTimer();
+      this.viewState.set('ready');
+      return;
+    }
+
+    if (this.viewState() === 'ready') {
+      this.viewState.set('empty');
+      return;
+    }
+
+    if (this.emptyStateTimer) return;
+
+    this.emptyStateTimer = setTimeout(() => {
+      this.emptyStateTimer = null;
+      this.viewState.set(this.lessons().length === 0 ? 'empty' : 'ready');
+    }, 320);
+  }
+
+  private clearEmptyStateTimer() {
+    if (this.emptyStateTimer) {
+      clearTimeout(this.emptyStateTimer);
+      this.emptyStateTimer = null;
+    }
   }
 
   hocPhanItems = [1, 2, 3, 4] as const;

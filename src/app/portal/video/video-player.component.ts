@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   OnDestroy,
@@ -8,19 +9,20 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { InteractiveVideoService } from '../../core/services/interactive-video.service';
 import { CheckpointStateService } from '../../core/services/checkpoint-state.service';
+import { VideoModalService } from '../../core/services/video-modal.service';
 import { InteractiveVideo, VideoCheckpoint } from '../../core/models';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-video-player',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './video-player.component.html',
 })
 export class VideoPlayerComponent implements OnInit, OnDestroy {
@@ -30,6 +32,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private videoService = inject(InteractiveVideoService);
   private checkpointState = inject(CheckpointStateService);
+  readonly videoModal = inject(VideoModalService);
+  private destroyRef = inject(DestroyRef);
 
   videoData = signal<InteractiveVideo | null>(null);
   loading = signal(true);
@@ -48,35 +52,45 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private lastTriggeredId: string | null = null;
   private lockedAtTime = 0;
 
-  // Modal state
-  showQuestionModal = false;
-  showHelperModal = false;
-  showInfoModal = false;
   currentCheckpoint: VideoCheckpoint | null = null;
   selectedOption: string | null = null;
   answerResult: 'correct' | 'wrong' | null = null;
 
-  private sub?: Subscription;
   private nativeListeners: Array<() => void> = [];
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('videoId')!;
-    this.sub = this.videoService.getVideo(id).subscribe({
-      next: (vid) => {
-        if (!vid || !vid.published) {
-          this.notFound.set(true);
-          this.loading.set(false);
-          return;
-        }
-        this.videoData.set(vid);
-        this.completedCheckpoints = this.checkpointState.getCompleted(vid.id);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.notFound.set(true);
-        this.loading.set(false);
+    this.videoModal.registerHandlers({
+      onSelectOption: (option) => this.selectOption(option),
+      onConfirmAnswer: () => this.confirmAnswer(),
+      onRetryQuestion: () => this.retryQuestion(),
+      onHelperContinue: () => this.onHelperContinue(),
+      onCloseInfo: () => this.closeInfoModal(),
+      onResetProgress: () => {
+        this.resetProgress();
+        this.closeInfoModal();
       },
     });
+
+    const id = this.route.snapshot.paramMap.get('videoId')!;
+    this.videoService
+      .getVideo(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (vid) => {
+          if (!vid || !vid.published) {
+            this.notFound.set(true);
+            this.loading.set(false);
+            return;
+          }
+          this.videoData.set(vid);
+          this.completedCheckpoints = this.checkpointState.getCompleted(vid.id);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.notFound.set(true);
+          this.loading.set(false);
+        },
+      });
   }
 
   ngAfterViewInit() {
@@ -86,6 +100,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private attachNativeListeners() {
     const video = this.videoRef?.nativeElement;
     if (!video) return;
+
+    // Clear existing to prevent double binding
+    this.nativeListeners.forEach((fn) => fn());
+    this.nativeListeners = [];
 
     const onPlay = () => {
       if (this.isLocked) {
@@ -110,13 +128,14 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.nativeListeners.push(
       () => video.removeEventListener('play', onPlay),
       () => video.removeEventListener('seeked', onSeeked),
-      () => document.removeEventListener('fullscreenchange', onFullscreenChange),
+      () =>
+        document.removeEventListener('fullscreenchange', onFullscreenChange)
     );
   }
 
   ngOnDestroy() {
-    this.sub?.unsubscribe();
     this.nativeListeners.forEach((fn) => fn());
+    this.videoModal.clearHandlers();
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -170,7 +189,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.currentCheckpoint = checkpoint;
     this.selectedOption = null;
     this.answerResult = null;
-    this.showQuestionModal = true;
+    this.videoModal.openQuestion(checkpoint, this.selectedOption, this.answerResult);
   }
 
   selectOption(option: string) {
@@ -181,33 +200,34 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       (ans) => ans.trim().toLowerCase() === option.trim().toLowerCase()
     );
     this.answerResult = isCorrect ? 'correct' : 'wrong';
+    this.videoModal.updateQuestionResult(this.selectedOption, this.answerResult);
   }
 
   confirmAnswer() {
     if (!this.currentCheckpoint || !this.selectedOption) return;
     if (this.answerResult === 'correct') {
       this.markDone(this.currentCheckpoint.id);
-      this.showQuestionModal = false;
+      this.videoModal.close();
       this.isLocked = false;
       this.lastTriggeredId = null;
       this.videoRef.nativeElement.play();
       this.isPlaying = true;
     } else {
-      this.showQuestionModal = false;
-      this.showHelperModal = true;
+      this.videoModal.openHelper(this.currentCheckpoint);
     }
   }
 
   retryQuestion() {
-    this.showHelperModal = false;
     this.selectedOption = null;
     this.answerResult = null;
-    this.showQuestionModal = true;
+    if (this.currentCheckpoint) {
+      this.videoModal.openQuestion(this.currentCheckpoint, this.selectedOption, this.answerResult);
+    }
   }
 
   onHelperContinue() {
     if (this.currentCheckpoint) this.markDone(this.currentCheckpoint.id);
-    this.showHelperModal = false;
+    this.videoModal.close();
     this.isLocked = false;
     this.lastTriggeredId = null;
     this.videoRef.nativeElement.play();
@@ -230,14 +250,14 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   }
 
   openInfoModal() {
-    this.showInfoModal = true;
+    this.videoModal.openInfo(this.completedCheckpoints.size > 0);
     if (!this.isLocked && !this.videoRef.nativeElement.paused) {
       this.togglePlay(); // Pause while reading info
     }
   }
 
   closeInfoModal() {
-    this.showInfoModal = false;
+    this.videoModal.close();
   }
 
   togglePlay() {
@@ -320,9 +340,5 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   goBack() {
     this.router.navigate(['/video']);
-  }
-
-  getOptionLetter(index: number): string {
-    return String.fromCharCode(65 + index); // A, B, C, D...
   }
 }
