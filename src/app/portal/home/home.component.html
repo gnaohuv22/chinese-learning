@@ -27,7 +27,7 @@
           class="inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-xl transition-colors shadow-lg hero-cta-primary"
         >
           <i class="fa-solid fa-book-open"></i>
-          {{ 'nav.courses' | translate }}
+          {{ 'home.hero_cta' | translate }}
         </a>
         <a
           routerLink="/thi-thu"
@@ -138,6 +138,62 @@
         }
       </div>
     }
+  </div>
+</section>
+
+<!-- Interactive video introduction -->
+<section class="border-b iv-intro-section">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="iv-intro-card grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 mb-3 iv-intro-chip">
+          <i class="fa-solid fa-film"></i>
+          <span>{{ 'exercise_types.interactive_video' | translate }}</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-2 iv-intro-title">
+          {{ 'home.iv_title' | translate }}
+        </h2>
+        <p class="text-sm sm:text-base mb-5 iv-intro-description">
+          {{ 'home.iv_description' | translate }}
+        </p>
+        <a
+          routerLink="/video"
+          class="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all iv-intro-cta"
+        >
+          {{ 'home.try_now' | translate }}
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+
+      <a routerLink="/video" class="block rounded-2xl overflow-hidden iv-media-link">
+        <div class="relative aspect-video iv-media-shell">
+          @if (resolveVideoThumbnail(featuredVideo()); as thumbUrl) {
+            <img
+              [src]="thumbUrl"
+              [alt]="featuredVideo()?.title || ('home.iv_title' | translate)"
+              title="Interactive video thumbnail"
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover iv-media-image"
+            />
+          } @else {
+            <div class="absolute inset-0 iv-media-fallback"></div>
+          }
+
+          <div class="absolute inset-0 flex items-center justify-center iv-media-overlay">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center iv-media-play">
+              <i class="fa-solid fa-play text-xl ml-1"></i>
+            </div>
+          </div>
+
+          @if (featuredVideo()?.title) {
+            <div class="absolute bottom-3 left-3 right-3 px-3 py-2 rounded-xl iv-media-caption">
+              <p class="text-xs sm:text-sm font-medium line-clamp-1">{{ featuredVideo()?.title }}</p>
+            </div>
+          }
+        </div>
+      </a>
+    </div>
   </div>
 </section>
 

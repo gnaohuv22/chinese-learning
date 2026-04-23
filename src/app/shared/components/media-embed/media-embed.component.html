@@ -111,7 +111,15 @@
 
       @case ('image') {
         <div class="rounded-lg overflow-hidden border shadow-sm" style="border-color: var(--color-border)">
-          <img [src]="thumbnailUrl" [alt]="fileId" class="w-full h-auto object-cover" />
+          <img
+            [src]="thumbnailUrl"
+            [alt]="fileId"
+            width="1280"
+            height="720"
+            loading="lazy"
+            decoding="async"
+            class="w-full h-auto object-cover"
+          />
         </div>
       }
     }

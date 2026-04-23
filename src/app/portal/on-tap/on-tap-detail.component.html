@@ -13,15 +13,19 @@
     }
   </div>
 
-  @if (loading()) {
+  @if (viewState() === 'loading') {
     <div class="flex justify-center py-16">
       <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
     </div>
-  } @else if (notFound()) {
+  } @else if (viewState() === 'not-found') {
     <div class="card text-center py-16">
       <div class="text-5xl mb-4 not-found-char">书</div>
       <p class="text-lg font-semibold mb-2 not-found-title">{{ 'course.no_courses' | translate }}</p>
       <p class="text-sm not-found-subtitle">{{ 'course.choose_course' | translate }}</p>
+    </div>
+  } @else if (viewState() === 'error') {
+    <div class="card text-center py-16">
+      <p class="text-lg font-semibold mb-2">{{ 'common.error' | translate }}</p>
     </div>
   } @else if (course()) {
     <!-- Course header card -->
@@ -76,7 +80,7 @@
         </div>
       </div>
 
-      @if (filteredLessons().length === 0) {
+      @if (viewState() === 'empty' || filteredLessons().length === 0) {
         <div class="card text-center py-10 empty-state">
           <i class="fa-solid fa-filter text-2xl mb-3 block empty-icon"></i>
           {{ 'lesson.no_lessons' | translate }}
@@ -108,4 +112,5 @@
       }
     </div>
   }
+
 </div>

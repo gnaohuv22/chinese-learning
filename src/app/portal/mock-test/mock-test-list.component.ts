@@ -1,6 +1,14 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MockTestService } from '../../core/services/mock-test.service';
 import { MockTest, HocPhan } from '../../core/models';
 
@@ -13,6 +21,7 @@ import { MockTest, HocPhan } from '../../core/models';
 })
 export class MockTestListComponent implements OnInit {
   private mockTestService = inject(MockTestService);
+  private destroyRef = inject(DestroyRef);
 
   allTests = signal<MockTest[]>([]);
   loading = signal(true);
@@ -25,13 +34,16 @@ export class MockTestListComponent implements OnInit {
   );
 
   ngOnInit() {
-    this.mockTestService.getMockTests().subscribe({
-      next: (tests) => {
-        this.allTests.set(tests);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
+    this.mockTestService
+      .getMockTests()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (tests) => {
+          this.allTests.set(tests);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
   }
 
   countForHocPhan(n: HocPhan): number {

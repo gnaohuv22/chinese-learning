@@ -1,9 +1,23 @@
 @if (!isAdminRoute()) {
 <div class="md:hidden">
   <!-- Ôn tập slide-up sheet -->
-  @if (ontapSheetOpen()) {
-  <div class="fixed inset-0 z-40" style="background: rgba(0,0,0,0.4);" (click)="closeSheet()"></div>
-  <div class="fixed z-50 rounded-2xl overflow-hidden shadow-2xl border animate-slide-up" style="
+  <div
+    class="fixed inset-0 z-40 transition-opacity duration-150"
+    style="background: rgba(0,0,0,0.4);"
+    [class.opacity-100]="ontapSheetOpen()"
+    [class.opacity-0]="!ontapSheetOpen()"
+    [class.pointer-events-none]="!ontapSheetOpen()"
+    (click)="closeSheet()"
+  ></div>
+    <div class="fixed z-50 rounded-2xl overflow-hidden shadow-2xl border transition-all duration-200 ease-out"
+      [class.opacity-100]="ontapSheetOpen()"
+      [class.opacity-0]="!ontapSheetOpen()"
+      [class.translate-y-0]="ontapSheetOpen()"
+      [class.translate-y-3]="!ontapSheetOpen()"
+      [class.pointer-events-auto]="ontapSheetOpen()"
+      [class.pointer-events-none]="!ontapSheetOpen()"
+      [attr.aria-hidden]="!ontapSheetOpen()"
+      style="
         bottom: calc(max(0.5rem, env(safe-area-inset-bottom)) + 4.5rem);
         left: 50%;
         transform: translateX(-50%);
@@ -26,7 +40,6 @@
     </button>
     }
   </div>
-  }
 
   <!-- Floating pill nav bar -->
   <nav class="fixed z-40 rounded-3xl shadow-xl border" style="

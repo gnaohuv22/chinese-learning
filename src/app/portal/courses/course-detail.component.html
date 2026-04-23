@@ -4,9 +4,13 @@
     {{ 'course.all_courses' | translate }}
   </a>
 
-  @if (loading()) {
+  @if (viewState() === 'loading') {
     <div class="flex justify-center py-16">
       <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
+    </div>
+  } @else if (viewState() === 'error') {
+    <div class="card text-center py-12 empty-state">
+      {{ 'common.error' | translate }}
     </div>
   } @else if (course()) {
     <div class="card mb-6 course-header-card">
@@ -29,7 +33,7 @@
         <span class="text-sm font-normal ml-2 lessons-count">({{ lessons().length }})</span>
       </h2>
 
-      @if (lessons().length === 0) {
+      @if (viewState() === 'empty') {
         <div class="card text-center py-12 empty-state">
           {{ 'lesson.no_lessons' | translate }}
         </div>
@@ -60,4 +64,5 @@
       }
     </div>
   }
+
 </div>

@@ -4,9 +4,13 @@
     {{ 'lesson.back_to_course' | translate }}
   </a>
 
-  @if (loading()) {
+  @if (viewState() === 'loading') {
     <div class="flex justify-center py-16">
       <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
+    </div>
+  } @else if (viewState() === 'error') {
+    <div class="card text-center py-12 empty-state">
+      {{ 'common.error' | translate }}
     </div>
   } @else if (lesson()) {
     <div class="mb-6">
@@ -14,7 +18,7 @@
     </div>
 
     <div class="space-y-6">
-      @if (exercises().length === 0) {
+      @if (viewState() === 'empty') {
         <div class="card text-center py-12 empty-state">
           {{ 'lesson.no_exercises' | translate }}
         </div>
@@ -34,4 +38,5 @@
       }
     </div>
   }
+
 </div>

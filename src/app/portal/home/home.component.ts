@@ -16,7 +16,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CourseService } from '../../core/services/course.service';
 import { NewsService } from '../../core/services/news.service';
 import { LessonService } from '../../core/services/lesson.service';
-import { Course, News, Lesson } from '../../core/models';
+import { InteractiveVideoService } from '../../core/services/interactive-video.service';
+import { Course, News, Lesson, InteractiveVideo } from '../../core/models';
 
 type Skill = 'listening' | 'speaking' | 'reading' | 'writing';
 
@@ -46,10 +47,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   private courseService = inject(CourseService);
   private newsService = inject(NewsService);
   private lessonService = inject(LessonService);
+  private interactiveVideoService = inject(InteractiveVideoService);
   private destroyRef = inject(DestroyRef);
 
   courses = signal<Course[]>([]);
   news = signal<News[]>([]);
+  featuredVideo = signal<InteractiveVideo | null>(null);
   activeSkill = signal<Skill | null>(null);
   skillLessons = signal<Array<{ lesson: Lesson; courseName: string; courseId: string }>>([]);
   loadingSkill = signal(false);
@@ -83,6 +86,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.newsService.getNewsList()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((n) => this.news.set(n));
+    this.interactiveVideoService.getPublishedVideos()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((videos) => this.featuredVideo.set(videos[0] ?? null));
     this.startTypingAnimation();
     this.startCursorBlink();
   }
@@ -193,5 +199,21 @@ export class HomeComponent implements OnInit, OnDestroy {
       .replace(/\s+/g, ' ')
       .trim();
     return plain.slice(0, maxLength) + (plain.length > maxLength ? '…' : '');
+  }
+
+  resolveVideoThumbnail(video: InteractiveVideo | null): string | null {
+    if (!video) return null;
+    if (video.thumbnailUrl) return video.thumbnailUrl;
+    if (!this.isCloudinaryUrl(video.videoUrl)) return null;
+    return this.deriveCloudinaryThumbnail(video.videoUrl);
+  }
+
+  private isCloudinaryUrl(url: string): boolean {
+    return /res\.cloudinary\.com/i.test(url) && /\/video\/upload\//i.test(url);
+  }
+
+  private deriveCloudinaryThumbnail(url: string): string {
+    const withJpgTransform = url.replace('/video/upload/', '/video/upload/f_jpg,q_auto/');
+    return withJpgTransform.replace(/\.[^/.?#]+([?#].*)?$/, '.jpg$1');
   }
 }

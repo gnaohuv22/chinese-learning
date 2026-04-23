@@ -26,16 +26,17 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Full-height flex shell — prevents body-level scrolling.
-   app-root acts as a flex column; main takes all remaining space. */
+/* App shell uses body-level scroll for more stable mobile viewport behavior. */
 html,
 body {
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
   margin: 0;
+  min-height: 100dvh;
   background-color: var(--color-bg);
   color: var(--color-text);
 }
@@ -43,23 +44,12 @@ body {
 app-root {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100dvh;
 }
 
 /* Dark mode fade transition — applied globally */
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-html,
-html *,
-html *::before,
-html *::after {
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
 }
 
 /* Override: keep interaction transitions fast */
@@ -102,22 +92,6 @@ html.dark {
   --color-card-shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px rgb(0 0 0 / 0.3);
 }
 
-/* Smooth router transitions */
-router-outlet + * {
-  animation: pageEnter 0.2s ease-out both;
-}
-
-@keyframes pageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Fade-in animation for modals */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -141,6 +115,28 @@ router-outlet + * {
 }
 
 .animate-slide-up {
+  animation: slideUp 0.25s ease-out both;
+}
+
+/* Full-screen overlay for global video interaction modals */
+.video-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.75);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.video-modal-panel {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
   animation: slideUp 0.25s ease-out both;
 }
 
@@ -440,31 +436,45 @@ html.dark .answer-incorrect { background: rgba(220, 38, 38, 0.18) !important; bo
   border-radius: 0.75rem;
 }
 
-/* Custom scrollbar for main scroll container */
-.scroll-container::-webkit-scrollbar {
+/* Custom scrollbar for main scroll container and global page scroll */
+.scroll-container::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
   width: 6px;
 }
 
-.scroll-container::-webkit-scrollbar-track {
+.scroll-container::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.scroll-container::-webkit-scrollbar-thumb {
+.scroll-container::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
   background: #c8ac89;
   border-radius: 3px;
 }
 
-.scroll-container::-webkit-scrollbar-thumb:hover {
+.scroll-container::-webkit-scrollbar-thumb:hover,
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
   background: #be9672;
 }
 
-html.dark .scroll-container::-webkit-scrollbar-thumb {
+html.dark .scroll-container::-webkit-scrollbar-thumb,
+html.dark::-webkit-scrollbar-thumb,
+html.dark body::-webkit-scrollbar-thumb {
   background: #7e480a;
 }
 
-html.dark .scroll-container::-webkit-scrollbar-thumb:hover {
+html.dark .scroll-container::-webkit-scrollbar-thumb:hover,
+html.dark::-webkit-scrollbar-thumb:hover,
+html.dark body::-webkit-scrollbar-thumb:hover {
   background: #be9672;
 }
+
+/* Firefox global scrollbar colors */
 
 /* Fade-out animation for exercise edit */
 @keyframes fadeOut {
