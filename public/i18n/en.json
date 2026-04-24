@@ -9,7 +9,8 @@
     "news": "News",
     "mock_test": "Mock Test",
     "exam": "Mock Test",
-    "admin": "Admin"
+    "admin": "Admin",
+    "radicals": "Radicals"
   },
   "hoc_phan": {
     "label": "Module {{n}}",
@@ -174,6 +175,24 @@
     "read_more": "Read More",
     "no_news": "No news yet"
   },
+  "radicals": {
+    "title": "Radicals",
+    "back_to_list": "Radicals",
+    "subtitle": "Practice Chinese writing by topic",
+    "empty": "No radical topics yet",
+    "start": "Start practice",
+    "characters": "characters",
+    "has_video": "Video available",
+    "no_video": "No video",
+    "not_found": "Topic not found or not published",
+    "current_character": "Current character",
+    "demo_once": "Show demo",
+    "pinyin": "Pinyin",
+    "definition": "Definition",
+    "next_character": "Next character",
+    "progress": "Progress",
+    "video": "Video"
+  },
   "home": {
     "lessons_for_skill": "Lessons by Skill",
     "no_lessons_skill": "No lessons for this skill yet",
@@ -235,6 +254,7 @@
     "mock_tests": "Mock Tests",
     "news": "News",
     "interactive_videos": "Interactive Videos",
+    "radicals": "Radicals",
     "manage_interactive_videos": "Manage interactive videos with timestamped questions",
     "add_video": "Add Video",
     "no_videos": "No videos yet. Click 'Add Video' to create one.",
@@ -367,12 +387,21 @@
     "delete_exam_title": "Delete Exam",
     "delete_mock_test_title": "Delete Mock Test",
     "delete_video_title": "Delete Video",
+    "delete_topic_title": "Delete Topic",
     "delete_submission_title": "Delete Submission",
     "delete_confirm_msg": "Are you sure you want to delete \"{{name}}\"?",
     "created_success": "Created successfully",
     "updated_success": "Updated successfully",
     "deleted_success": "Deleted successfully",
-    "error_min_correct": "Select at least 1 correct answer"
+    "error_min_correct": "Select at least 1 correct answer",
+    "definition": "Definition",
+    "pinyin": "Pinyin",
+    "characters": "characters",
+    "no_radicals": "No radical topics yet",
+    "topic_title": "Topic title",
+    "topic_characters": "Character list",
+    "topic_characters_hint": "Add at least 1 and up to 10 characters per topic",
+    "update_question": "Update question"
   },
   "pagination": {
     "prev": "Prev",

@@ -1,0 +1,129 @@
+<div class="calc(min-h-screen-64px)" style="background: var(--color-bg);">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    @if (loading()) {
+      <div class="flex justify-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent spinner"></div>
+      </div>
+    } @else if (notFound() || !topic()) {
+      <div class="card text-center py-10">
+        <p class="text-base font-semibold">{{ 'radicals.not_found' | translate }}</p>
+        <button
+          class="btn-secondary mt-4"
+          (click)="goBack()"
+          [attr.aria-label]="'radicals.back_to_list' | translate"
+          [attr.title]="'radicals.back_to_list' | translate"
+        >
+          {{ 'radicals.back_to_list' | translate }}
+        </button>
+      </div>
+    } @else {
+      <div class="mb-4">
+        <button
+          class="btn-secondary text-sm inline-flex items-center gap-2"
+          (click)="goBack()"
+          [attr.aria-label]="'radicals.back_to_list' | translate"
+          [attr.title]="'radicals.back_to_list' | translate"
+        >
+          <i class="fa-solid fa-chevron-left text-sm"></i>
+          <span>{{ 'radicals.back_to_list' | translate }}</span>
+        </button>
+      </div>
+
+      <div class="mb-4">
+        <h1 class="text-xl sm:text-2xl font-bold" style="color: var(--color-text);">{{ topic()!.title }}</h1>
+        @if (topic()!.description) {
+          <p class="text-sm mt-1" style="color: var(--color-text-muted);">{{ topic()!.description }}</p>
+        }
+      </div>
+
+      <div class="grid grid-cols-1 gap-4" [ngClass]="topic()!.videoUrl ? 'lg:grid-cols-2 lg:items-stretch' : ''">
+        <div class="card flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs" style="color: var(--color-text-muted);">{{ 'radicals.current_character' | translate }}</p>
+              <p class="text-2xl font-bold">{{ currentCharacter()?.hanzi }}</p>
+            </div>
+            <button class="btn-secondary text-sm" (click)="playDemo()" [disabled]="isAnimatingDemo()">
+              {{ 'radicals.demo_once' | translate }}
+            </button>
+          </div>
+
+          <div class="rounded-xl border p-2 sm:p-3 writer-shell" style="border-color: var(--color-border);">
+            <div #writerSurface class="w-full max-w-[240px] mx-auto writer-surface">
+              <div #writerHost class="w-full min-h-[120px] sm:min-h-[180px] writer-host"></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-sm">
+            <div class="card py-2 text-center">
+              <div class="text-xs" style="color: var(--color-text-muted);">{{ 'radicals.pinyin' | translate }}</div>
+              <div class="font-semibold">{{ currentCharacter()?.pinyin }}</div>
+            </div>
+            <div class="card py-2 text-center col-span-2">
+              <div class="text-xs" style="color: var(--color-text-muted);">{{ 'radicals.definition' | translate }}</div>
+              <div class="font-semibold">{{ currentCharacter()?.definition }}</div>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button class="btn-primary" (click)="nextCharacter()" [disabled]="!isCompleted(currentIndex())">
+              {{ 'radicals.next_character' | translate }}
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-xs font-semibold" style="color: var(--color-text-muted);">{{ 'radicals.progress' | translate }}</p>
+            <div class="grid grid-cols-5 sm:grid-cols-10 gap-2">
+              @for (char of topic()!.characters; track $index) {
+                <div
+                  class="h-10 rounded-lg border flex items-center justify-center text-sm font-semibold"
+                  [style.border-color]="isCompleted($index) ? '#16a34a' : 'var(--color-border)'"
+                  [style.opacity]="isLocked($index) ? 0.55 : 1"
+                  [style.background]="isCompleted($index) ? '#16a34a1f' : 'transparent'"
+                >
+                  {{ char.hanzi }}
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (topic()!.videoUrl) {
+        <div class="card flex flex-col">
+          <p class="text-sm font-semibold mb-2">{{ 'radicals.video' | translate }}</p>
+            <div class="rounded-xl overflow-hidden border flex justify-center" style="border-color: var(--color-border);">
+              <video
+                #practiceVideo
+                [src]="topic()!.videoUrl"
+                class="w-full object-contain mx-auto"
+                [style.max-height]="videoMaxHeight()"
+                style="background: #0a0a0a;"
+                playsinline
+                preload="metadata"
+                (loadedmetadata)="onPracticeVideoReady()"
+                (play)="isPlaying.set(true)"
+                (pause)="isPlaying.set(false)"
+              ></video>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              <button class="btn-secondary text-sm" (click)="togglePlayVideo()">
+                @if (isPlaying()) {
+                  <i class="fa-solid fa-pause"></i>
+                } @else {
+                  <i class="fa-solid fa-play"></i>
+                }
+              </button>
+              <button class="btn-secondary text-sm" (click)="toggleMute()">
+                @if (isMuted()) {
+                  <i class="fa-solid fa-volume-xmark"></i>
+                } @else {
+                  <i class="fa-solid fa-volume-high"></i>
+                }
+              </button>
+            </div>
+        </div>
+        }
+      </div>
+    }
+  </div>
+</div>

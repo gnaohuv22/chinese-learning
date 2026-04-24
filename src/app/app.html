@@ -3,9 +3,12 @@
   class="flex-1 pb-24 md:pb-0"
   style="background: var(--color-bg); color: var(--color-text)"
 >
-  <router-outlet />
+  <div class="relative min-h-[calc(100vh-4rem)] overflow-x-hidden" [@routeAnimations]="getRouteAnimationData()">
+    <router-outlet />
+  </div>
 </main>
 <app-bottom-nav />
 <app-confirm-modal />
 <app-toast />
 <app-video-modal-host />
+<app-scroll-to-top />

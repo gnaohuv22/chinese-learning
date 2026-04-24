@@ -28,6 +28,11 @@ const NAV_ITEMS = [
     route: '/admin/interactive-videos',
     icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z',
   },
+  {
+    label: 'admin.radicals',
+    route: '/admin/radicals',
+    icon: 'M7 8h10M7 12h10M7 16h6M4 5h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V7a2 2 0 012-2z',
+  },
 ];
 
 @Component({

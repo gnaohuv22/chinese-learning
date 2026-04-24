@@ -1,4 +1,4 @@
-import { Component, inject, signal, HostListener, ElementRef } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageSwitcherComponent } from '../language-switcher/language-switcher.component';
@@ -23,9 +23,6 @@ const FLOAT_CHARS = ['汉', '语', '记', '诗', '书', '画', '风', '云', '�
 })
 export class HeaderComponent {
   theme = inject(ThemeService);
-  private elRef = inject(ElementRef);
-
-  ontapOpen = signal(false);
 
   floatingChars: FloatingChar[] = Array.from({ length: 10 }, (_, i) => ({
     char: FLOAT_CHARS[i % FLOAT_CHARS.length],
@@ -35,20 +32,4 @@ export class HeaderComponent {
     delay: -(i * 2.1) % 12,
     opacity: 0.06 + (i * 0.03) % 0.12,
   }));
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (!this.elRef.nativeElement.contains(event.target)) {
-      this.ontapOpen.set(false);
-    }
-  }
-
-  toggleOntap(event: MouseEvent) {
-    event.stopPropagation();
-    this.ontapOpen.update((v) => !v);
-  }
-
-  closeOntap() {
-    this.ontapOpen.set(false);
-  }
 }

@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+.writer-shell {
+  background:
+    radial-gradient(circle at 20% 20%, rgb(255 255 255 / 0.25), transparent 58%),
+    radial-gradient(circle at 80% 80%, rgb(126 72 10 / 0.08), transparent 60%);
+}
+
+.writer-surface {
+  position: relative;
+  touch-action: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.writer-host {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.writer-host :where(svg, canvas) {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  height: auto !important;
+}
+
+:host-context(html.dark) .writer-shell {
+  background:
+    radial-gradient(circle at 20% 20%, rgb(239 231 219 / 0.12), transparent 56%),
+    radial-gradient(circle at 80% 80%, rgb(190 150 114 / 0.1), transparent 58%);
+}

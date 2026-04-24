@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   ElementRef,
   HostListener,
@@ -46,6 +47,21 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   duration = 0;
   volume = 1;
   isMuted = false;
+  videoAspectRatio = signal<number | null>(null);
+
+  videoMaxHeight = computed(() => {
+    const ratio = this.videoAspectRatio();
+    if (!ratio) {
+      return 'min(72vh, 760px)';
+    }
+    if (ratio < 0.8) {
+      return 'min(86vh, 980px)';
+    }
+    if (ratio < 1.15) {
+      return 'min(78vh, 860px)';
+    }
+    return 'min(72vh, 760px)';
+  });
 
   // Checkpoint state
   completedCheckpoints = new Set<string>();
@@ -83,6 +99,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
             return;
           }
           this.videoData.set(vid);
+          this.videoAspectRatio.set(null);
           this.completedCheckpoints = this.checkpointState.getCompleted(vid.id);
           this.loading.set(false);
         },
@@ -156,6 +173,11 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.attachNativeListeners();
     const video = this.videoRef.nativeElement;
     this.duration = video.duration || 0;
+    const width = video.videoWidth || 0;
+    const height = video.videoHeight || 0;
+    if (width > 0 && height > 0) {
+      this.videoAspectRatio.set(width / height);
+    }
   }
 
   onTimeUpdate() {

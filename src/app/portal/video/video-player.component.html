@@ -1,7 +1,7 @@
-<div class="min-h-screen" style="background: var(--color-bg);">
+<div class="calc(min-h-screen-64px)" style="background: var(--color-bg);">
 
   @if (loading()) {
-  <div class="flex justify-center items-center min-h-screen">
+  <div class="flex justify-center items-center calc(min-h-screen-64px)" style="background: var(--color-bg);">
     <div class="flex flex-col items-center gap-3">
       <div class="animate-spin rounded-full h-10 w-10 border-2"
         style="border-color: var(--color-primary); border-top-color: transparent;"></div>
@@ -61,7 +61,8 @@
       <!-- VIDEO ELEMENT — no controls attribute -->
       <video #videoEl [src]="vid.videoUrl" class="w-full block"
         [style.filter]="isLocked ? 'brightness(0.35)' : 'brightness(1)'"
-        style="transition: filter 0.3s ease; max-height: 70vh; object-fit: contain;" playsinline webkit-playsinline
+        [style.max-height]="videoMaxHeight()"
+        style="transition: filter 0.3s ease; object-fit: contain;" playsinline webkit-playsinline
         preload="metadata" (loadedmetadata)="onVideoReady()" (durationchange)="onDurationChange()"
         (timeupdate)="onTimeUpdate()" (play)="onPlay()" (pause)="onPause()" (ended)="onEnded()"
         id="interactive-video-main"></video>

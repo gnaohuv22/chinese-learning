@@ -3,11 +3,13 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
+    data: { level: 0 },
     loadComponent: () =>
       import('./portal/home/home.component').then((m) => m.HomeComponent),
   },
   {
     path: 'courses',
+    data: { level: 1 },
     loadComponent: () =>
       import('./portal/courses/course-list.component').then(
         (m) => m.CourseListComponent
@@ -15,6 +17,7 @@ export const routes: Routes = [
   },
   {
     path: 'courses/:courseId',
+    data: { level: 2 },
     loadComponent: () =>
       import('./portal/courses/course-detail.component').then(
         (m) => m.CourseDetailComponent
@@ -22,6 +25,7 @@ export const routes: Routes = [
   },
   {
     path: 'courses/:courseId/lessons/:lessonId',
+    data: { level: 3 },
     loadComponent: () =>
       import('./portal/lessons/lesson-detail.component').then(
         (m) => m.LessonDetailComponent
@@ -29,6 +33,7 @@ export const routes: Routes = [
   },
   {
     path: 'on-tap/:phan',
+    data: { level: 1 },
     loadComponent: () =>
       import('./portal/on-tap/on-tap-detail.component').then(
         (m) => m.OnTapDetailComponent
@@ -36,6 +41,7 @@ export const routes: Routes = [
   },
   {
     path: 'thi-thu',
+    data: { level: 1 },
     loadComponent: () =>
       import('./portal/mock-test/mock-test-list.component').then(
         (m) => m.MockTestListComponent
@@ -43,6 +49,7 @@ export const routes: Routes = [
   },
   {
     path: 'thi-thu/:testId',
+    data: { level: 2 },
     loadComponent: () =>
       import('./portal/mock-test/mock-test-summary.component').then(
         (m) => m.MockTestSummaryComponent
@@ -50,6 +57,7 @@ export const routes: Routes = [
   },
   {
     path: 'thi-thu/:testId/test',
+    data: { level: 3 },
     loadComponent: () =>
       import('./portal/mock-test/mock-test-exam.component').then(
         (m) => m.MockTestExamComponent
@@ -62,6 +70,7 @@ export const routes: Routes = [
   },
   {
     path: 'video',
+    data: { level: 1 },
     loadComponent: () =>
       import('./portal/video/video-list.component').then(
         (m) => m.VideoListComponent
@@ -69,13 +78,31 @@ export const routes: Routes = [
   },
   {
     path: 'video/:videoId',
+    data: { level: 2 },
     loadComponent: () =>
       import('./portal/video/video-player.component').then(
         (m) => m.VideoPlayerComponent
       ),
   },
   {
+    path: 'bo-thu',
+    data: { level: 1 },
+    loadComponent: () =>
+      import('./portal/radicals/radical-topic-list.component').then(
+        (m) => m.RadicalTopicListComponent
+      ),
+  },
+  {
+    path: 'bo-thu/:topicId',
+    data: { level: 2 },
+    loadComponent: () =>
+      import('./portal/radicals/radical-practice.component').then(
+        (m) => m.RadicalPracticeComponent
+      ),
+  },
+  {
     path: 'news',
+    data: { level: 1 },
     loadComponent: () =>
       import('./portal/news/news-list.component').then(
         (m) => m.NewsListComponent
@@ -83,6 +110,7 @@ export const routes: Routes = [
   },
   {
     path: 'news/:newsId',
+    data: { level: 2 },
     loadComponent: () =>
       import('./portal/news/news-detail.component').then(
         (m) => m.NewsDetailComponent
@@ -154,6 +182,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./admin/submitted-exams/admin-submitted-exams.component').then(
             (m) => m.AdminSubmittedExamsComponent
+          ),
+      },
+      {
+        path: 'radicals',
+        loadComponent: () =>
+          import('./admin/radicals/admin-radicals.component').then(
+            (m) => m.AdminRadicalsComponent
           ),
       },
     ],
