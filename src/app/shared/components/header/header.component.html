@@ -48,48 +48,14 @@
           {{ 'nav.home' | translate }}
         </a>
 
-        <!-- Ôn tập with submenu -->
-        <div class="relative">
-          <button
-            type="button"
-            (click)="toggleOntap($event)"
-            class="nav-link flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            style="color: #efe7db;"
-            [style.background]="ontapOpen() ? 'rgba(200,172,137,0.2)' : ''"
-          >
-            {{ 'nav.courses' | translate }}
-            <svg
-              class="w-3.5 h-3.5 transition-transform duration-200"
-              [class.rotate-180]="ontapOpen()"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          <!-- Submenu -->
-          @if (ontapOpen()) {
-            <div
-              class="absolute top-full left-0 mt-1.5 w-48 rounded-xl shadow-xl border overflow-hidden submenu-enter"
-              style="background: #3a1b00; border-color: #7e480a;"
-            >
-              @for (n of [1, 2, 3, 4]; track n) {
-                <a
-                  [routerLink]="['/on-tap', n]"
-                  (click)="closeOntap()"
-                  class="submenu-item flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-b last:border-b-0"
-                  style="color: #efe7db; border-color: #7e480a;"
-                >
-                  <span
-                    class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0"
-                    style="background: #7e480a; color: #efe7db;"
-                  >{{ n }}</span>
-                  {{ 'hoc_phan.' + n | translate }}
-                </a>
-              }
-            </div>
-          }
-        </div>
+        <a
+          routerLink="/on-tap/1"
+          routerLinkActive="active-nav"
+          class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          style="color: #efe7db;"
+        >
+          {{ 'nav.courses' | translate }}
+        </a>
 
         <a
           routerLink="/news"
@@ -103,11 +69,19 @@
         <a
           routerLink="/video"
           routerLinkActive="active-nav"
-          class="nav-link flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors"
           style="color: #efe7db;"
         >
-          <i class="fa-solid fa-film text-xs"></i>
           Video
+        </a>
+
+        <a
+          routerLink="/bo-thu"
+          routerLinkActive="active-nav"
+          class="nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          style="color: #efe7db;"
+        >
+          {{ 'nav.radicals' | translate }}
         </a>
 
         <a

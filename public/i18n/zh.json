@@ -9,7 +9,8 @@
     "news": "新闻",
     "mock_test": "模拟考试",
     "exam": "模拟考试",
-    "admin": "管理"
+    "admin": "管理",
+    "radicals": "部首"
   },
   "hoc_phan": {
     "label": "学习单元 {{n}}",
@@ -174,6 +175,24 @@
     "read_more": "阅读更多",
     "no_news": "暂无新闻"
   },
+  "radicals": {
+    "title": "部首",
+    "back_to_list": "部首",
+    "subtitle": "按主题练习汉字书写",
+    "empty": "暂无部首主题",
+    "start": "开始练习",
+    "characters": "个字",
+    "has_video": "有教学视频",
+    "no_video": "无视频",
+    "not_found": "未找到主题或主题未发布",
+    "current_character": "当前汉字",
+    "demo_once": "演示一遍",
+    "pinyin": "拼音",
+    "definition": "释义",
+    "next_character": "下一个汉字",
+    "progress": "进度",
+    "video": "视频"
+  },
   "home": {
     "lessons_for_skill": "技能课时",
     "no_lessons_skill": "该技能暂无课时",
@@ -235,6 +254,7 @@
     "mock_tests": "模拟考试管理",
     "news": "新闻管理",
     "interactive_videos": "互动视频",
+    "radicals": "部首",
     "manage_interactive_videos": "管理带有时间戳问题的互动视频",
     "add_video": "添加视频",
     "no_videos": "暂无视频。点击“添加视频”创建一个。",
@@ -367,12 +387,21 @@
     "delete_exam_title": "删除考试",
     "delete_mock_test_title": "删除模拟考试",
     "delete_video_title": "删除视频",
+    "delete_topic_title": "删除主题",
     "delete_submission_title": "删除记录",
     "delete_confirm_msg": "确定要删除「{{name}}」吗？",
     "created_success": "创建成功",
     "updated_success": "更新成功",
     "deleted_success": "删除成功",
-    "error_min_correct": "必须选择至少1个正确答案"
+    "error_min_correct": "必须选择至少1个正确答案",
+    "definition": "定义",
+    "pinyin": "拼音",
+    "characters": "汉字",
+    "no_radicals": "暂无部首主题",
+    "topic_title": "主题名称",
+    "topic_characters": "汉字列表",
+    "topic_characters_hint": "每个主题至少添加1个汉字，最多10个",
+    "update_question": "更新题目"
   },
   "pagination": {
     "prev": "上一页",

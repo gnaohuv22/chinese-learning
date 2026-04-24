@@ -9,7 +9,8 @@
     "news": "Tin tức",
     "mock_test": "Thi thử",
     "exam": "Thi thử",
-    "admin": "Quản trị"
+    "admin": "Quản trị",
+    "radicals": "Bộ thủ"
   },
   "hoc_phan": {
     "label": "Học phần {{n}}",
@@ -174,6 +175,24 @@
     "read_more": "Đọc thêm",
     "no_news": "Chưa có tin tức"
   },
+  "radicals": {
+    "title": "Bộ thủ",
+    "back_to_list": "Bộ thủ",
+    "subtitle": "Luyện viết theo từng chủ đề chữ Hán",
+    "empty": "Chưa có chủ đề Bộ thủ",
+    "start": "Bắt đầu luyện",
+    "characters": "chữ",
+    "has_video": "Có video hướng dẫn",
+    "no_video": "Không có video",
+    "not_found": "Không tìm thấy chủ đề hoặc chủ đề chưa công khai",
+    "current_character": "Chữ hiện tại",
+    "demo_once": "Viết mẫu",
+    "pinyin": "Pinyin",
+    "definition": "Định nghĩa",
+    "next_character": "Chữ tiếp theo",
+    "progress": "Tiến trình",
+    "video": "Video"
+  },
   "home": {
     "lessons_for_skill": "Bài học theo kỹ năng",
     "no_lessons_skill": "Chưa có bài học nào cho kỹ năng này",
@@ -235,6 +254,7 @@
     "mock_tests": "Quản lý thi thử",
     "news": "Quản lý tin tức",
     "interactive_videos": "Video Tương Tác",
+    "radicals": "Bộ thủ",
     "manage_interactive_videos": "Quản lý video học có câu hỏi timestamp",
     "add_video": "Thêm Video",
     "no_videos": "Chưa có video nào. Bấm 'Thêm Video' để tạo mới.",
@@ -367,12 +387,21 @@
     "delete_exam_title": "Xóa đề thi",
     "delete_mock_test_title": "Xóa đề thi thử",
     "delete_video_title": "Xóa video",
+    "delete_topic_title": "Xóa chủ đề",
     "delete_submission_title": "Xóa bài nộp",
     "delete_confirm_msg": "Bạn có chắc muốn xóa \"{{name}}\" không?",
     "created_success": "Tạo mới thành công",
     "updated_success": "Cập nhật thành công",
     "deleted_success": "Đã xóa thành công",
-    "error_min_correct": "Phải chọn ít nhất 1 đáp án đúng"
+    "error_min_correct": "Phải chọn ít nhất 1 đáp án đúng",
+    "definition": "Định nghĩa",
+    "pinyin": "Pinyin",
+    "characters": "chữ",
+    "no_radicals": "Chưa có chủ đề Bộ thủ nào",
+    "topic_title": "Tên chủ đề",
+    "topic_characters": "Danh sách chữ",
+    "topic_characters_hint": "Thêm tối thiểu 1 chữ và tối đa 10 chữ cho mỗi chủ đề",
+    "update_question": "Cập nhật câu hỏi"
   },
   "pagination": {
     "prev": "Trước",

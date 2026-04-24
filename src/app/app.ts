@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, ChildrenOutletContexts } from '@angular/router';
+import { routeTransition } from './core/animations/route-animations';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
@@ -7,21 +8,28 @@ import { ThemeService } from './core/services/theme.service';
 import { ConfirmModalComponent } from './shared/components/modal/confirm-modal.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { VideoModalHostComponent } from './shared/components/video-modal-host/video-modal-host.component';
+import { ScrollToTopComponent } from './shared/components/scroll-to-top/scroll-to-top.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, BottomNavComponent, ConfirmModalComponent, ToastComponent, VideoModalHostComponent],
+  imports: [RouterOutlet, HeaderComponent, BottomNavComponent, ConfirmModalComponent, ToastComponent, VideoModalHostComponent, ScrollToTopComponent],
   templateUrl: './app.html',
+  animations: [routeTransition],
 })
 export class App implements OnInit {
   private translate = inject(TranslateService);
   // ThemeService is injected here to ensure it initialises (applies saved theme) on app start
   private _theme = inject(ThemeService);
+  private contexts = inject(ChildrenOutletContexts);
+
+  getRouteAnimationData() {
+    return this.contexts.getContext('primary')?.route?.snapshot?.data?.['level'];
+  }
 
   ngOnInit() {
     this.translate.addLangs(['vi', 'en', 'zh']);
-    this.translate.setDefaultLang('vi');
+    this.translate.setFallbackLang('vi');
 
     const saved = localStorage.getItem('lang');
     const browserLang = this.translate.getBrowserLang();

@@ -6,3 +6,4 @@ export * from './mock-test.model';
 export * from './news.model';
 export * from './submitted-exam.model';
 export * from './interactive-video.model';
+export * from './radical-topic.model';
