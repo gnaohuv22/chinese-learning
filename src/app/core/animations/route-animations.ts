@@ -27,7 +27,7 @@ export const routeTransition = trigger('routeAnimations', [
     query(':leave', [style({ zIndex: 1 })], { optional: true }),
     group([
       query(':leave', [
-        animate(slideConfig, style({ transform: 'translateX(-30%)', opacity: 0 })),
+        animate(slideConfig, style({ transform: 'translateX(-50%)', opacity: 0 })),
       ], { optional: true }),
       query(':enter', [
         animate(slideConfig, style({ transform: 'translateX(0)', opacity: 1 })),
@@ -48,11 +48,11 @@ export const routeTransition = trigger('routeAnimations', [
         zIndex: 1,
       }),
     ], { optional: true }),
-    query(':enter', [style({ transform: 'translateX(-30%)', opacity: 0.5, zIndex: 1 })], { optional: true }),
+    query(':enter', [style({ transform: 'translateX(-50%)', opacity: 0.5, zIndex: 1 })], { optional: true }),
     query(':leave', [style({ zIndex: 2 })], { optional: true }),
     group([
       query(':leave', [
-        animate(slideConfig, style({ transform: 'translateX(100%)', opacity: 1 })),
+        animate(slideConfig, style({ transform: 'translateX(100%)', opacity: 0.3 })),
       ], { optional: true }),
       query(':enter', [
         animate(slideConfig, style({ transform: 'translateX(0)', opacity: 1 })),
