@@ -96,6 +96,8 @@ $hero-text-faint: rgba(239, 231, 219, 0.8);
   &.skill-active {
     border-color: var(--color-primary);
     background: rgba(126, 72, 10, 0.08);
+    box-shadow: 0 0 15px -2px var(--color-primary-glow);
+    transform: scale(1.02);
   }
 }
 

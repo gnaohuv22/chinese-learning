@@ -14,7 +14,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CourseService } from '../../core/services/course.service';
 import { LessonService } from '../../core/services/lesson.service';
-import { Course, Lesson, Skill } from '../../core/models';
+import { ExerciseService } from '../../core/services/exercise.service';
+import { Course, Lesson, Skill, Exercise } from '../../core/models';
 
 type SkillFilter = 'all' | Skill;
 
@@ -44,6 +45,7 @@ export class OnTapDetailComponent implements OnInit, OnChanges, OnDestroy {
 
   private courseService = inject(CourseService);
   private lessonService = inject(LessonService);
+  private exerciseService = inject(ExerciseService);
   private destroyRef = inject(DestroyRef);
 
   phanNumber = signal<number>(1);
@@ -99,8 +101,23 @@ export class OnTapDetailComponent implements OnInit, OnChanges, OnDestroy {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
               next: (lessons) => {
-                this.lessons.set(lessons);
-                this.resolveViewState(lessons.length);
+                this.exerciseService.getExercisesByCourse(course.id)
+                  .pipe(takeUntilDestroyed(this.destroyRef))
+                  .subscribe({
+                    next: (exercises) => {
+                      const dynamicLessons = lessons.map(l => {
+                        const lessonExercises = exercises.filter(e => e.lessonId === l.id);
+                        const dynamicSkills = [...new Set(lessonExercises.map(e => e.skill))];
+                        return { ...l, skills: dynamicSkills.length > 0 ? dynamicSkills : l.skills };
+                      });
+                      this.lessons.set(dynamicLessons);
+                      this.resolveViewState(dynamicLessons.length);
+                    },
+                    error: () => {
+                      this.lessons.set(lessons);
+                      this.resolveViewState(lessons.length);
+                    }
+                  });
               },
               error: () => this.viewState.set('error'),
             });
