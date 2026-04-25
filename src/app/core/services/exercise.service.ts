@@ -37,6 +37,12 @@ export class ExerciseService extends FirestoreBaseService<Exercise> {
     ]);
   }
 
+  getExercisesByCourse(courseId: string): Observable<Exercise[]> {
+    return this.getOnce('exercises', 'order', undefined, [
+      { field: 'courseId', op: '==', value: courseId },
+    ]);
+  }
+
   getExercise(
     courseId: string,
     lessonId: string,

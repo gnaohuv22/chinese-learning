@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   news = signal<News[]>([]);
   featuredVideo = signal<InteractiveVideo | null>(null);
   activeSkill = signal<Skill | null>(null);
-  skillLessons = signal<Array<{ lesson: Lesson; courseName: string; courseId: string }>>([]);
+  skillLessons = signal<Array<{ lesson: Lesson; courseName: string; courseId: string; courseDescription?: string }>>([]);
   loadingSkill = signal(false);
 
   // Typing animation
@@ -157,7 +157,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               take(1),
               switchMap((lessons) => {
                 const filtered = lessons.filter((l) => l.skills.includes(skill));
-                return of(filtered.map((l) => ({ lesson: l, courseName: course.title, courseId: course.id })));
+                return of(filtered.map((l) => ({ lesson: l, courseName: course.title, courseId: course.id, courseDescription: course.description })));
               })
             )
           )
@@ -169,7 +169,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         const elapsed = Date.now() - startTime;
         const delay = Math.max(0, 500 - elapsed);
         setTimeout(() => {
-          this.skillLessons.set(flat);
+          this.skillLessons.set(flat.slice(0, 3));
           this.loadingSkill.set(false);
         }, delay);
       },

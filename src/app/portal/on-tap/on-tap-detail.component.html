@@ -14,8 +14,10 @@
   </div>
 
   @if (viewState() === 'loading') {
-    <div class="flex justify-center py-16">
-      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="card h-20 skeleton"></div>
+      }
     </div>
   } @else if (viewState() === 'not-found') {
     <div class="card text-center py-16">
@@ -86,26 +88,29 @@
           {{ 'lesson.no_lessons' | translate }}
         </div>
       } @else {
-        <div class="space-y-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           @for (lesson of filteredLessons(); track lesson.id; let i = $index) {
             <a
               [routerLink]="['/courses', course()!.id, 'lessons', lesson.id]"
-              class="card flex items-center gap-4 hover:shadow-md transition-all hover:-translate-y-0.5 group lesson-card"
+              class="card hover:shadow-lg transition-all hover:-translate-y-1 group lesson-card flex flex-col gap-3 p-5"
             >
-              <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 lesson-number">
-                {{ lesson.order }}
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 lesson-number bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-200">
+                  {{ lesson.order }}
+                </div>
+                <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-3 group-hover:translate-x-0"></i>
               </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="font-medium transition-colors lesson-title">
+              
+              <div class="flex-1">
+                <h3 class="font-bold text-base transition-colors group-hover:text-amber-700 dark:group-hover:text-amber-200 mb-2">
                   {{ lesson.title }}
                 </h3>
-                <div class="flex flex-wrap gap-1 mt-1">
+                <div class="flex flex-wrap gap-1.5">
                   @for (skill of lesson.skills; track skill) {
-                    <span class="chip skill-{{ skill }} text-xs">{{ 'skills.' + skill | translate }}</span>
+                    <span class="chip skill-{{ skill }} text-[10px] uppercase font-bold tracking-wider py-0.5 px-2">{{ 'skills.' + skill | translate }}</span>
                   }
                 </div>
               </div>
-              <i class="fa-solid fa-chevron-right text-xs flex-shrink-0 transition-colors list-chevron"></i>
             </a>
           }
         </div>

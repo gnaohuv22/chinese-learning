@@ -46,7 +46,7 @@
 
       <!-- Stats bar -->
       @if (statsTotal().courses > 0 || statsTotal().exams > 0) {
-        <div class="flex flex-wrap gap-6 text-sm hero-stats">
+        <div class="flex flex-wrap gap-4 text-sm hero-stats glass-effect px-5 py-3 rounded-2xl w-fit mb-6">
           @if (statsTotal().courses > 0) {
             <span class="flex items-center gap-1.5">
               <i class="fa-solid fa-book-open text-xs hero-stats-icon"></i>
@@ -117,20 +117,35 @@
         } @else if (skillLessons().length === 0) {
           <p class="text-sm text-center py-8 empty-state">{{ 'home.no_lessons_skill' | translate }}</p>
         } @else {
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             @for (item of skillLessons(); track item.lesson.id) {
               @let result = getPracticeResults(item.lesson.id);
-              <a
+            <a
                 [routerLink]="['/courses', item.courseId]"
-                class="card hover:shadow-md transition-all hover:-translate-y-0.5 group flex flex-col gap-1"
+                class="card card-hover transition-all group flex flex-col p-6 border-2"
+                style="border-color: var(--color-border);"
               >
-                <p class="text-xs skill-lesson-course">{{ item.courseName }}</p>
-                <h4 class="font-medium text-sm transition-colors skill-lesson-title">{{ item.lesson.title }}</h4>
-                @if (result) {
-                  <p class="text-xs text-green-600 mt-1">
-                    <i class="fa-solid fa-check-circle mr-1"></i>{{ result.correct }}/{{ result.total }} {{ 'home.correct' | translate }}
-                  </p>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-200">
+                    {{ item.courseName }}
+                  </span>
+                  @if (result) {
+                    <span class="text-xs font-bold text-green-600 dark:text-green-400">
+                      {{ (result.correct / result.total * 100) | number:'1.0-0' }}%
+                    </span>
+                  }
+                </div>
+                
+                <h4 class="font-bold text-lg mb-2 group-hover:text-amber-700 dark:group-hover:text-amber-200 transition-colors">{{ item.lesson.title }}</h4>
+                
+                @if (item.courseDescription) {
+                  <p class="text-sm line-clamp-2 mb-4 opacity-70 leading-relaxed">{{ item.courseDescription }}</p>
                 }
+
+                <div class="mt-auto pt-4 border-t flex items-center justify-between" style="border-color: var(--color-border);">
+                  <span class="text-xs font-semibold">{{ 'home.start_learning' | translate }}</span>
+                  <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </div>
               </a>
             }
           </div>
@@ -210,7 +225,7 @@
   } @else {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       @for (course of courses().slice(0, 4); track course.id) {
-        <a [routerLink]="['/on-tap', course.order + 1]" class="card hover:shadow-lg transition-all hover:-translate-y-0.5 group flex flex-col">
+        <a [routerLink]="['/on-tap', course.order + 1]" class="card card-hover transition-all group flex flex-col">
           <div class="flex items-start gap-3 flex-1">
             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-base course-icon">
               {{ course.order + 1 }}

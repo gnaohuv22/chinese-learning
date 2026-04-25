@@ -72,11 +72,12 @@ html textarea {
   --color-bg-surface: #faf6f0;
   --color-primary: #7e480a;
   --color-primary-hover: #3a1b00;
+  --color-primary-glow: rgba(126, 72, 10, 0.4);
   --color-text: #3a1b00;
   --color-text-muted: #be9672;
   --color-border: #c8ac89;
   --color-input-bg: #faf6f0;
-  --color-card-shadow: 0 1px 3px rgb(58 27 0 / 0.10), 0 1px 2px rgb(58 27 0 / 0.08);
+  --color-card-shadow: 0 4px 12px rgba(58, 27, 0, 0.1), 0 2px 4px rgba(58, 27, 0, 0.08);
 }
 
 /* CSS custom properties — dark mode */
@@ -85,11 +86,25 @@ html.dark {
   --color-bg-surface: #3a1b00;
   --color-primary: #be9672;
   --color-primary-hover: #c8ac89;
+  --color-primary-glow: rgba(190, 150, 114, 0.4);
   --color-text: #efe7db;
   --color-text-muted: #c8ac89;
   --color-border: #7e480a;
   --color-input-bg: #3a1b00;
-  --color-card-shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 1px 2px rgb(0 0 0 / 0.3);
+  --color-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Glassmorphism utility */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+html.dark .glass-effect {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Fade-in animation for modals */
@@ -236,10 +251,20 @@ html.dark {
 /* Utility classes */
 .card {
   background: var(--color-bg-surface);
-  border-radius: 0.75rem;
+  border-radius: 1.25rem;
   box-shadow: var(--color-card-shadow);
   padding: 1rem;
   border: 1px solid var(--color-border);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -10px rgba(58, 27, 0, 0.2);
+}
+
+html.dark .card-hover:hover {
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
 }
 
 .btn-primary {
@@ -496,4 +521,95 @@ html.dark body::-webkit-scrollbar-thumb:hover {
   transition: stroke-dashoffset 1s linear;
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
+}
+/* Skeleton loading animation */
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0.15;
+  }
+}
+
+.skeleton {
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+  background-color: var(--color-border);
+  border-radius: 0.75rem;
+}
+
+@keyframes success-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-success-pop {
+  animation: success-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+/* Mastered character state animation */
+@keyframes mastery-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 var(--color-primary-glow); }
+  50% { transform: scale(1.05); box-shadow: 0 0 15px 4px var(--color-primary-glow); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 var(--color-primary-glow); }
+}
+
+.mastered-animation {
+  animation: mastery-pulse 0.6s ease-out;
+}
+
+/* Shimmer effect for completed tiles */
+@keyframes shimmer-gold {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-completion {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer-gold 1.5s infinite;
+}
+
+/* Video Overlay Styles */
+.video-overlay-controls {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  padding: 1.5rem 1rem 1rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.video-shell-hover:hover .video-overlay-controls {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.video-control-btn {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.video-control-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }

@@ -12,7 +12,7 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import HanziWriter from 'hanzi-writer';
@@ -23,7 +23,7 @@ import { ThemeService } from '../../core/services/theme.service';
 @Component({
   selector: 'app-radical-practice',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, RouterLink, TranslateModule],
   templateUrl: './radical-practice.component.html',
   styleUrls: ['./radical-practice.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,6 +50,7 @@ export class RadicalPracticeComponent implements AfterViewInit, OnDestroy {
   isMuted = signal(false);
   isPlaying = signal(false);
   showScrollTop = signal(false);
+  isSuccessOverlayVisible = signal(false);
 
   private writer: any | null = null;
   private canAdvance = false;
@@ -230,7 +231,7 @@ export class RadicalPracticeComponent implements AfterViewInit, OnDestroy {
         this.completedIndexes.update((list) =>
           list.includes(this.currentIndex()) ? list : [...list, this.currentIndex()]
         );
-        this.scheduleAutoNext();
+        this.showSuccessAndAdvance();
       },
     });
   }
@@ -247,12 +248,20 @@ export class RadicalPracticeComponent implements AfterViewInit, OnDestroy {
   }
 
   nextCharacter() {
-    if (!this.canAdvance || !this.topic()) return;
+    if (!this.topic()) return;
     const lastIndex = this.topic()!.characters.length - 1;
     if (this.currentIndex() >= lastIndex) return;
     this.clearAutoNextTimer();
+    this.isSuccessOverlayVisible.set(false);
     this.currentIndex.update((i) => i + 1);
     this.setupWriter();
+  }
+
+  private showSuccessAndAdvance() {
+    this.isSuccessOverlayVisible.set(true);
+    setTimeout(() => {
+      this.nextCharacter();
+    }, 1600);
   }
 
   isCompleted(index: number): boolean {

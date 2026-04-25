@@ -2,6 +2,10 @@
   display: block;
 }
 
+.back-link {
+  color: var(--color-text-muted);
+}
+
 .writer-shell {
   background:
     radial-gradient(circle at 20% 20%, rgb(255 255 255 / 0.25), transparent 58%),

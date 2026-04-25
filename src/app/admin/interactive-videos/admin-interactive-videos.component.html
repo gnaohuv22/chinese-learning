@@ -314,18 +314,12 @@
             </div>
           }
 
-          <!-- Published + Order -->
-          <div class="grid grid-cols-2 gap-4">
-            <div class="form-field">
-              <label class="form-label">{{ 'admin.order' | translate }}</label>
-              <input formControlName="order" type="number" class="form-input" placeholder="0" />
-            </div>
-            <div class="form-field flex items-end pb-1">
-              <label class="flex items-center gap-2 cursor-pointer select-none">
-                <input type="checkbox" formControlName="published" class="rounded accent-amber-500" id="video-published-check" />
-                <span class="text-sm form-label mb-0">{{ 'admin.published' | translate }}</span>
-              </label>
-            </div>
+          <!-- Published -->
+          <div class="form-field pb-1">
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" formControlName="published" class="rounded accent-amber-500" id="video-published-check" />
+              <span class="text-sm form-label mb-0">{{ 'admin.published' | translate }}</span>
+            </label>
           </div>
 
           <!-- Actions -->

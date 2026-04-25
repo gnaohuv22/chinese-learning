@@ -26,11 +26,10 @@
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     @if (viewState() === 'loading') {
-      <div class="flex justify-center py-20">
-        <div class="flex flex-col items-center gap-3">
-          <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent" style="border-color: var(--color-primary); border-top-color: transparent;"></div>
-          <p class="text-sm" style="color: var(--color-text-muted);">{{ 'common.loading' | translate }}</p>
-        </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-fade-in">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="rounded-2xl h-64 skeleton"></div>
+        }
       </div>
     } @else if (viewState() === 'error') {
       <div class="flex flex-col items-center gap-4 py-20 text-center">
