@@ -37,6 +37,42 @@
       </div>
 
       <div class="grid grid-cols-1 gap-4" [ngClass]="topic()!.videoUrl ? 'lg:grid-cols-2 lg:items-stretch' : ''">
+        @if (topic()!.videoUrl) {
+        <div class="card flex flex-col">
+          <p class="text-sm font-semibold mb-2">{{ 'radicals.video' | translate }}</p>
+            <div class="rounded-xl overflow-hidden border flex justify-center" style="border-color: var(--color-border);">
+              <video
+                #practiceVideo
+                [src]="topic()!.videoUrl"
+                class="w-full object-contain mx-auto"
+                [style.max-height]="videoMaxHeight()"
+                style="background: #0a0a0a;"
+                playsinline
+                preload="metadata"
+                (loadedmetadata)="onPracticeVideoReady()"
+                (play)="isPlaying.set(true)"
+                (pause)="isPlaying.set(false)"
+              ></video>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              <button class="btn-secondary text-sm" (click)="togglePlayVideo()">
+                @if (isPlaying()) {
+                  <i class="fa-solid fa-pause"></i>
+                } @else {
+                  <i class="fa-solid fa-play"></i>
+                }
+              </button>
+              <button class="btn-secondary text-sm" (click)="toggleMute()">
+                @if (isMuted()) {
+                  <i class="fa-solid fa-volume-xmark"></i>
+                } @else {
+                  <i class="fa-solid fa-volume-high"></i>
+                }
+              </button>
+            </div>
+        </div>
+        }
+
         <div class="card flex flex-col gap-4">
           <div class="flex items-center justify-between">
             <div>
@@ -87,42 +123,6 @@
             </div>
           </div>
         </div>
-
-        @if (topic()!.videoUrl) {
-        <div class="card flex flex-col">
-          <p class="text-sm font-semibold mb-2">{{ 'radicals.video' | translate }}</p>
-            <div class="rounded-xl overflow-hidden border flex justify-center" style="border-color: var(--color-border);">
-              <video
-                #practiceVideo
-                [src]="topic()!.videoUrl"
-                class="w-full object-contain mx-auto"
-                [style.max-height]="videoMaxHeight()"
-                style="background: #0a0a0a;"
-                playsinline
-                preload="metadata"
-                (loadedmetadata)="onPracticeVideoReady()"
-                (play)="isPlaying.set(true)"
-                (pause)="isPlaying.set(false)"
-              ></video>
-            </div>
-            <div class="flex items-center gap-2 mt-3">
-              <button class="btn-secondary text-sm" (click)="togglePlayVideo()">
-                @if (isPlaying()) {
-                  <i class="fa-solid fa-pause"></i>
-                } @else {
-                  <i class="fa-solid fa-play"></i>
-                }
-              </button>
-              <button class="btn-secondary text-sm" (click)="toggleMute()">
-                @if (isMuted()) {
-                  <i class="fa-solid fa-volume-xmark"></i>
-                } @else {
-                  <i class="fa-solid fa-volume-high"></i>
-                }
-              </button>
-            </div>
-        </div>
-        }
       </div>
     }
   </div>
