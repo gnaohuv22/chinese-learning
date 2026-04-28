@@ -1,13 +1,81 @@
-// Hero section is always dark regardless of app theme.
-// These SCSS variables map to the design-system dark-palette tokens.
 $hero-bg-start: #3a1b00;
 $hero-bg-mid: #7e480a;
 $hero-bg-end: #be9672;
 $hero-text: #efe7db;
 $hero-text-muted: #c8ac89;
-$hero-text-faint: rgba(239, 231, 219, 0.8);
 
-// ─── Hero section ───────────────────────────────────────────────────────────
+.bg-surface {
+  background-color: var(--color-bg-surface);
+}
+
+.bg-sand {
+  background-color: var(--color-bg);
+}
+
+.text-ink {
+  color: var(--color-text);
+}
+
+.text-ink-muted {
+  color: var(--color-text-muted);
+}
+
+.border-border {
+  border-color: var(--color-border);
+}
+
+.snap-container {
+  height: calc(100dvh - 72px); // Adjust based on actual header height
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  min-height: calc(100dvh - 72px);
+  position: relative;
+}
+
+.animate-on-scroll {
+  opacity: 0;
+  transition-duration: 0.8s;
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-property: opacity, transform;
+}
+
+.fade-in {
+  transform: translateY(0);
+}
+
+.slide-up {
+  transform: translateY(40px);
+}
+
+.scale-up {
+  transform: scale(0.95);
+}
+
+.snap-section.is-visible {
+  .animate-on-scroll {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
 .hero {
   background: linear-gradient(135deg, $hero-bg-start 0%, $hero-bg-mid 60%, $hero-bg-end 100%);
@@ -25,280 +93,75 @@ $hero-text-faint: rgba(239, 231, 219, 0.8);
   color: $hero-text;
 }
 
-.hero-typed {
-  color: $hero-text;
+@keyframes gentle-float {
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) scale(1.05) rotate(5deg);
+  }
 }
 
-.hero-title {
-  color: $hero-text;
+.animate-gentle-float {
+  animation: gentle-float 15s ease-in-out infinite;
 }
 
-.hero-subtitle {
-  color: $hero-text-muted;
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(10px);
+  }
 }
 
-.hero-tagline {
-  color: $hero-text-faint;
+.animate-bounce {
+  animation: bounce 2s infinite;
 }
 
-.hero-cta-primary {
-  background: $hero-text;
-  color: $hero-bg-start;
-}
-
-.hero-cta-secondary {
-  border-color: rgba(200, 172, 137, 0.5);
-  color: $hero-text;
-}
-
-.hero-cta-tertiary {
-  border-color: rgba(200, 172, 137, 0.4);
-  color: $hero-text;
-}
-
-.hero-stats {
-  color: $hero-text-muted;
-}
-
-.hero-stats-icon {
-  color: $hero-bg-end;
-}
-
-.hero-stats-value {
-  color: $hero-text;
-}
-
-// ─── Skills section ──────────────────────────────────────────────────────────
-
-.skills-section {
+.ds-card {
   background: var(--color-bg-surface);
-  border-color: var(--color-border);
-}
-
-.section-heading {
-  color: var(--color-text);
-}
-
-.section-subtitle {
-  color: var(--color-text-muted);
-}
-
-// Skill toggle button — base (inactive) and active variant
-.skill-btn {
-  background: var(--color-bg-surface);
-  border-color: transparent;
-  transform: translateY(0);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(58, 27, 0, 0.05);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 
   &:hover {
-    transform: translateY(-2px);
-  }
-
-  &.skill-active {
-    border-color: var(--color-primary);
-    background: rgba(126, 72, 10, 0.08);
-    box-shadow: 0 0 15px -2px var(--color-primary-glow);
-    transform: scale(1.02);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px -10px rgba(58, 27, 0, 0.15);
   }
 }
 
-.skill-btn-icon {
-  background: var(--color-bg);
+html.dark .ds-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
-  .skill-active & {
-    background: rgba(126, 72, 10, 0.15);
+  &:hover {
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
   }
 }
 
-.icon-primary {
-  color: var(--color-primary);
+.btn-hero {
+  background-color: var(--color-primary);
+  color: #fff;
+
+  &:hover {
+    background-color: var(--color-bg-surface);
+    color: var(--color-primary);
+  }
 }
 
-.skill-btn-label {
-  color: var(--color-text);
-}
+html.dark .btn-hero {
+  color: var(--color-bg-surface);
 
-.skill-btn:hover .skill-btn-label {
-  color: var(--color-primary);
-}
-
-.skill-panel-heading {
-  color: var(--color-text);
-}
-
-.skill-panel-name {
-  color: var(--color-primary);
-}
-
-.skill-close-btn {
-  color: var(--color-text-muted);
-}
-
-.spinner {
-  border-color: var(--color-primary);
-  border-top-color: transparent;
-}
-
-.skill-loading-text {
-  color: var(--color-text-muted);
-}
-
-.empty-state {
-  color: var(--color-text-muted);
-}
-
-.skill-lesson-course {
-  color: var(--color-text-muted);
-}
-
-.skill-lesson-title {
-  color: var(--color-text);
-}
-
-// ─── Interactive video intro ────────────────────────────────────────────────
-
-.iv-intro-section {
-  background: var(--color-bg);
-  border-color: var(--color-border);
-}
-
-.iv-intro-card {
-  border: 1px solid var(--color-border);
-  border-radius: 1rem;
-  padding: 1.25rem;
-  background:
-    radial-gradient(circle at top right, rgba(200, 134, 26, 0.08), transparent 45%),
-    var(--color-bg-surface);
-}
-
-.iv-intro-chip {
-  color: var(--color-primary);
-  background: var(--color-primary-ghost);
-  border-radius: 9999px;
-  padding: 0.35rem 0.75rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.iv-intro-title {
-  color: var(--color-text);
-}
-
-.iv-intro-description {
-  color: var(--color-text-muted);
-}
-
-.iv-intro-cta {
-  color: #efe7db;
-  background: linear-gradient(135deg, #7e480a, #c8861a);
-}
-
-.iv-intro-cta:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.03);
-}
-
-.iv-media-link {
-  border: 1px solid var(--color-border);
-}
-
-.iv-media-shell {
-  background: #1a0d00;
-}
-
-.iv-media-image {
-  transition: transform 220ms ease;
-}
-
-.iv-media-link:hover .iv-media-image {
-  transform: scale(1.02);
-}
-
-.iv-media-fallback {
-  background:
-    radial-gradient(circle at top right, rgba(200, 172, 137, 0.45), transparent 40%),
-    linear-gradient(135deg, #3a1b00 0%, #7e480a 65%, #be9672 100%);
-}
-
-.iv-media-overlay {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent 55%);
-}
-
-.iv-media-play {
-  background: rgba(200, 172, 137, 0.9);
-  color: #3a1b00;
-}
-
-.iv-media-caption {
-  color: #efe7db;
-  background: rgba(0, 0, 0, 0.45);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-}
-
-// ─── Latest courses section ──────────────────────────────────────────────────
-
-.section-title {
-  color: var(--color-text);
-}
-
-.view-all-link {
-  color: var(--color-primary);
-}
-
-.course-icon {
-  background: var(--color-primary);
-  color: #efe7db;
-}
-
-.course-phan-label {
-  color: var(--color-primary);
-}
-
-.course-title {
-  color: var(--color-text);
-}
-
-.course-desc {
-  color: var(--color-text-muted);
-}
-
-.course-card-footer {
-  border-color: var(--color-border);
-}
-
-.course-start-label {
-  color: var(--color-primary);
-}
-
-// ─── Latest news section ─────────────────────────────────────────────────────
-
-.news-section {
-  background: var(--color-bg-surface);
-}
-
-.news-title {
-  color: var(--color-text);
-}
-
-.news-excerpt {
-  color: var(--color-text-muted);
-}
-
-.news-date {
-  color: var(--color-text-muted);
-}
-
-.news-read-more {
-  color: var(--color-primary);
-}
-
-// ─── Footer ──────────────────────────────────────────────────────────────────
-
-.site-footer {
-  background: var(--color-bg);
-  border-color: var(--color-border);
-}
-
-.footer-text {
-  color: var(--color-text-muted);
+  &:hover {
+    background-color: var(--color-bg-surface);
+    color: var(--color-primary);
+  }
 }

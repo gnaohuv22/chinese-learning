@@ -244,7 +244,18 @@
     "delete_confirm_msg": "Bạn có chắc muốn xóa \"{{name}}\" không?",
     "created_success": "Tạo mới thành công",
     "updated_success": "Cập nhật thành công",
-    "deleted_success": "Đã xóa thành công"
+    "deleted_success": "Đã xóa thành công",
+    "hero_title_1": "HÁN NGỮ KÝ",
+    "hero_title_2": "汉语记",
+    "hero_desc": "Mọi hành trình vĩ đại đều bắt đầu từ những bước chân đầu tiên. Hán Ngữ Ký là nơi câu chuyện của bạn với tiếng Trung bắt đầu — từng bước để khám phá một chân trời mới.",
+    "scroll_explore": "Cuộn để khám phá",
+    "iv_title2": "Học thật sáng tạo.",
+    "modules_title": "Khám phá các học phần này.",
+    "modules_desc": "Các bài học được thiết kế để xây dựng từ vựng và nhận diện mặt chữ từng bước một.",
+    "mock_test_title": "Sẵn sàng kiểm tra kỹ năng của bạn chưa?",
+    "mock_test_desc": "Mô phỏng điều kiện thi thật với các bài thi thử toàn diện. Xác định điểm mạnh và tập trung vào những phần cần cải thiện.",
+    "take_mock_test": "Làm bài thi thử",
+    "no_news_desc": "Hiện không có tin tức mới nào."
   },
   "admin": {
     "title": "Quản trị",

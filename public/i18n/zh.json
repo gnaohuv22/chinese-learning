@@ -244,7 +244,18 @@
     "delete_confirm_msg": "确定要删除「{{name}}」吗？",
     "created_success": "创建成功",
     "updated_success": "更新成功",
-    "deleted_success": "删除成功"
+    "deleted_success": "删除成功",
+    "hero_title_1": "HÁN NGỮ KÝ",
+    "hero_title_2": "汉语记",
+    "hero_desc": "千里之行，始于足下。汉语记，是你开启中文之旅的第一步——字字积累，循序渐进，从零走向流利。",
+    "scroll_explore": "滚动探索",
+    "iv_title2": "沉浸式学习体验。",
+    "modules_title": "探索这些学习单元。",
+    "modules_desc": "第步式课程设计，帮你逐步建立词汇量和汉字识别能力。",
+    "mock_test_title": "准备好检验你的学习成果了吗？",
+    "mock_test_desc": "模拟真实考试环境，全面评估你的汉语实力。找到优势，冻结弱项，精准突破。",
+    "take_mock_test": "参加模拟考试",
+    "no_news_desc": "暂无最新资讯。"
   },
   "admin": {
     "title": "管理",
