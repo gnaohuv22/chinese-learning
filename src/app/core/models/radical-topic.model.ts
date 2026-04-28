@@ -2,6 +2,7 @@ export interface RadicalCharacter {
   hanzi: string;
   pinyin: string;
   definition: string;
+  videoUrl?: string;
 }
 
 export interface RadicalTopic {
@@ -9,7 +10,6 @@ export interface RadicalTopic {
   title: string;
   description?: string;
   characters: RadicalCharacter[];
-  videoUrl?: string;
   published: boolean;
   order: number;
   createdAt?: Date;

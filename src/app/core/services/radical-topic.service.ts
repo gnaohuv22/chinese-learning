@@ -60,6 +60,7 @@ export class RadicalTopicService extends FirestoreBaseService<RadicalTopic> {
         hanzi: (char.hanzi ?? '').trim(),
         pinyin: (char.pinyin ?? '').trim(),
         definition: (char.definition ?? '').trim(),
+        videoUrl: char.videoUrl?.trim() || undefined,
       }))
       .filter((char) => char.hanzi && char.pinyin && char.definition)
       .slice(0, this.MAX_CHARACTERS);

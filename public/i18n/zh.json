@@ -59,7 +59,9 @@
     "view_all": "查看全部",
     "close": "关闭",
     "clear": "清除全部",
-    "detail": "详情"
+    "detail": "详情",
+    "optional": "可选",
+    "required": "必填"
   },
   "skills": {
     "listening": "听力",

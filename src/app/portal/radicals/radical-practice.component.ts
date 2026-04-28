@@ -47,8 +47,6 @@ export class RadicalPracticeComponent implements AfterViewInit, OnDestroy {
   mistakeCount = signal(0);
   completedIndexes = signal<number[]>([]);
   isAnimatingDemo = signal(false);
-  isMuted = signal(false);
-  isPlaying = signal(false);
   showScrollTop = signal(false);
   isSuccessOverlayVisible = signal(false);
 
@@ -264,31 +262,21 @@ export class RadicalPracticeComponent implements AfterViewInit, OnDestroy {
     }, 1600);
   }
 
+  selectCharacter(index: number) {
+    if (this.isLocked(index)) return;
+    this.clearAutoNextTimer();
+    this.isSuccessOverlayVisible.set(false);
+    this.currentIndex.set(index);
+    this.setupWriter();
+  }
+
   isCompleted(index: number): boolean {
     return this.completedIndexes().includes(index);
   }
 
   isLocked(index: number): boolean {
-    return index > this.currentIndex();
-  }
-
-  togglePlayVideo() {
-    const video = this.practiceVideo?.nativeElement;
-    if (!video) return;
-    if (video.paused) {
-      video.play();
-      this.isPlaying.set(true);
-    } else {
-      video.pause();
-      this.isPlaying.set(false);
-    }
-  }
-
-  toggleMute() {
-    const video = this.practiceVideo?.nativeElement;
-    if (!video) return;
-    this.isMuted.update((v) => !v);
-    video.muted = this.isMuted();
+    // Only locked if it's past the current character AND not already completed
+    return index > this.currentIndex() && !this.isCompleted(index);
   }
 
   onPracticeVideoReady() {

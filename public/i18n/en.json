@@ -59,7 +59,9 @@
     "view_all": "View all",
     "close": "Close",
     "clear": "Clear all",
-    "detail": "Detail"
+    "detail": "Detail",
+    "optional": "optional",
+    "required": "required"
   },
   "skills": {
     "listening": "Listening",

@@ -40,4 +40,8 @@ export class RadicalTopicListComponent {
   openTopic(topicId: string) {
     this.router.navigate(['/bo-thu', topicId]);
   }
+
+  hasVideo(topic: RadicalTopic): boolean {
+    return topic.characters.some(c => !!c.videoUrl);
+  }
 }
