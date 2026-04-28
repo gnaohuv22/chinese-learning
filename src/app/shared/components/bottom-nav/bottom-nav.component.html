@@ -19,7 +19,8 @@
       <button type="button" (click)="navigate('/')"
         class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-3xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url === '/'"
-        [style.color]="router.url === '/' ? 'var(--color-primary)' : 'var(--color-text-muted)'">
+        [style.color]="router.url === '/' ? 'var(--color-primary)' : 'var(--color-text)'"
+        [style.opacity]="router.url === '/' ? '1' : '0.6'">
         <i class="fa-solid fa-house text-sm"></i>
         <span>{{ 'nav.home' | translate }}</span>
       </button>
@@ -28,7 +29,8 @@
       <button type="button" (click)="navigate('/news')"
         class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-3xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url.startsWith('/news')"
-        [style.color]="router.url.startsWith('/news') ? 'var(--color-primary)' : 'var(--color-text-muted)'">
+        [style.color]="router.url.startsWith('/news') ? 'var(--color-primary)' : 'var(--color-text)'"
+        [style.opacity]="router.url.startsWith('/news') ? '1' : '0.6'">
         <i class="fa-solid fa-newspaper text-sm"></i>
         <span>{{ 'nav.news' | translate }}</span>
       </button>
@@ -37,7 +39,8 @@
       <button type="button" (click)="navigate('/on-tap/1')"
         class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-3xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url.startsWith('/on-tap')"
-        [style.color]="router.url.startsWith('/on-tap') ? 'var(--color-primary)' : 'var(--color-text-muted)'">
+        [style.color]="router.url.startsWith('/on-tap') ? 'var(--color-primary)' : 'var(--color-text)'"
+        [style.opacity]="router.url.startsWith('/on-tap') ? '1' : '0.6'">
         <i class="fa-solid fa-book-open text-sm"></i>
         <span>{{ 'nav.courses' | translate }}</span>
       </button>
@@ -46,7 +49,8 @@
       <button type="button" (click)="navigate('/thi-thu')"
         class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-3xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url.startsWith('/thi-thu')"
-        [style.color]="router.url.startsWith('/thi-thu') ? 'var(--color-primary)' : 'var(--color-text-muted)'">
+        [style.color]="router.url.startsWith('/thi-thu') ? 'var(--color-primary)' : 'var(--color-text)'"
+        [style.opacity]="router.url.startsWith('/thi-thu') ? '1' : '0.6'">
         <i class="fa-solid fa-file-pen text-sm"></i>
         <span>{{ 'nav.mock_test' | translate }}</span>
       </button>
@@ -55,7 +59,8 @@
       <button type="button" (click)="navigate('/video')"
         class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-3xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url.startsWith('/video')"
-        [style.color]="router.url.startsWith('/video') ? 'var(--color-primary)' : 'var(--color-text-muted)'"
+        [style.color]="router.url.startsWith('/video') ? 'var(--color-primary)' : 'var(--color-text)'"
+        [style.opacity]="router.url.startsWith('/video') ? '1' : '0.6'"
         id="bottom-nav-video">
         <i class="fa-solid fa-film text-sm"></i>
         <span>Video</span>
@@ -65,7 +70,8 @@
       <button type="button" (click)="navigate('/bo-thu')"
         class="bottom-nav-btn flex flex-col items-center justify-center gap-0.5 rounded-3xl flex-1 py-2 text-xs font-medium transition-all"
         [class.bottom-nav-active]="router.url.startsWith('/bo-thu')"
-        [style.color]="router.url.startsWith('/bo-thu') ? 'var(--color-primary)' : 'var(--color-text-muted)'">
+        [style.color]="router.url.startsWith('/bo-thu') ? 'var(--color-primary)' : 'var(--color-text)'"
+        [style.opacity]="router.url.startsWith('/bo-thu') ? '1' : '0.6'">
         <i class="fa-solid fa-pen-nib text-sm"></i>
         <span>{{ 'nav.radicals' | translate }}</span>
       </button>

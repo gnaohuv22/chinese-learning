@@ -59,7 +59,9 @@
     "view_all": "View all",
     "close": "Close",
     "clear": "Clear all",
-    "detail": "Detail"
+    "detail": "Detail",
+    "optional": "optional",
+    "required": "required"
   },
   "skills": {
     "listening": "Listening",
@@ -242,7 +244,18 @@
     "delete_confirm_msg": "Are you sure you want to delete \"{{name}}\"?",
     "created_success": "Created successfully",
     "updated_success": "Updated successfully",
-    "deleted_success": "Deleted successfully"
+    "deleted_success": "Deleted successfully",
+    "hero_title_1": "HÁN NGỮ KÝ",
+    "hero_title_2": "汉语记",
+    "hero_desc": "Every great journey begins with the first step. Hán Ngữ Ký is where your story with the Chinese language begins — one step at a time to discover a new horizon.",
+    "scroll_explore": "Scroll to explore",
+    "iv_title2": "An immersive way to learn.",
+    "modules_title": "Check out these Modules.",
+    "modules_desc": "Structured lessons designed to build your vocabulary and character recognition step-by-step.",
+    "mock_test_title": "Ready to test your skills?",
+    "mock_test_desc": "Simulate real exam conditions with our comprehensive mock tests. Identify your strengths and focus on areas that need improvement.",
+    "take_mock_test": "Take a Mock Test",
+    "no_news_desc": "No recent news available."
   },
   "admin": {
     "title": "Admin",

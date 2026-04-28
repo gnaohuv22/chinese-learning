@@ -44,7 +44,7 @@
             </div>
             <div class="mt-4 flex items-center justify-between">
               <span class="text-xs" style="color: var(--color-text-muted);">
-                @if (topic.videoUrl) {
+                @if (hasVideo(topic)) {
                   {{ 'radicals.has_video' | translate }}
                 } @else {
                   {{ 'radicals.no_video' | translate }}

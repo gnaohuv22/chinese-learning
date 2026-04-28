@@ -45,7 +45,6 @@ export class AdminRadicalsComponent {
   form = this.fb.group({
     title: ['', Validators.required],
     description: [''],
-    videoUrl: [''],
     published: [false],
     characters: this.fb.array([]),
   });
@@ -72,6 +71,7 @@ export class AdminRadicalsComponent {
       hanzi: ['', Validators.required],
       pinyin: ['', Validators.required],
       definition: ['', Validators.required],
+      videoUrl: [''],
     });
   }
 
@@ -90,7 +90,6 @@ export class AdminRadicalsComponent {
     this.form.reset({
       title: '',
       description: '',
-      videoUrl: '',
       published: false,
     });
     this.characterArray.clear();
@@ -103,7 +102,6 @@ export class AdminRadicalsComponent {
     this.form.reset({
       title: topic.title,
       description: topic.description ?? '',
-      videoUrl: topic.videoUrl ?? '',
       published: topic.published,
     });
     this.characterArray.clear();
@@ -113,6 +111,7 @@ export class AdminRadicalsComponent {
           hanzi: [char.hanzi, Validators.required],
           pinyin: [char.pinyin, Validators.required],
           definition: [char.definition, Validators.required],
+          videoUrl: [char.videoUrl ?? ''],
         })
       );
     });
@@ -124,12 +123,12 @@ export class AdminRadicalsComponent {
     this.editingTopic.set(null);
   }
 
-  onVideoUploaded(resp: DriveUploadResponse) {
-    this.form.patchValue({ videoUrl: resp.fileId });
+  onVideoUploaded(resp: DriveUploadResponse, index: number) {
+    this.characterArray.at(index).patchValue({ videoUrl: resp.fileId });
   }
 
-  onVideoClear() {
-    this.form.patchValue({ videoUrl: '' });
+  onVideoClear(index: number) {
+    this.characterArray.at(index).patchValue({ videoUrl: '' });
   }
 
   drop(event: CdkDragDrop<RadicalTopic[]>) {
@@ -150,13 +149,13 @@ export class AdminRadicalsComponent {
     const payload: RadicalTopicCreatePayload = {
       title: value.title!.trim(),
       description: value.description?.trim() ?? '',
-      videoUrl: value.videoUrl?.trim() || undefined,
       published: value.published ?? false,
       order: this.editingTopic()?.order ?? this.topics().length,
       characters: this.characterArray.controls.map((group) => ({
         hanzi: group.value.hanzi.trim(),
         pinyin: group.value.pinyin.trim(),
         definition: group.value.definition.trim(),
+        videoUrl: group.value.videoUrl?.trim() || undefined,
       })),
     };
 

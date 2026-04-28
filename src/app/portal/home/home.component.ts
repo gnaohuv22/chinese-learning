@@ -6,6 +6,10 @@ import {
   OnDestroy,
   computed,
   DestroyRef,
+  ElementRef,
+  ViewChildren,
+  QueryList,
+  AfterViewInit,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -18,6 +22,7 @@ import { NewsService } from '../../core/services/news.service';
 import { LessonService } from '../../core/services/lesson.service';
 import { InteractiveVideoService } from '../../core/services/interactive-video.service';
 import { Course, News, Lesson, InteractiveVideo } from '../../core/models';
+import { ScrollToTopComponent } from '../../shared/components/scroll-to-top/scroll-to-top.component';
 
 type Skill = 'listening' | 'speaking' | 'reading' | 'writing';
 
@@ -39,11 +44,11 @@ export interface PracticeResult {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule, DatePipe],
+  imports: [CommonModule, RouterLink, TranslateModule, DatePipe, ScrollToTopComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private courseService = inject(CourseService);
   private newsService = inject(NewsService);
   private lessonService = inject(LessonService);
@@ -56,6 +61,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   activeSkill = signal<Skill | null>(null);
   skillLessons = signal<Array<{ lesson: Lesson; courseName: string; courseId: string; courseDescription?: string }>>([]);
   loadingSkill = signal(false);
+
+  @ViewChildren('animatedSection') animatedSections!: QueryList<ElementRef>;
+  private observer: IntersectionObserver | null = null;
 
   // Typing animation
   typedText = signal('');
@@ -96,6 +104,31 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.typingTimer) clearTimeout(this.typingTimer);
     if (this.cursorTimer) clearInterval(this.cursorTimer);
+    if (this.observer) this.observer.disconnect();
+  }
+
+  ngAfterViewInit() {
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Toggle the class so animations replay every time the section enters/leaves view
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          } else {
+            entry.target.classList.remove('is-visible');
+          }
+        });
+      },
+      {
+        // Use the snap-container as the root so events fire within it
+        root: document.querySelector('.snap-container'),
+        threshold: 0.3,
+      }
+    );
+
+    this.animatedSections.forEach((section) => {
+      this.observer?.observe(section.nativeElement);
+    });
   }
 
   private startTypingAnimation(): void {

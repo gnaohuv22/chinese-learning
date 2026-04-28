@@ -83,7 +83,8 @@ export class AdminLessonsComponent implements OnInit {
         .subscribe({
           next: (exercises) => {
             const skills = [...new Set(exercises.map((e) => e.skill))] as Skill[];
-            this.derivedSkills.set(skills.length > 0 ? skills : lesson.skills ?? []);
+            const mergedSkills = [...new Set([...(lesson.skills || []), ...skills])] as Skill[];
+            this.derivedSkills.set(mergedSkills.length > 0 ? mergedSkills : lesson.skills ?? []);
             this.loadingSkills.set(false);
           },
           error: () => this.loadingSkills.set(false),
