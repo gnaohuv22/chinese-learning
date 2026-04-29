@@ -414,7 +414,12 @@
     "topic_title": "Topic title",
     "topic_characters": "Character list",
     "topic_characters_hint": "Add at least 1 and up to 10 characters per topic",
-    "update_question": "Update question"
+    "update_question": "Update question",
+    "preview": "Preview",
+    "hide_preview": "Hide preview",
+    "max_file_size": "Max 100 MB",
+    "error_file_too_large": "File exceeds 100 MB limit. Please choose a smaller file.",
+    "preview_unavailable": "Preview not available for previously uploaded files. Re-upload to preview."
   },
   "pagination": {
     "prev": "Prev",

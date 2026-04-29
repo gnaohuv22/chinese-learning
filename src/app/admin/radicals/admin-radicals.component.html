@@ -46,13 +46,16 @@
           </div>
           @for (charCtrl of characterArray.controls; track $index) {
             <div class="card p-3 mb-2 border">
-              <div class="grid grid-cols-12 gap-2 mb-2">
-                <input [formControl]="$any(charCtrl.get('hanzi'))" class="form-input col-span-2" placeholder="字" />
-                <input [formControl]="$any(charCtrl.get('pinyin'))" class="form-input col-span-3" placeholder="pinyin" />
-                <input [formControl]="$any(charCtrl.get('definition'))" class="form-input col-span-6" [placeholder]="'admin.definition' | translate" />
-                <button type="button" class="justify-center btn-danger col-span-1" (click)="removeCharacter($index)" [title]="'common.delete' | translate">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
+              <!-- Desktop: 12-col grid. Mobile: stacked -->
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 mb-2">
+                <input [formControl]="$any(charCtrl.get('hanzi'))" class="form-input sm:col-span-2" placeholder="字" />
+                <input [formControl]="$any(charCtrl.get('pinyin'))" class="form-input sm:col-span-3" placeholder="pinyin" />
+                <div class="flex gap-2 sm:contents">
+                  <input [formControl]="$any(charCtrl.get('definition'))" class="form-input flex-1 sm:col-span-6" [placeholder]="'admin.definition' | translate" />
+                  <button type="button" class="justify-center btn-danger sm:col-span-1 flex-shrink-0" (click)="removeCharacter($index)" [title]="'common.delete' | translate">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               </div>
               <div class="form-field">
                 <label class="form-label text-xs">{{ 'admin.video_upload' | translate }} ({{ 'common.optional' | translate }})</label>

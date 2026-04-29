@@ -160,11 +160,20 @@ export class AdminRadicalsComponent {
     };
 
     const editing = this.editingTopic();
-    const op$ = (editing
-      ? this.topicService.updateTopic(editing.id, payload)
-      : this.topicService.createTopic(payload)) as import('rxjs').Observable<unknown>;
 
-    op$.subscribe({
+    let op$: import('rxjs').Observable<unknown>;
+    try {
+      op$ = (editing
+        ? this.topicService.updateTopic(editing.id, payload)
+        : this.topicService.createTopic(payload)) as import('rxjs').Observable<unknown>;
+    } catch (err) {
+      console.error('[AdminRadicals] save() synchronous error:', err);
+      this.saving.set(false);
+      this.toast.error(this.translate.instant('common.error'));
+      return;
+    }
+
+    op$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.saving.set(false);
         this.closeForm();

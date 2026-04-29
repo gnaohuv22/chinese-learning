@@ -14,8 +14,8 @@ import {
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { forkJoin, of, switchMap } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { forkJoin, of, switchMap, Subject, timer } from 'rxjs';
+import { take, map, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CourseService } from '../../core/services/course.service';
 import { NewsService } from '../../core/services/news.service';
@@ -75,6 +75,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private charIndex = 0;
   private isDeleting = false;
 
+  /** Drives the skill-panel data fetch — emits on every toggleSkill() call. */
+  private readonly skillSelect$ = new Subject<Skill | null>();
+
   skills: Array<{ key: string; skill: Skill; icon: string }> = [
     { key: 'skills.listening', skill: 'listening', icon: 'fa-solid fa-headphones' },
     { key: 'skills.speaking', skill: 'speaking', icon: 'fa-solid fa-microphone' },
@@ -99,6 +102,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((videos) => this.featuredVideo.set(videos[0] ?? null));
     this.startTypingAnimation();
     this.startCursorBlink();
+    this.setupSkillPipeline();
   }
 
   ngOnDestroy() {
@@ -168,46 +172,74 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 530);
   }
 
+  /**
+   * Sets up a single reactive pipeline for skill-panel data.
+   * Using switchMap ensures any in-flight request is automatically cancelled
+   * when the user selects a different skill, preventing stale data races.
+   */
+  private setupSkillPipeline(): void {
+    this.skillSelect$
+      .pipe(
+        tap((skill) => {
+          this.activeSkill.set(skill);
+          this.loadingSkill.set(skill !== null);
+          this.skillLessons.set([]);
+        }),
+        switchMap((skill) => {
+          if (skill === null) return of(null);
+
+          const fetchStart = Date.now();
+          return this.courseService.getCourses().pipe(
+            take(1),
+            switchMap((courses) => {
+              if (courses.length === 0) {
+                return of([] as Array<Array<{ lesson: Lesson; courseName: string; courseId: string; courseDescription?: string }>>);
+              }
+              return forkJoin(
+                courses.map((course) =>
+                  this.lessonService.getLessons(course.id).pipe(
+                    take(1),
+                    map((lessons) => {
+                      const filtered = lessons.filter((l) => l.skills.includes(skill));
+                      return filtered.map((l) => ({
+                        lesson: l,
+                        courseName: course.title,
+                        courseId: course.id,
+                        courseDescription: course.description,
+                      }));
+                    })
+                  )
+                )
+              );
+            }),
+            // Guarantee a minimum 500 ms shimmer so the loading state is visible
+            switchMap((groups) => {
+              const flat = (groups as Array<Array<{ lesson: Lesson; courseName: string; courseId: string }>>).flat();
+              const elapsed = Date.now() - fetchStart;
+              const minDelay = Math.max(0, 500 - elapsed);
+              return timer(minDelay).pipe(map(() => flat));
+            })
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (result) => {
+          if (result === null) return; // deselect — already cleared above
+          this.skillLessons.set(result.slice(0, 3));
+          this.loadingSkill.set(false);
+        },
+        error: () => this.loadingSkill.set(false),
+      });
+  }
+
   toggleSkill(skill: Skill) {
     if (this.activeSkill() === skill) {
-      this.activeSkill.set(null);
-      this.skillLessons.set([]);
-      return;
+      // Deselect
+      this.skillSelect$.next(null);
+    } else {
+      this.skillSelect$.next(skill);
     }
-    this.activeSkill.set(skill);
-    this.loadingSkill.set(true);
-    this.skillLessons.set([]);
-
-    const startTime = Date.now();
-
-    this.courseService.getCourses().pipe(
-      take(1),
-      switchMap((courses) => {
-        if (courses.length === 0) return of([] as Array<Array<{ lesson: Lesson; courseName: string; courseId: string }>>);
-        return forkJoin(
-          courses.map((course) =>
-            this.lessonService.getLessons(course.id).pipe(
-              take(1),
-              switchMap((lessons) => {
-                const filtered = lessons.filter((l) => l.skills.includes(skill));
-                return of(filtered.map((l) => ({ lesson: l, courseName: course.title, courseId: course.id, courseDescription: course.description })));
-              })
-            )
-          )
-        );
-      })
-    ).subscribe({
-      next: (groups) => {
-        const flat = (groups as Array<Array<{ lesson: Lesson; courseName: string; courseId: string }>>).flat();
-        const elapsed = Date.now() - startTime;
-        const delay = Math.max(0, 500 - elapsed);
-        setTimeout(() => {
-          this.skillLessons.set(flat.slice(0, 3));
-          this.loadingSkill.set(false);
-        }, delay);
-      },
-      error: () => this.loadingSkill.set(false),
-    });
   }
 
   getPracticeResults(lessonId: string): PracticeResult | null {

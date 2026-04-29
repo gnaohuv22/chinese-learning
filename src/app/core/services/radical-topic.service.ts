@@ -56,12 +56,17 @@ export class RadicalTopicService extends FirestoreBaseService<RadicalTopic> {
     }
 
     const characters = (sanitized['characters'] as RadicalTopicCreatePayload['characters'])
-      .map((char) => ({
-        hanzi: (char.hanzi ?? '').trim(),
-        pinyin: (char.pinyin ?? '').trim(),
-        definition: (char.definition ?? '').trim(),
-        videoUrl: char.videoUrl?.trim() || undefined,
-      }))
+      .map((char) => {
+        const trimmedVideo = char.videoUrl?.trim();
+        return {
+          hanzi: (char.hanzi ?? '').trim(),
+          pinyin: (char.pinyin ?? '').trim(),
+          definition: (char.definition ?? '').trim(),
+          // Omit the key entirely when empty — Firestore rejects `undefined`
+          // inside nested objects (including array elements).
+          ...(trimmedVideo ? { videoUrl: trimmedVideo } : {}),
+        };
+      })
       .filter((char) => char.hanzi && char.pinyin && char.definition)
       .slice(0, this.MAX_CHARACTERS);
 
