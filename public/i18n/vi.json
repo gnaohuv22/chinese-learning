@@ -414,7 +414,12 @@
     "topic_title": "Tên chủ đề",
     "topic_characters": "Danh sách chữ",
     "topic_characters_hint": "Thêm tối thiểu 1 chữ và tối đa 10 chữ cho mỗi chủ đề",
-    "update_question": "Cập nhật câu hỏi"
+    "update_question": "Cập nhật câu hỏi",
+    "preview": "Xem trước",
+    "hide_preview": "Ẩn xem trước",
+    "max_file_size": "Tối đa 100 MB",
+    "error_file_too_large": "File vượt quá giới hạn 100 MB. Vui lòng chọn file nhỏ hơn.",
+    "preview_unavailable": "Không thể xem trước file đã tải lên trước. Tải lại để xem trước."
   },
   "pagination": {
     "prev": "Trước",

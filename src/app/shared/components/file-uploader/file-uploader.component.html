@@ -1,16 +1,55 @@
 <div class="file-uploader">
   @if (currentFileId()) {
-    <div class="flex items-center gap-2 mb-2 text-sm text-gray-600">
-      <i class="fa-solid fa-circle-check text-green-500"></i>
-      <span class="truncate text-xs">{{ 'admin.file_uploaded' | translate }}</span>
-      <button type="button" (click)="clearFile()" class="text-red-500 hover:text-red-700 ml-auto flex-shrink-0">
+    <!-- Uploaded file row: status + preview toggle + clear -->
+    <div class="flex items-center gap-2 mb-2 text-sm">
+      <i class="fa-solid fa-circle-check text-green-500 flex-shrink-0"></i>
+      <span class="truncate text-xs flex-1" style="color: var(--color-text-muted);">{{ 'admin.file_uploaded' | translate }}</span>
+
+      <!-- Preview toggle: only available when we have a local blob -->
+      @if (previewBlobUrl()) {
+        <button
+          type="button"
+          (click)="togglePreview()"
+          class="text-xs px-2 py-0.5 rounded flex items-center gap-1 transition-colors flex-shrink-0"
+          style="background: var(--color-primary-10, rgba(180,120,40,0.12)); color: var(--color-primary);"
+        >
+          <i [class]="showPreview() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" class="text-xs"></i>
+          <span class="hidden sm:inline">{{ showPreview() ? ('admin.hide_preview' | translate) : ('admin.preview' | translate) }}</span>
+        </button>
+      }
+
+      <button
+        type="button"
+        (click)="clearFile()"
+        class="text-red-500 hover:text-red-700 flex-shrink-0 transition-colors"
+        [title]="'common.delete' | translate"
+      >
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
+
+    <!-- Inline video preview via local blob URL (no Google Drive embed) -->
+    @if (showPreview() && previewBlobUrl()) {
+      <div class="mb-2 rounded-lg overflow-hidden border border-border/40 bg-black" style="aspect-ratio: 16/9;">
+        <video
+          [src]="previewBlobUrl()"
+          controls
+          class="w-full h-full"
+          preload="metadata"
+        ></video>
+      </div>
+    }
+
+    <!-- Remote-only file (edit mode, no local blob) -->
+    @if (hasRemoteFile()) {
+      <p class="text-xs mb-2" style="color: var(--color-text-muted);">
+        <i class="fa-solid fa-circle-info mr-1"></i>{{ 'admin.preview_unavailable' | translate }}
+      </p>
+    }
   }
 
   <label
-    class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed rounded-lg text-sm transition-colors"
+    class="flex flex-col items-center justify-center gap-1 px-4 py-3 border-2 border-dashed rounded-lg text-sm transition-colors"
     [class.opacity-40]="disabled"
     [class.cursor-not-allowed]="disabled"
     [class.cursor-pointer]="!disabled"
@@ -20,15 +59,21 @@
     [class.text-gray-500]="!uploading()"
     [class.text-blue-500]="uploading()"
   >
-    @if (uploading()) {
-      <i class="fa-solid fa-spinner animate-spin"></i>
-      <span>{{ 'admin.uploading' | translate }} @if (progress() !== null) { ({{ progress() }}%) }</span>
-    } @else if (disabled) {
-      <i class="fa-solid fa-lock text-gray-400"></i>
-      <span class="text-gray-400 text-xs">{{ 'admin.select_media_type_first' | translate }}</span>
-    } @else {
-      <i class="fa-solid fa-cloud-arrow-up"></i>
-      <span>{{ label || ('admin.choose_file' | translate) }}</span>
+    <div class="flex items-center gap-2">
+      @if (uploading()) {
+        <i class="fa-solid fa-spinner animate-spin"></i>
+        <span>{{ 'admin.uploading' | translate }} @if (progress() !== null) { ({{ progress() }}%) }</span>
+      } @else if (disabled) {
+        <i class="fa-solid fa-lock text-gray-400"></i>
+        <span class="text-gray-400 text-xs">{{ 'admin.select_media_type_first' | translate }}</span>
+      } @else {
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>{{ label || ('admin.choose_file' | translate) }}</span>
+      }
+    </div>
+    <!-- 100 MB size hint -->
+    @if (!uploading() && !disabled) {
+      <span class="text-xs opacity-60">{{ 'admin.max_file_size' | translate }}</span>
     }
     <input
       type="file"
@@ -49,6 +94,12 @@
   }
 
   @if (error()) {
-    <p class="mt-1 text-xs text-red-500">{{ error() }}</p>
+    <p class="mt-1 text-xs text-red-500">
+      @if (error() === 'admin.error_file_too_large') {
+        {{ 'admin.error_file_too_large' | translate }}
+      } @else {
+        {{ error() }}
+      }
+    </p>
   }
 </div>

@@ -414,7 +414,12 @@
     "topic_title": "主题名称",
     "topic_characters": "汉字列表",
     "topic_characters_hint": "每个主题至少添加1个汉字，最多10个",
-    "update_question": "更新题目"
+    "update_question": "更新题目",
+    "preview": "预览",
+    "hide_preview": "隐藏预览",
+    "max_file_size": "最大 100 MB",
+    "error_file_too_large": "文件超过 100 MB 限制，请选择较小的文件。",
+    "preview_unavailable": "无法预览已上传的文件，请重新上传以预览。"
   },
   "pagination": {
     "prev": "上一页",
