@@ -104,18 +104,6 @@
           <!-- Type + Skill — stacked on mobile, 2-col on sm+ -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="form-field">
-              <label class="form-label">{{ 'admin.type' | translate }} *</label>
-              <select formControlName="type" class="form-input form-select" data-field="type"
-                [class.error]="validationErrors()['type']">
-                @for (t of validExerciseTypes(); track t) {
-                  <option [value]="t">{{ 'exercise_types.' + t | translate }}</option>
-                }
-              </select>
-              @if (validationErrors()['type']) {
-                <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['type'] | translate }}</p>
-              }
-            </div>
-            <div class="form-field">
               <label class="form-label">{{ 'admin.skill' | translate }} *</label>
               <select formControlName="skill" class="form-input form-select" data-field="skill"
                 [class.error]="validationErrors()['skill']">
@@ -125,6 +113,18 @@
               </select>
               @if (validationErrors()['skill']) {
                 <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['skill'] | translate }}</p>
+              }
+            </div>
+            <div class="form-field">
+              <label class="form-label">{{ 'admin.type' | translate }} *</label>
+              <select formControlName="type" class="form-input form-select" data-field="type"
+                [class.error]="validationErrors()['type']">
+                @for (t of validExerciseTypes; track t) {
+                  <option [value]="t">{{ 'exercise_types.' + t | translate }}</option>
+                }
+              </select>
+              @if (validationErrors()['type']) {
+                <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['type'] | translate }}</p>
               }
             </div>
           </div>

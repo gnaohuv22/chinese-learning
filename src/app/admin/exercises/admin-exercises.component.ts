@@ -8,7 +8,6 @@ import {
   ViewChild,
   inject,
   signal,
-  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -94,10 +93,10 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
     outline: this.fb.array([]),
   });
 
-  validExerciseTypes = computed(() => {
+  get validExerciseTypes(): ExerciseType[] {
     const skill = this.form.value.skill as Skill;
     return skill ? SKILL_EXERCISE_TYPES[skill] : [];
-  });
+  }
 
   get optionsArray() {
     return this.form.get('options') as FormArray;
