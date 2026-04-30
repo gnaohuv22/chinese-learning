@@ -107,14 +107,14 @@
                 @for (opt of ex.options; track $index) {
                   <label
                     class="flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors option-label"
-                    [class.option-selected]="getAnswer(ex.id) === $index.toString()"
+                    [class.option-selected]="getAnswer(ex.id)?.split(',')?.includes($index.toString())"
                   >
                     <input
-                      type="radio"
-                      [name]="'q_' + ex.id"
+                      type="checkbox"
+                      [name]="'q_' + ex.id + '_' + $index"
                       [value]="$index.toString()"
-                      [checked]="getAnswer(ex.id) === $index.toString()"
-                      (change)="setAnswer(ex.id, $index.toString())"
+                      [checked]="getAnswer(ex.id)?.split(',')?.includes($index.toString())"
+                      (change)="toggleMcqAnswer(ex.id, $index.toString())"
                       class="accent-red-700"
                     />
                     <span class="text-sm option-text">{{ opt }}</span>
@@ -148,6 +148,14 @@
                   (input)="setAnswer(ex.id, $any($event.target).value)"
                 />
               </div>
+            } @else if (ex.type === 'viet_chinese_translation') {
+              <input
+                type="text"
+                class="form-input w-full max-w-md"
+                placeholder="Nhập câu tiếng Trung..."
+                [value]="getAnswer(ex.id) ?? ''"
+                (input)="setAnswer(ex.id, $any($event.target).value)"
+              />
             } @else {
               <textarea
                 class="form-input w-full"

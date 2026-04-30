@@ -43,6 +43,8 @@
     "no_data": "No data",
     "error": "An error occurred",
     "success": "Success",
+    "save_success": "Saved successfully",
+    "delete_success": "Deleted successfully",
     "upload": "Upload",
     "uploading": "Uploading...",
     "open_new_tab": "Open in new tab",
@@ -67,7 +69,8 @@
     "listening": "Listening",
     "speaking": "Speaking",
     "reading": "Reading",
-    "writing": "Writing"
+    "writing": "Writing",
+    "undefined": "Undefined"
   },
   "exercise_types": {
     "mcq": "Multiple Choice",
@@ -79,7 +82,9 @@
     "dictation": "Listen and write (dictation)",
     "interactive_video": "Interactive Video",
     "speaking_record": "Voice Recording",
-    "scramble_dnd": "Word Scramble (drag and drop)"
+    "scramble_dnd": "Word Scramble (drag and drop)",
+    "viet_chinese_translation": "Vietnamese-to-Chinese Translation",
+    "undefined": "Undefined"
   },
   "exercise": {
     "type_answer": "Type your answer",
