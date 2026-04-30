@@ -10,12 +10,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { MockTestService } from '../../core/services/mock-test.service';
-import { ExerciseService } from '../../core/services/exercise.service';
 import { SubmittedExamService } from '../../core/services/submitted-exam.service';
-import { MockTest, Exercise, Skill } from '../../core/models';
+import { MockTest, MockTestQuestion, Skill } from '../../core/models';
 import { ModalService } from '../../shared/components/modal/modal.service';
 import { DriveService } from '../../core/services/drive.service';
 
@@ -28,7 +26,7 @@ interface SectionAnswer {
 
 interface SectionResult {
   skill: Skill;
-  exercises: Exercise[];
+  exercises: MockTestQuestion[];
   answers: SectionAnswer[];
   score: number;
   total: number;
@@ -47,7 +45,6 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
   @Input({ required: true }) testId!: string;
 
   private mockTestService = inject(MockTestService);
-  private exerciseService = inject(ExerciseService);
   private submittedExamService = inject(SubmittedExamService);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
@@ -55,7 +52,6 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
 
   state = signal<TestState>('loading');
   test = signal<MockTest | null>(null);
-  exerciseMap = signal<Map<string, Exercise>>(new Map());
   answerMap = signal<Map<string, string>>(new Map());
   timeLeft = signal(0);
   wasAutoSubmitted = signal(false);
@@ -103,39 +99,9 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
           return;
         }
         this.test.set(test);
-        this.loadExercises(test);
-      },
-      error: () => this.state.set('running'),
-    });
-  }
-
-  private loadExercises(test: MockTest) {
-    const allIds = [
-      ...test.sections.listening,
-      ...test.sections.speaking,
-      ...test.sections.reading,
-      ...test.sections.writing,
-    ];
-
-    if (allIds.length === 0) {
-      this.restoreProgress(test);
-      return;
-    }
-
-    const fetches = allIds.map((id) =>
-      this.exerciseService.getFlatExercise(id).pipe(take(1))
-    );
-
-    forkJoin(fetches).subscribe({
-      next: (exercises) => {
-        const map = new Map<string, Exercise>();
-        for (const ex of exercises) {
-          if (ex) map.set(ex.id, ex);
-        }
-        this.exerciseMap.set(map);
         this.restoreProgress(test);
       },
-      error: () => this.restoreProgress(test),
+      error: () => this.state.set('running'),
     });
   }
 
@@ -209,12 +175,10 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
     }
   }
 
-  sectionExercises(section: Skill): Exercise[] {
+  sectionExercises(section: Skill): MockTestQuestion[] {
     const test = this.test();
     if (!test) return [];
-    return test.sections[section]
-      .map((id) => this.exerciseMap().get(id))
-      .filter((e): e is Exercise => !!e);
+    return test.sections[section] || [];
   }
 
   answeredInSection(section: Skill): number {
@@ -234,6 +198,27 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
       return next;
     });
     this.saveProgress();
+  }
+
+  toggleMcqAnswer(exerciseId: string, value: string) {
+    const current = this.getAnswer(exerciseId);
+    let arr = current ? current.split(',') : [];
+    if (arr.includes(value)) {
+      arr = arr.filter((x) => x !== value);
+    } else {
+      arr.push(value);
+    }
+    
+    if (arr.length > 0) {
+      this.setAnswer(exerciseId, arr.sort().join(','));
+    } else {
+      this.answerMap.update((m) => {
+        const next = new Map(m);
+        next.delete(exerciseId);
+        return next;
+      });
+      this.saveProgress();
+    }
   }
 
   async submitTest() {
@@ -293,11 +278,21 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
     this.state.set('submitted');
   }
 
-  checkAnswer(ex: Exercise, selected: string | null): boolean {
+  checkAnswer(ex: MockTestQuestion, selected: string | null): boolean {
     if (!selected) return false;
     const answer = ex.answer;
+    
+    if (Array.isArray(answer)) {
+      if (ex.type === 'mcq' || ex.type === 'audio_mcq') {
+        const selectedArr = selected.split(',').sort();
+        const correctArr = [...answer].map(String).sort();
+        return JSON.stringify(selectedArr) === JSON.stringify(correctArr);
+      }
+      return false;
+    }
+
     if (typeof answer === 'string') {
-      if (ex.type === 'dictation') {
+      if (ex.type === 'dictation' || ex.type === 'viet_chinese_translation') {
         return selected.trim() === answer.trim();
       }
       const idx = parseInt(answer, 10);
@@ -307,21 +302,45 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  displayAnswer(ex: Exercise, selected: string | null): string {
+  displayAnswer(ex: MockTestQuestion, selected: string | null): string {
     if (!selected) return '';
-    const idx = parseInt(selected, 10);
-    if (!isNaN(idx) && ex.options?.[idx]) return ex.options[idx];
+    if (ex.type === 'mcq' || ex.type === 'audio_mcq') {
+      return selected.split(',').map(val => {
+        const idx = parseInt(val, 10);
+        if (!isNaN(idx) && ex.options?.[idx]) {
+          const letter = ['A','B','C','D','E','F','G','H','I','J'][idx];
+          return `${letter}. ${ex.options[idx]}`;
+        }
+        return val;
+      }).join(' | ');
+    }
     return selected;
   }
 
-  displayCorrectAnswer(ex: Exercise): string {
+  displayCorrectAnswer(ex: MockTestQuestion): string {
     const answer = ex.answer;
+    if (Array.isArray(answer)) {
+      if (ex.type === 'mcq' || ex.type === 'audio_mcq') {
+        return answer.map(val => {
+          const idx = parseInt(val, 10);
+          if (!isNaN(idx) && ex.options?.[idx]) {
+            const letter = ['A','B','C','D','E','F','G','H','I','J'][idx];
+            return `${letter}. ${ex.options[idx]}`;
+          }
+          return val;
+        }).join(' | ');
+      }
+      return answer.join(' ');
+    }
+
     if (typeof answer === 'string') {
       const idx = parseInt(answer, 10);
-      if (!isNaN(idx) && ex.options?.[idx]) return ex.options[idx];
+      if (!isNaN(idx) && ex.options?.[idx]) {
+        const letter = ['A','B','C','D','E','F','G','H','I','J'][idx];
+        return `${letter}. ${ex.options[idx]}`;
+      }
       return answer;
     }
-    if (Array.isArray(answer)) return answer.join(' ');
     return '';
   }
 

@@ -8,6 +8,7 @@ import {
   ViewChild,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -23,24 +24,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { LessonService } from '../../core/services/lesson.service';
 import { FileUploaderComponent } from '../../shared/components/file-uploader/file-uploader.component';
-import { Exercise, ExerciseType, Skill } from '../../core/models';
+import { Exercise, ExerciseType, Skill, SKILL_EXERCISE_TYPES } from '../../core/models';
 import { DriveUploadResponse } from '../../core/services/drive.service';
 import { ModalService } from '../../shared/components/modal/modal.service';
 import { ToastService } from '../../shared/components/toast/toast.service';
 import { MediaEmbedComponent } from '../../shared/components/media-embed/media-embed.component';
 
-const EXERCISE_TYPES: ExerciseType[] = [
-  'mcq',
-  'scramble',
-  'guided_writing',
-  'speaking_topic',
-  'speaking_record',
-  'reflex_speaking',
-  'audio_mcq',
-  'dictation',
-  'interactive_video',
-  'scramble_dnd',
-];
 const SKILLS: Skill[] = ['listening', 'speaking', 'reading', 'writing'];
 
 @Component({
@@ -81,11 +70,14 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
   showForm = signal(false);
   saving = signal(false);
   editingExercise = signal<Exercise | null>(null);
+  /** ID of exercise being edited, used to render inline form at correct position */
+  editingExerciseId = signal<string | null>(null);
   validationErrors = signal<Record<string, string>>({});
-  shuffleDefault = signal(false);
   fadingOutId = signal<string | null>(null);
+  shuffleDefault = signal(false);
+  /** Array of selected correct answers for mcq/audio_mcq (0-based indices) */
+  correctAnswers = signal<number[]>([]);
 
-  exerciseTypes = EXERCISE_TYPES;
   skills = SKILLS;
 
   form = this.fb.group({
@@ -100,6 +92,11 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
     options: this.fb.array([]),
     keywords: this.fb.array([]),
     outline: this.fb.array([]),
+  });
+
+  validExerciseTypes = computed(() => {
+    const skill = this.form.value.skill as Skill;
+    return skill ? SKILL_EXERCISE_TYPES[skill] : [];
   });
 
   get optionsArray() {
@@ -123,7 +120,7 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
   }
 
   get needsAnswer(): boolean {
-    return ['mcq', 'audio_mcq', 'dictation', 'scramble', 'scramble_dnd'].includes(this.form.value.type ?? '');
+    return ['mcq', 'audio_mcq', 'dictation', 'scramble', 'scramble_dnd', 'viet_chinese_translation'].includes(this.form.value.type ?? '');
   }
 
   get needsKeywords(): boolean {
@@ -160,6 +157,16 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
         },
         error: () => this.loading.set(false),
       });
+
+    this.form.get('skill')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((skill) => {
+      if (skill) {
+        const validTypes = SKILL_EXERCISE_TYPES[skill as Skill];
+        const currentType = this.form.value.type as ExerciseType;
+        if (!validTypes.includes(currentType)) {
+          this.form.patchValue({ type: validTypes.includes('mcq') ? 'mcq' : validTypes[0] });
+        }
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -183,6 +190,10 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
   }
   removeOption(i: number) {
     this.optionsArray.removeAt(i);
+    this.correctAnswers.update(arr => 
+      arr.filter(idx => idx !== i)
+         .map(idx => idx > i ? idx - 1 : idx)
+    );
   }
   addKeyword() {
     this.keywordsArray.push(this.fb.control(''));
@@ -207,40 +218,62 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
 
   openForm(exercise?: Exercise) {
     this.editingExercise.set(exercise ?? null);
+    this.editingExerciseId.set(exercise?.id ?? null);
     this.validationErrors.set({});
+    this.correctAnswers.set([]);
 
     while (this.optionsArray.length) this.optionsArray.removeAt(0);
     while (this.keywordsArray.length) this.keywordsArray.removeAt(0);
     while (this.outlineArray.length) this.outlineArray.removeAt(0);
 
-    if (exercise?.options) {
-      exercise.options.forEach((o) => this.optionsArray.push(this.fb.control(o)));
-    }
-    if (exercise?.keywords) {
-      exercise.keywords.forEach((k) => this.keywordsArray.push(this.fb.control(k)));
-    }
-    if (exercise?.outline) {
-      exercise.outline.forEach((o) => this.outlineArray.push(this.fb.control(o)));
+    if (exercise) {
+      (exercise?.options ?? []).forEach((o) => this.optionsArray.push(this.fb.control(o)));
+      (exercise?.keywords ?? []).forEach((k) => this.keywordsArray.push(this.fb.control(k)));
+      (exercise?.outline ?? []).forEach((o) => this.outlineArray.push(this.fb.control(o)));
+
+      this.form.patchValue({
+        type: exercise.type,
+        skill: exercise.skill,
+        prompt: exercise.prompt,
+        mediaUrl: exercise.mediaUrl ?? '',
+        mediaType: exercise.mediaType ?? '',
+        answer: (exercise.type === 'mcq' || exercise.type === 'audio_mcq')
+          ? ''
+          : Array.isArray(exercise.answer)
+            ? exercise.answer.join(', ')
+            : exercise.answer ?? '',
+        durationSeconds: exercise.durationSeconds ?? 60,
+        shuffle: exercise.shuffle ?? false,
+      });
+
+      if ((exercise.type === 'mcq' || exercise.type === 'audio_mcq') && exercise.answer !== undefined) {
+        const answers = Array.isArray(exercise.answer) ? exercise.answer : [exercise.answer];
+        const indices = answers
+          .map(a => typeof a === 'string' ? parseInt(a, 10) : a)
+          .filter(a => !isNaN(a as number)) as number[];
+        this.correctAnswers.set(indices);
+      }
+    } else {
+      const skill = this.exercises().length > 0 ? this.exercises()[0].skill : 'listening';
+      const validTypes = SKILL_EXERCISE_TYPES[skill as Skill];
+      const defaultType = validTypes.includes('mcq') ? 'mcq' : validTypes[0];
+      this.form.patchValue({
+        type: defaultType,
+        skill: skill,
+        prompt: '',
+        mediaUrl: '',
+        mediaType: '',
+        answer: '',
+        durationSeconds: 60,
+        shuffle: this.shuffleDefault(),
+      });
     }
 
-    this.form.reset({
-      type: exercise?.type ?? 'mcq',
-      skill: exercise?.skill ?? 'listening',
-      prompt: exercise?.prompt ?? '',
-      mediaUrl: exercise?.mediaUrl ?? '',
-      mediaType: exercise?.mediaType ?? '',
-      answer: Array.isArray(exercise?.answer)
-        ? exercise.answer.join(', ')
-        : exercise?.answer ?? '',
-      durationSeconds: exercise?.durationSeconds ?? 60,
-      // When editing, use the exercise's value; when creating, use the header default
-      shuffle: exercise ? (exercise.shuffle ?? false) : this.shuffleDefault(),
-    });
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
 
     this.showForm.set(true);
-    if (this.formScrollTimer) {
-      clearTimeout(this.formScrollTimer);
-    }
+    if (this.formScrollTimer) clearTimeout(this.formScrollTimer);
     this.formScrollTimer = setTimeout(() => {
       this.formPanelRef?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       this.formScrollTimer = null;
@@ -248,21 +281,17 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
   }
 
   editExercise(ex: Exercise) {
-    this.fadingOutId.set(ex.id);
-    if (this.editOpenTimer) {
-      clearTimeout(this.editOpenTimer);
-    }
-    this.editOpenTimer = setTimeout(() => {
-      this.fadingOutId.set(null);
-      this.openForm(ex);
-      this.editOpenTimer = null;
-    }, 220);
+    this.openForm(ex);
   }
 
   closeForm() {
     this.showForm.set(false);
     this.editingExercise.set(null);
-    this.validationErrors.set({});
+    this.editingExerciseId.set(null);
+    this.correctAnswers.set([]);
+    while (this.optionsArray.length) this.optionsArray.removeAt(0);
+    while (this.keywordsArray.length) this.keywordsArray.removeAt(0);
+    while (this.outlineArray.length) this.outlineArray.removeAt(0);
   }
 
   save() {
@@ -276,20 +305,27 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
 
     const vPre = this.form.value;
     const typePre = vPre.type as ExerciseType;
+
+    if ((typePre === 'mcq' || typePre === 'audio_mcq') && this.correctAnswers().length === 0) {
+      errors['options'] = 'admin.error_min_correct';
+    }
+
     if (typePre === 'dictation') {
       const mt = vPre.mediaType;
       if (!vPre.mediaUrl?.trim()) errors['media'] = 'admin.error_dictation_media';
       else if (mt !== 'audio' && mt !== 'video') errors['media'] = 'admin.error_dictation_media_type';
       if (!(vPre.answer?.trim() ?? '')) errors['answer'] = 'admin.error_dictation_answer';
+    } else if (this.needsAnswer && typePre !== 'mcq' && typePre !== 'audio_mcq') {
+      if (!(vPre.answer?.trim() ?? '')) {
+        errors['answer'] = 'admin.error_required';
+      }
     }
 
     this.validationErrors.set(errors);
 
     if (Object.keys(errors).length > 0) {
       const firstKey = Object.keys(errors)[0];
-      if (this.validationFocusTimer) {
-        clearTimeout(this.validationFocusTimer);
-      }
+      if (this.validationFocusTimer) clearTimeout(this.validationFocusTimer);
       this.validationFocusTimer = setTimeout(() => {
         const el = document.querySelector<HTMLElement>(`[data-field="${firstKey}"]`);
         if (el) {
@@ -306,9 +342,18 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
     const v = this.form.value;
     const type = v.type as ExerciseType;
 
-    const answerRaw = v.answer?.trim() ?? '';
-    const answer: string | string[] =
-      (type === 'scramble' || type === 'scramble_dnd') ? answerRaw.split(/\s+/).filter(Boolean) : answerRaw;
+    let answer: string | string[] | undefined;
+    if (type === 'mcq' || type === 'audio_mcq') {
+      const arr = this.correctAnswers();
+      answer = arr.length > 0 ? arr.map(String) : undefined;
+    } else {
+      const answerRaw = v.answer?.trim() ?? '';
+      if (answerRaw) {
+        answer = (type === 'scramble' || type === 'scramble_dnd')
+          ? answerRaw.split(/\s+/).filter(Boolean)
+          : answerRaw;
+      }
+    }
 
     const payload: Omit<Exercise, 'id' | 'courseId' | 'lessonId'> = {
       type,
@@ -318,7 +363,7 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
       shuffle: v.shuffle ?? false,
       ...(v.mediaUrl ? { mediaUrl: v.mediaUrl } : {}),
       ...(v.mediaType ? { mediaType: v.mediaType as Exercise['mediaType'] } : {}),
-      ...(answerRaw ? { answer } : {}),
+      ...(answer !== undefined ? { answer } : {}),
       ...(this.optionsArray.length
         ? { options: this.optionsArray.value.filter(Boolean) }
         : {}),
@@ -361,6 +406,12 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
         this.toast.error(this.translate.instant('common.error'));
       },
     });
+  }
+
+  toggleCorrectAnswer(i: number) {
+    this.correctAnswers.update(arr => 
+      arr.includes(i) ? arr.filter(x => x !== i) : [...arr, i]
+    );
   }
 
   async deleteExercise(ex: Exercise) {

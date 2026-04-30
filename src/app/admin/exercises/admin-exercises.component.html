@@ -78,6 +78,11 @@
             </div>
             <div *cdkDragPlaceholder class="h-16 border-dashed border-2 rounded-xl drag-placeholder"></div>
           </div>
+          @if (showForm() && editingExerciseId() === ex.id) {
+            <div #formPanel class="card animate-slide-up my-3 form-panel">
+              <ng-container *ngTemplateOutlet="formContent"></ng-container>
+            </div>
+          }
         }
       </div>
     } @else {
@@ -85,8 +90,7 @@
     }
 
     <!-- Inline exercise form -->
-    @if (showForm()) {
-      <div #formPanel class="card animate-slide-up mb-6 form-panel">
+    <ng-template #formContent>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-base sm:text-lg font-semibold form-heading">
             {{ editingExercise() ? ('admin.edit_question' | translate) : ('admin.new_question' | translate) }}
@@ -103,7 +107,7 @@
               <label class="form-label">{{ 'admin.type' | translate }} *</label>
               <select formControlName="type" class="form-input form-select" data-field="type"
                 [class.error]="validationErrors()['type']">
-                @for (t of exerciseTypes; track t) {
+                @for (t of validExerciseTypes(); track t) {
                   <option [value]="t">{{ 'exercise_types.' + t | translate }}</option>
                 }
               </select>
@@ -174,8 +178,24 @@
               </div>
               <div formArrayName="options" class="space-y-2">
                 @for (opt of optionsArray.controls; track $index) {
-                  <div class="flex gap-2">
+                  <div class="flex gap-2 items-center">
+                    <span class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0"
+                      style="background: var(--color-border); color: var(--color-text-muted);">
+                      {{ ['A','B','C','D','E','F','G','H','I','J'][$index] }}
+                    </span>
                     <input [formControlName]="$index" class="form-input flex-1" [placeholder]="('admin.option' | translate) + ' ' + ($index + 1)" />
+                    <!-- Mark correct toggle -->
+                    <button
+                      type="button"
+                      (click)="toggleCorrectAnswer($index)"
+                      class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border transition-colors text-xs"
+                      [style.background]="correctAnswers().includes($index) ? '#16a34a' : 'var(--color-bg-surface)'"
+                      [style.border-color]="correctAnswers().includes($index) ? '#16a34a' : 'var(--color-border)'"
+                      [style.color]="correctAnswers().includes($index) ? '#fff' : 'var(--color-text-muted)'"
+                      [title]="'admin.answer' | translate"
+                    >
+                      <i class="fa-solid fa-check"></i>
+                    </button>
                     <button type="button" class="btn-danger py-1.5 px-2" (click)="removeOption($index)">
                       <i class="fa-solid fa-xmark w-4 text-center"></i>
                     </button>
@@ -190,8 +210,12 @@
                   <i class="fa-solid fa-plus mr-1"></i>{{ 'admin.add_option' | translate }}
                 </button>
               </div>
+              <p class="text-xs mt-1" style="color: var(--color-text-muted);" [innerHTML]="'admin.mark_correct_hint' | translate"></p>
               @if (validationErrors()['options']) {
                 <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['options'] | translate }}</p>
+              }
+              @if (correctAnswers().length === 0 && optionsArray.length >= 2) {
+                <p class="text-xs mt-1" style="color: #d97706;"><i class="fa-solid fa-triangle-exclamation mr-1"></i>{{ 'admin.answer' | translate }}: chưa chọn đáp án đúng</p>
               }
             </div>
           }
@@ -205,7 +229,12 @@
               @if (form.value.type === 'dictation') {
                 <p class="text-xs mb-1 dictation-hint">{{ 'admin.dictation_answer_hint' | translate }}</p>
               }
-              <input formControlName="answer" class="form-input" [placeholder]="'admin.answer_placeholder' | translate" />
+              @if (form.value.type === 'viet_chinese_translation') {
+                <p class="text-xs mb-1" style="color: var(--color-text-muted);">Câu tiếng Trung mà học viên cần viết chính xác</p>
+              }
+              @if (form.value.type !== 'mcq' && form.value.type !== 'audio_mcq') {
+                <input formControlName="answer" class="form-input" [placeholder]="'admin.answer_placeholder' | translate" />
+              }
               @if (validationErrors()['answer']) {
                 <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['answer'] | translate }}</p>
               }
@@ -265,8 +294,13 @@
             </button>
           </div>
         </form>
+    </ng-template>
+
+    @if (showForm() && editingExerciseId() === null) {
+      <div #formPanel class="card animate-slide-up mb-6 form-panel">
+        <ng-container *ngTemplateOutlet="formContent"></ng-container>
       </div>
-    } @else {
+    } @else if (!showForm()) {
       <button class="w-full btn-secondary py-3 border-dashed" (click)="openForm()">
         <i class="fa-solid fa-plus mr-2"></i>{{ 'admin.add_question' | translate }}
       </button>

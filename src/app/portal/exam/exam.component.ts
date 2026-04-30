@@ -131,6 +131,26 @@ export class ExamComponent implements OnInit, OnDestroy {
     });
   }
 
+  toggleMcqAnswer(exerciseId: string, value: string) {
+    const current = this.getAnswer(exerciseId);
+    let arr = current ? current.split(',') : [];
+    if (arr.includes(value)) {
+      arr = arr.filter((x) => x !== value);
+    } else {
+      arr.push(value);
+    }
+    
+    if (arr.length > 0) {
+      this.setAnswer(exerciseId, arr.sort().join(','));
+    } else {
+      this.answerMap.update((m) => {
+        const next = new Map(m);
+        next.delete(exerciseId);
+        return next;
+      });
+    }
+  }
+
   startExam() {
     const exam = this.exam();
     if (!exam) return;
@@ -266,8 +286,18 @@ export class ExamComponent implements OnInit, OnDestroy {
   checkAnswer(ex: Exercise, selected: string | null): boolean {
     if (!selected) return false;
     const answer = ex.answer;
+    
+    if (Array.isArray(answer)) {
+      if (ex.type === 'mcq' || ex.type === 'audio_mcq') {
+        const selectedArr = selected.split(',').sort();
+        const correctArr = [...answer].map(String).sort();
+        return JSON.stringify(selectedArr) === JSON.stringify(correctArr);
+      }
+      return false;
+    }
+
     if (typeof answer === 'string') {
-      if (ex.type === 'dictation') {
+      if (ex.type === 'dictation' || ex.type === 'viet_chinese_translation') {
         return selected.trim() === answer.trim();
       }
       const idx = parseInt(answer, 10);
@@ -279,19 +309,43 @@ export class ExamComponent implements OnInit, OnDestroy {
 
   displayAnswer(ex: Exercise, selected: string | null): string {
     if (!selected) return '';
-    const idx = parseInt(selected, 10);
-    if (!isNaN(idx) && ex.options?.[idx]) return ex.options[idx];
+    if (ex.type === 'mcq' || ex.type === 'audio_mcq') {
+      return selected.split(',').map(val => {
+        const idx = parseInt(val, 10);
+        if (!isNaN(idx) && ex.options?.[idx]) {
+          const letter = ['A','B','C','D','E','F','G','H','I','J'][idx];
+          return `${letter}. ${ex.options[idx]}`;
+        }
+        return val;
+      }).join(' | ');
+    }
     return selected;
   }
 
   displayCorrectAnswer(ex: Exercise): string {
     const answer = ex.answer;
+    if (Array.isArray(answer)) {
+      if (ex.type === 'mcq' || ex.type === 'audio_mcq') {
+        return answer.map(val => {
+          const idx = parseInt(val, 10);
+          if (!isNaN(idx) && ex.options?.[idx]) {
+            const letter = ['A','B','C','D','E','F','G','H','I','J'][idx];
+            return `${letter}. ${ex.options[idx]}`;
+          }
+          return val;
+        }).join(' | ');
+      }
+      return answer.join(' ');
+    }
+
     if (typeof answer === 'string') {
       const idx = parseInt(answer, 10);
-      if (!isNaN(idx) && ex.options?.[idx]) return ex.options[idx];
+      if (!isNaN(idx) && ex.options?.[idx]) {
+        const letter = ['A','B','C','D','E','F','G','H','I','J'][idx];
+        return `${letter}. ${ex.options[idx]}`;
+      }
       return answer;
     }
-    if (Array.isArray(answer)) return answer.join(' ');
     return '';
   }
 

@@ -10,7 +10,15 @@ export type ExerciseType =
   | 'dictation'
   | 'interactive_video'
   | 'speaking_record'
-  | 'scramble_dnd';
+  | 'scramble_dnd'
+  | 'viet_chinese_translation';
+
+export const SKILL_EXERCISE_TYPES: Record<Skill, ExerciseType[]> = {
+  listening: ['audio_mcq', 'dictation', 'interactive_video'],
+  speaking: ['speaking_topic', 'speaking_record', 'reflex_speaking'],
+  reading: ['mcq', 'scramble', 'scramble_dnd'],
+  writing: ['guided_writing', 'viet_chinese_translation']
+};
 
 export type MediaType = 'video' | 'audio' | 'image';
 

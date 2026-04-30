@@ -43,6 +43,8 @@
     "no_data": "暂无数据",
     "error": "发生错误",
     "success": "操作成功",
+    "save_success": "已保存",
+    "delete_success": "已删除",
     "upload": "上传",
     "uploading": "上传中...",
     "open_new_tab": "在新标签中打开",
@@ -61,7 +63,8 @@
     "clear": "清除全部",
     "detail": "详情",
     "optional": "可选",
-    "required": "必填"
+    "required": "必填",
+    "undefined": "未定义"
   },
   "skills": {
     "listening": "听力",
@@ -79,7 +82,9 @@
     "dictation": "听写",
     "interactive_video": "互动视频",
     "speaking_record": "录音",
-    "scramble_dnd": "词语排序（拖拽）"
+    "scramble_dnd": "词语排序（拖拽）",
+    "viet_chinese_translation": "越译中",
+    "undefined": "未定义"
   },
   "exercise": {
     "type_answer": "输入答案",

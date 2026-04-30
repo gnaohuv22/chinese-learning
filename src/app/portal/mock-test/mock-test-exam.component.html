@@ -86,9 +86,9 @@
               @for (opt of ex.options; track $index; let j = $index) {
                 <button
                   type="button"
-                  (click)="setAnswer(ex.id, j.toString())"
+                  (click)="toggleMcqAnswer(ex.id, j.toString())"
                   class="w-full text-left px-4 py-2.5 rounded-xl border text-sm transition-all option-btn"
-                  [class.option-selected]="getAnswer(ex.id) === j.toString()"
+                  [class.option-selected]="getAnswer(ex.id)?.split(',')?.includes(j.toString())"
                 >
                   <span class="font-mono mr-2 text-xs option-label">{{ ['A','B','C','D'][j] }}.</span>
                   {{ opt }}
@@ -118,6 +118,17 @@
                 type="text"
                 class="form-input max-w-md"
                 [placeholder]="'exercise.dictation_placeholder' | translate"
+                [value]="getAnswer(ex.id) ?? ''"
+                (change)="setAnswer(ex.id, $any($event.target).value)"
+              />
+            </div>
+          } @else if (ex.type === 'viet_chinese_translation') {
+            <!-- Viet-Chinese translation: text input for Chinese answer -->
+            <div class="pl-10">
+              <input
+                type="text"
+                class="form-input"
+                placeholder="Nhập câu tiếng Trung..."
                 [value]="getAnswer(ex.id) ?? ''"
                 (change)="setAnswer(ex.id, $any($event.target).value)"
               />

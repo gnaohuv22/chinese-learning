@@ -43,6 +43,8 @@
     "no_data": "Không có dữ liệu",
     "error": "Có lỗi xảy ra",
     "success": "Thành công",
+    "save_success": "Lưu thành công",
+    "delete_success": "Xóa thành công",
     "upload": "Tải lên",
     "uploading": "Đang tải...",
     "open_new_tab": "Mở trong tab mới",
@@ -67,7 +69,8 @@
     "listening": "Nghe",
     "speaking": "Nói",
     "reading": "Đọc",
-    "writing": "Viết"
+    "writing": "Viết",
+    "undefined": "Chưa xác định"
   },
   "exercise_types": {
     "mcq": "Trắc nghiệm",
@@ -79,7 +82,9 @@
     "dictation": "Nghe chép chính tả",
     "interactive_video": "Video tương tác",
     "speaking_record": "Ghi âm",
-    "scramble_dnd": "Sắp xếp câu (kéo thả)"
+    "scramble_dnd": "Sắp xếp câu (kéo thả)",
+    "viet_chinese_translation": "Dịch Việt-Trung",
+    "undefined": "Chưa xác định"
   },
   "exercise": {
     "type_answer": "Nhập câu trả lời",
