@@ -38,7 +38,7 @@
       <p class="text-xs mb-3 flex items-center gap-1 drag-hint">
         <i class="fa-solid fa-grip-lines"></i>{{ 'admin.drag_to_reorder' | translate }}
       </p>
-      <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3 mb-6">
+      <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3 mb-6 select-none">
         @for (ex of exercises(); track ex.id) {
           <div cdkDrag class="card" [class.animate-fade-out]="fadingOutId() === ex.id">
             <div class="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">

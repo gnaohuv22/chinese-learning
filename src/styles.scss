@@ -461,6 +461,21 @@ html.dark .answer-incorrect { background: rgba(220, 38, 38, 0.18) !important; bo
   border-radius: 0.75rem;
 }
 
+/* Disable drag animations for scramble exercises to prevent confusing re-ordering visuals */
+.exercise-scramble, 
+.exercise-scramble * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+.exercise-scramble .cdk-drag-animating {
+  transition: none !important;
+}
+.exercise-scramble.cdk-drop-list-dragging .cdk-drag {
+  transition: none !important;
+}
+
 /* Custom scrollbar for main scroll container and global page scroll */
 .scroll-container::-webkit-scrollbar,
 html::-webkit-scrollbar,
