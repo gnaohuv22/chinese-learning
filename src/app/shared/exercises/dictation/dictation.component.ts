@@ -26,13 +26,14 @@ export class DictationComponent {
   }
 
   isCorrect(): boolean {
-    const expected = this.exercise.answer;
-    if (typeof expected !== 'string') return false;
+    const expected = this.expectedAnswer();
+    if (!expected) return false;
     return this.userInput().trim() === expected.trim();
   }
 
   expectedAnswer(): string {
     const a = this.exercise.answer;
+    if (Array.isArray(a) && a.length > 0) return typeof a[0] === 'string' ? a[0] : '';
     return typeof a === 'string' ? a : '';
   }
 }

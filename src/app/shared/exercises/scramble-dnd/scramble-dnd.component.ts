@@ -20,7 +20,12 @@ export class ScrambleDndComponent implements OnInit {
   get correctWords(): string[] {
     const answer = this.exercise.answer;
     if (Array.isArray(answer)) return answer;
-    if (typeof answer === 'string') return answer.split(/\s+/).filter(Boolean);
+    if (typeof answer === 'string') {
+      if (answer.includes(',')) {
+        return answer.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      return answer.split(/\s+/).filter(Boolean);
+    }
     return [];
   }
 

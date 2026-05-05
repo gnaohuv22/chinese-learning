@@ -239,7 +239,7 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
         answer: (exercise.type === 'mcq' || exercise.type === 'audio_mcq')
           ? ''
           : Array.isArray(exercise.answer)
-            ? exercise.answer.join(', ')
+            ? (exercise.type === 'scramble' || exercise.type === 'scramble_dnd' ? exercise.answer.join(' ') : exercise.answer.join(', '))
             : exercise.answer ?? '',
         durationSeconds: exercise.durationSeconds ?? 60,
         shuffle: exercise.shuffle ?? false,
@@ -349,7 +349,7 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
       const answerRaw = v.answer?.trim() ?? '';
       if (answerRaw) {
         answer = (type === 'scramble' || type === 'scramble_dnd')
-          ? answerRaw.split(/\s+/).filter(Boolean)
+          ? answerRaw.split(/[\s,]+/).filter(Boolean)
           : answerRaw;
       }
     }
@@ -444,5 +444,19 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
       clearTimeout(this.validationFocusTimer);
       this.validationFocusTimer = null;
     }
+  }
+  getAnswerPreview(ex: Exercise): string {
+    if (!ex.answer) return '';
+    if (ex.type === 'mcq' || ex.type === 'audio_mcq') {
+      const answers = Array.isArray(ex.answer) ? ex.answer : [ex.answer];
+      const answerTexts = answers.map(a => {
+        const idx = typeof a === 'string' ? parseInt(a, 10) : Number(a);
+        if (!isNaN(idx) && ex.options && ex.options[idx]) return ex.options[idx];
+        return a;
+      });
+      return answerTexts.join(' | ');
+    }
+    if (Array.isArray(ex.answer)) return ex.answer.join(' / ');
+    return String(ex.answer);
   }
 }

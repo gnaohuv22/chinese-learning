@@ -91,7 +91,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           @for (lesson of filteredLessons(); track lesson.id; let i = $index) {
             <a
-              [routerLink]="['/courses', course()!.id, 'lessons', lesson.id]"
+              [routerLink]="['/on-tap', phanNumber(), 'lessons', lesson.id]"
               class="card hover:shadow-lg transition-all hover:-translate-y-1 group lesson-card flex flex-col gap-3 p-5"
             >
               <div class="flex items-center justify-between">

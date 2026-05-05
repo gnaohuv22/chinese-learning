@@ -5,7 +5,9 @@
     <app-media-embed [fileId]="exercise.mediaUrl" [mediaType]="exercise.mediaType" />
   }
   
-  <p class="text-xs" style="color: var(--color-text-muted)">{{ 'exercise.drag_hint' | translate }}</p>
+  <p class="text-xs" style="color: var(--color-text-muted)">
+    {{ 'exercise.drag_hint' | translate }}
+  </p>
 
   <div
     cdkDropList
@@ -36,17 +38,18 @@
     </button>
   } @else {
     <div
-      class="flex items-start gap-2 p-3 rounded-lg text-sm"
-      [class.bg-green-50]="isCorrect()"
-      [class.bg-red-50]="!isCorrect()"
+      class="flex items-start gap-2 p-3 rounded-lg text-sm border"
+      [style.background]="isCorrect() ? 'rgba(22,163,74,0.1)' : 'rgba(220,38,38,0.1)'"
+      [style.border-color]="isCorrect() ? '#16a34a' : '#dc2626'"
     >
       @if (isCorrect()) {
-        <i class="fa-solid fa-circle-check text-green-600 mt-0.5"></i>
-        <span class="text-green-700 font-medium">{{ 'exercise.correct' | translate }}</span>
+        <i class="fa-solid fa-circle-check mt-0.5 flex-shrink-0" style="color: #16a34a;"></i>
+        <span class="font-semibold" style="color: #15803d;">{{ 'exercise.correct' | translate }}</span>
       } @else {
-        <div>
-          <p class="text-red-700">{{ 'exercise.incorrect' | translate }}</p>
-          <p class="text-red-600 font-medium mt-1">{{ correctSentence }}</p>
+        <i class="fa-solid fa-circle-xmark mt-0.5 flex-shrink-0" style="color: #dc2626;"></i>
+        <div style="color: #dc2626;">
+          <p>{{ 'exercise.incorrect' | translate }}</p>
+          <p class="font-semibold mt-1">{{ correctSentence }}</p>
         </div>
       }
     </div>

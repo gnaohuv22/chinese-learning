@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LessonService } from '../../core/services/lesson.service';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { Lesson, Exercise } from '../../core/models';
+import { CourseService } from '../../core/services/course.service';
 import { ExerciseRendererComponent } from '../../shared/exercises/exercise-renderer.component';
 
 @Component({
@@ -15,9 +16,11 @@ import { ExerciseRendererComponent } from '../../shared/exercises/exercise-rende
   styleUrl: './lesson-detail.component.scss',
 })
 export class LessonDetailComponent implements OnInit {
-  @Input({ required: true }) courseId!: string;
+  @Input() courseId?: string;
   @Input({ required: true }) lessonId!: string;
+  @Input() phan?: string;
 
+  private courseService = inject(CourseService);
   private lessonService = inject(LessonService);
   private exerciseService = inject(ExerciseService);
   private destroyRef = inject(DestroyRef);
@@ -28,6 +31,32 @@ export class LessonDetailComponent implements OnInit {
   private emptyStateTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit() {
+    if (this.phan) {
+      const n = parseInt(this.phan, 10);
+      const phanNum = isNaN(n) || n < 1 || n > 4 ? 1 : n;
+      this.courseService
+        .getCourseByOrder(phanNum - 1)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (course) => {
+            if (course) {
+              this.courseId = course.id;
+              this.loadLessonAndExercises();
+            } else {
+              this.viewState.set('error');
+            }
+          },
+          error: () => this.viewState.set('error'),
+        });
+    } else if (this.courseId) {
+      this.loadLessonAndExercises();
+    } else {
+      this.viewState.set('error');
+    }
+  }
+
+  private loadLessonAndExercises() {
+    if (!this.courseId) return;
     this.lessonService
       .getLesson(this.courseId, this.lessonId)
       .pipe(takeUntilDestroyed(this.destroyRef))

@@ -105,7 +105,8 @@
     "keyword_hint": "关键词提示：",
     "retry": "重试",
     "dictation_placeholder": "请输入中文",
-    "dictation_input_label": "你的答案"
+    "dictation_input_label": "你的答案",
+    "scramble_dnd_instruction": "答案将按逗号或空格自动拆分为段落"
   },
   "course": {
     "title": "温习",
@@ -390,7 +391,7 @@
     "drag_to_reorder": "拖拽排序",
     "shuffle": "随机顺序",
     "shuffle_hint": "（每次作答题目和选项顺序随机）",
-    "scramble_hint": "输入完整句子 — 将自动拆分为单词",
+    "scramble_hint": "输入完整句子 — 将按空格或逗号自动拆分为单词",
     "error_required": "此字段为必填项",
     "error_min_options": "选择题至少需要2个选项",
     "file_uploaded": "已上传",

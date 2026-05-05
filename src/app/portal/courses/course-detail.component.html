@@ -5,64 +5,63 @@
   </a>
 
   @if (viewState() === 'loading') {
-    <div class="flex justify-center py-16">
-      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
-    </div>
+  <div class="flex justify-center py-16">
+    <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
+  </div>
   } @else if (viewState() === 'error') {
-    <div class="card text-center py-12 empty-state">
-      {{ 'common.error' | translate }}
-    </div>
+  <div class="card text-center py-12 empty-state">
+    {{ 'common.error' | translate }}
+  </div>
   } @else if (course()) {
-    <div class="card mb-6 course-header-card">
-      <div class="flex items-start gap-4">
-        <div class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl font-bold flex-shrink-0 course-avatar">
-          {{ course()!.title[0] }}
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold page-title">{{ course()!.title }}</h1>
-          @if (course()!.description) {
-            <p class="mt-1 page-subtitle">{{ course()!.description }}</p>
-          }
-        </div>
+  <div class="card mb-6 course-header-card">
+    <div class="flex items-start gap-4">
+      <div class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl font-bold flex-shrink-0 course-avatar">
+        {{ course()!.title[0] }}
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold page-title">{{ course()!.title }}</h1>
+        @if (course()!.description) {
+        <p class="mt-1 page-subtitle">{{ course()!.description }}</p>
+        }
       </div>
     </div>
+  </div>
 
-    <div>
-      <h2 class="text-lg font-semibold mb-4 section-heading">
-        {{ 'course.lessons' | translate }}
-        <span class="text-sm font-normal ml-2 lessons-count">({{ lessons().length }})</span>
-      </h2>
+  <div>
+    <h2 class="text-lg font-semibold mb-4 section-heading">
+      {{ 'course.lessons' | translate }}
+      <span class="text-sm font-normal ml-2 lessons-count">({{ lessons().length }})</span>
+    </h2>
 
-      @if (viewState() === 'empty') {
-        <div class="card text-center py-12 empty-state">
-          {{ 'lesson.no_lessons' | translate }}
+    @if (viewState() === 'empty') {
+    <div class="card text-center py-12 empty-state">
+      {{ 'lesson.no_lessons' | translate }}
+    </div>
+    } @else {
+    <div class="space-y-3">
+      @for (lesson of lessons(); track lesson.id; let i = $index) {
+      <a [routerLink]="['/courses', courseId, 'lessons', lesson.id]"
+        class="card flex items-center gap-4 hover:shadow-md transition-shadow group">
+        <div
+          class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all lesson-number">
+          {{ i + 1 }}
         </div>
-      } @else {
-        <div class="space-y-3">
-          @for (lesson of lessons(); track lesson.id; let i = $index) {
-            <a
-              [routerLink]="['/courses', courseId, 'lessons', lesson.id]"
-              class="card flex items-center gap-4 hover:shadow-md transition-shadow group"
-            >
-              <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all lesson-number">
-                {{ i + 1 }}
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="font-medium transition-colors lesson-title">
-                  {{ lesson.title }}
-                </h3>
-                <div class="flex flex-wrap gap-1 mt-1">
-                  @for (skill of lesson.skills; track skill) {
-                    <span class="chip skill-{{ skill }} text-xs">{{ 'skills.' + skill | translate }}</span>
-                  }
-                </div>
-              </div>
-              <i class="fa-solid fa-chevron-right text-sm flex-shrink-0 transition-colors list-chevron"></i>
-            </a>
-          }
+        <div class="flex-1 min-w-0">
+          <h3 class="font-medium transition-colors lesson-title">
+            {{ lesson.title }}
+          </h3>
+          <div class="flex flex-wrap gap-1 mt-1">
+            @for (skill of lesson.skills; track skill) {
+            <span class="chip skill-{{ skill }} text-xs">{{ 'skills.' + skill | translate }}</span>
+            }
+          </div>
         </div>
+        <i class="fa-solid fa-chevron-right text-sm flex-shrink-0 transition-colors list-chevron"></i>
+      </a>
       }
     </div>
+    }
+  </div>
   }
 
 </div>
