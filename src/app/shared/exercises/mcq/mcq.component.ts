@@ -56,11 +56,36 @@ export class McqComponent implements OnInit {
 
   private getCorrectOriginalIndex(): number {
     const answer = this.exercise.answer;
-    if (typeof answer === 'string') {
-      const idx = parseInt(answer, 10);
-      if (!isNaN(idx)) return idx;
-      return this.exercise.options?.indexOf(answer) ?? -1;
+    if (answer === undefined || answer === null) return -1;
+    
+    let target: any = answer;
+    if (Array.isArray(answer) && answer.length > 0) {
+      target = answer[0];
     }
+    
+    if (typeof target === 'number') return target;
+    
+    if (typeof target === 'string') {
+      const trimmed = target.trim();
+      const idx = parseInt(trimmed, 10);
+      if (!isNaN(idx) && idx.toString() === trimmed) return idx;
+      
+      if (trimmed.length === 1) {
+        const charCode = trimmed.toUpperCase().charCodeAt(0);
+        if (charCode >= 65 && charCode <= 90) return charCode - 65;
+      }
+      
+      const options = this.exercise.options || [];
+      const foundIdx = options.findIndex(opt => opt.trim().toLowerCase() === trimmed.toLowerCase());
+      if (foundIdx !== -1) return foundIdx;
+      
+      const partialIdx = options.findIndex(opt => 
+        trimmed.toLowerCase().includes(opt.trim().toLowerCase()) || 
+        opt.trim().toLowerCase().includes(trimmed.toLowerCase())
+      );
+      if (partialIdx !== -1) return partialIdx;
+    }
+    
     return -1;
   }
 

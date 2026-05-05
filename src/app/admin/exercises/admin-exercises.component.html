@@ -38,15 +38,18 @@
       <p class="text-xs mb-3 flex items-center gap-1 drag-hint">
         <i class="fa-solid fa-grip-lines"></i>{{ 'admin.drag_to_reorder' | translate }}
       </p>
-      <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3 mb-6">
+      <div cdkDropList (cdkDropListDropped)="drop($event)" class="space-y-3 mb-6 select-none">
         @for (ex of exercises(); track ex.id) {
           <div cdkDrag class="card" [class.animate-fade-out]="fadingOutId() === ex.id">
             <div class="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
               <!-- Content row -->
               <div class="flex items-start gap-3 min-w-0 flex-1 overflow-hidden">
-                <span cdkDragHandle class="drag-handle mt-1 flex-shrink-0 cursor-grab list-drag-handle">
+                <span cdkDragHandle class="drag-handle mt-1 flex-shrink-0 cursor-grab list-drag-handle text-gray-400 hover:text-gray-600 transition-colors">
                   <i class="fa-solid fa-grip-vertical"></i>
                 </span>
+                <div class="w-7 h-7 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center text-xs font-bold flex-shrink-0 border border-gray-200 dark:border-gray-700 mt-0.5">
+                  {{ $index + 1 }}
+                </div>
                 <div class="flex-1 min-w-0 overflow-hidden">
                   <div class="flex items-center gap-2 flex-wrap mb-1">
                     <span class="chip chip-gray text-xs">{{ 'exercise_types.' + ex.type | translate }}</span>
@@ -60,7 +63,12 @@
                       </span>
                     }
                   </div>
-                  <p class="text-sm line-clamp-2 item-desc">{{ ex.prompt }}</p>
+                  <p class="text-sm line-clamp-2 item-desc font-medium">{{ ex.prompt }}</p>
+                  @if (getAnswerPreview(ex)) {
+                    <p class="text-xs text-gray-500 hidden sm:block mt-1 truncate">
+                      <strong>{{ 'admin.answer' | translate }}:</strong> {{ getAnswerPreview(ex) }}
+                    </p>
+                  }
                 </div>
               </div>
 

@@ -44,25 +44,50 @@ export class AudioMcqComponent {
     this.checked.set(true);
   }
 
-  isCorrect(): boolean {
+  private getCorrectOriginalIndex(): number {
     const answer = this.exercise.answer;
+    if (answer === undefined || answer === null) return -1;
+    
+    let target: any = answer;
+    if (Array.isArray(answer) && answer.length > 0) {
+      target = answer[0];
+    }
+    
+    if (typeof target === 'number') return target;
+    
+    if (typeof target === 'string') {
+      const trimmed = target.trim();
+      const idx = parseInt(trimmed, 10);
+      if (!isNaN(idx) && idx.toString() === trimmed) return idx;
+      
+      if (trimmed.length === 1) {
+        const charCode = trimmed.toUpperCase().charCodeAt(0);
+        if (charCode >= 65 && charCode <= 90) return charCode - 65;
+      }
+      
+      const options = this.exercise.options || [];
+      const foundIdx = options.findIndex(opt => opt.trim().toLowerCase() === trimmed.toLowerCase());
+      if (foundIdx !== -1) return foundIdx;
+      
+      const partialIdx = options.findIndex(opt => 
+        trimmed.toLowerCase().includes(opt.trim().toLowerCase()) || 
+        opt.trim().toLowerCase().includes(trimmed.toLowerCase())
+      );
+      if (partialIdx !== -1) return partialIdx;
+    }
+    
+    return -1;
+  }
+
+  isCorrect(): boolean {
     const selected = this.selectedIndex();
     if (selected === null) return false;
-    if (typeof answer === 'string') {
-      const idx = parseInt(answer, 10);
-      if (!isNaN(idx)) return selected === idx;
-      return (this.exercise.options?.[selected] ?? '') === answer;
-    }
-    return false;
+    return selected === this.getCorrectOriginalIndex();
   }
 
   correctOptionText(): string {
-    const answer = this.exercise.answer;
-    if (typeof answer === 'string') {
-      const idx = parseInt(answer, 10);
-      if (!isNaN(idx)) return this.exercise.options?.[idx] ?? answer;
-      return answer;
-    }
+    const idx = this.getCorrectOriginalIndex();
+    if (idx >= 0) return this.exercise.options?.[idx] ?? '';
     return '';
   }
 
@@ -70,24 +95,41 @@ export class AudioMcqComponent {
     return String.fromCharCode(65 + i);
   }
 
-  getOptionClass(i: number): string {
-    const base = 'border-2 ';
+  getOptionStyle(i: number): Record<string, string> {
     if (!this.checked()) {
-      return (
-        base +
-        (this.selectedIndex() === i
-          ? 'border-red-500 bg-red-50'
-          : 'border-gray-200 bg-white hover:border-gray-300')
-      );
+      return this.selectedIndex() === i
+        ? {
+            background: 'rgba(126, 72, 10, 0.12)',
+            borderColor: 'var(--color-primary)',
+            color: 'var(--color-text)',
+          }
+        : {
+            background: 'var(--color-bg-surface)',
+            borderColor: 'var(--color-border)',
+            color: 'var(--color-text)',
+          };
     }
-    const answer = this.exercise.answer;
-    const correctIdx =
-      typeof answer === 'string' && !isNaN(parseInt(answer, 10))
-        ? parseInt(answer, 10)
-        : this.exercise.options?.indexOf(answer as string) ?? -1;
+    const correctIdx = this.getCorrectOriginalIndex();
 
-    if (i === correctIdx) return base + 'border-green-500 bg-green-50';
-    if (i === this.selectedIndex()) return base + 'border-red-500 bg-red-50';
-    return base + 'border-gray-200 bg-white opacity-50';
+    if (i === correctIdx) {
+      return {
+        background: 'rgba(22, 163, 74, 0.14)',
+        borderColor: '#16a34a',
+        color: '#15803d',
+      };
+    }
+    if (i === this.selectedIndex()) {
+      return {
+        background: 'rgba(220, 38, 38, 0.14)',
+        borderColor: '#dc2626',
+        color: '#dc2626',
+      };
+    }
+    return {
+      background: 'var(--color-bg-surface)',
+      borderColor: 'var(--color-border)',
+      color: 'var(--color-text-muted)',
+      opacity: '0.45',
+    };
   }
 }

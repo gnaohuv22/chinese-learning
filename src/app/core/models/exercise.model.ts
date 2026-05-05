@@ -16,7 +16,7 @@ export type ExerciseType =
 export const SKILL_EXERCISE_TYPES: Record<Skill, ExerciseType[]> = {
   listening: ['audio_mcq', 'dictation', 'interactive_video'],
   speaking: ['speaking_topic', 'speaking_record', 'reflex_speaking'],
-  reading: ['mcq', 'scramble', 'scramble_dnd'],
+  reading: ['mcq', 'scramble'],
   writing: ['guided_writing', 'viet_chinese_translation']
 };
 

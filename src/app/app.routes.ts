@@ -40,6 +40,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'on-tap/:phan/lessons/:lessonId',
+    data: { level: 2 },
+    loadComponent: () =>
+      import('./portal/lessons/lesson-detail.component').then(
+        (m) => m.LessonDetailComponent
+      ),
+  },
+  {
     path: 'thi-thu',
     data: { level: 1 },
     loadComponent: () =>

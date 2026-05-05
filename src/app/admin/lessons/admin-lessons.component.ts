@@ -5,7 +5,8 @@ import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { take } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 import { LessonService } from '../../core/services/lesson.service';
 import { CourseService } from '../../core/services/course.service';
 import { ExerciseService } from '../../core/services/exercise.service';
@@ -54,8 +55,37 @@ export class AdminLessonsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (lessons) => {
-          this.lessons.set(lessons);
-          this.loading.set(false);
+          if (lessons.length === 0) {
+            this.lessons.set([]);
+            this.loading.set(false);
+            return;
+          }
+
+          const exerciseRequests = lessons.map(l =>
+            this.exerciseService.getExercises(this.courseId, l.id).pipe(
+              take(1),
+              map(exs => ({ lessonId: l.id, exs }))
+            )
+          );
+
+          forkJoin(exerciseRequests)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+              next: (results) => {
+                const dynamicLessons = lessons.map(l => {
+                  const lessonExercises = results.find(r => r.lessonId === l.id)?.exs || [];
+                  const dynamicSkills = [...new Set(lessonExercises.map(e => e.skill))];
+                  const mergedSkills = [...new Set([...(l.skills || []), ...dynamicSkills])];
+                  return { ...l, skills: mergedSkills.length > 0 ? mergedSkills : l.skills };
+                });
+                this.lessons.set(dynamicLessons);
+                this.loading.set(false);
+              },
+              error: () => {
+                this.lessons.set(lessons);
+                this.loading.set(false);
+              }
+            });
         },
         error: () => this.loading.set(false),
       });

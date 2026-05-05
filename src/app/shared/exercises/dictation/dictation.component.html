@@ -23,20 +23,20 @@
     </button>
   } @else {
     <div
-      class="flex items-start gap-2 p-3 rounded-lg text-sm"
-      [class.bg-green-50]="isCorrect()"
-      [class.bg-red-50]="!isCorrect()"
+      class="flex items-start gap-2 p-3 rounded-lg text-sm border"
+      [style.background]="isCorrect() ? 'rgba(22,163,74,0.1)' : 'rgba(220,38,38,0.1)'"
+      [style.border-color]="isCorrect() ? '#16a34a' : '#dc2626'"
     >
       @if (isCorrect()) {
-        <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: #16a34a;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <span class="text-green-700 font-medium">{{ 'exercise.correct' | translate }}</span>
+        <span class="font-semibold" style="color: #15803d;">{{ 'exercise.correct' | translate }}</span>
       } @else {
-        <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: #dc2626;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        <span class="text-red-700">
+        <span style="color: #dc2626;">
           {{ 'exercise.incorrect' | translate }}
           <strong class="font-medium">{{ expectedAnswer() }}</strong>
         </span>

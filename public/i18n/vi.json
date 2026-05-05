@@ -105,7 +105,8 @@
     "keyword_hint": "Gợi ý từ khóa:",
     "retry": "Thử lại",
     "dictation_placeholder": "Nhập chữ Hán",
-    "dictation_input_label": "Câu trả lời của bạn"
+    "dictation_input_label": "Câu trả lời của bạn",
+    "scramble_dnd_instruction": "Đáp án sẽ được tự động tách thành các segment bởi dấu phẩy hoặc khoảng trắng"
   },
   "course": {
     "title": "Ôn tập",
@@ -390,7 +391,7 @@
     "drag_to_reorder": "Kéo để sắp xếp thứ tự",
     "shuffle": "Xáo trộn",
     "shuffle_hint": "(thứ tự câu hỏi và đáp án sẽ ngẫu nhiên mỗi lần làm)",
-    "scramble_hint": "Nhập câu hoàn chỉnh — sẽ tự chia thành các từ",
+    "scramble_hint": "Nhập câu hoàn chỉnh — sẽ tự chia thành các từ theo khoảng trắng",
     "error_required": "Trường này là bắt buộc",
     "error_min_options": "Cần ít nhất 2 lựa chọn cho câu hỏi trắc nghiệm",
     "file_uploaded": "Đã tải lên",

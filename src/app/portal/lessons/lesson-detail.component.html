@@ -1,42 +1,50 @@
 <div class="page-container">
-  <a [routerLink]="['/courses', courseId]" class="inline-flex items-center gap-1 text-sm mb-6 transition-colors back-link">
-    <i class="fa-solid fa-chevron-left text-xs"></i>
-    {{ 'lesson.back_to_course' | translate }}
-  </a>
+  @if (phan) {
+    <a [routerLink]="['/on-tap', phan]" class="inline-flex items-center gap-1 text-sm mb-6 transition-colors back-link">
+      <i class="fa-solid fa-chevron-left text-xs"></i>
+      {{ 'lesson.back_to_course' | translate }}
+    </a>
+  } @else {
+    <a [routerLink]="['/courses', courseId]" class="inline-flex items-center gap-1 text-sm mb-6 transition-colors back-link">
+      <i class="fa-solid fa-chevron-left text-xs"></i>
+      {{ 'lesson.back_to_course' | translate }}
+    </a>
+  }
 
   @if (viewState() === 'loading') {
-    <div class="flex justify-center py-16">
-      <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
-    </div>
+  <div class="flex justify-center py-16">
+    <div class="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent spinner"></div>
+  </div>
   } @else if (viewState() === 'error') {
-    <div class="card text-center py-12 empty-state">
-      {{ 'common.error' | translate }}
-    </div>
+  <div class="card text-center py-12 empty-state">
+    {{ 'common.error' | translate }}
+  </div>
   } @else if (lesson()) {
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold page-title">{{ lesson()!.title }}</h1>
-    </div>
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold page-title">{{ lesson()!.title }}</h1>
+  </div>
 
-    <div class="space-y-6">
-      @if (viewState() === 'empty') {
-        <div class="card text-center py-12 empty-state">
-          {{ 'lesson.no_exercises' | translate }}
-        </div>
-      } @else {
-        @for (ex of exercises(); track ex.id; let i = $index) {
-          <div class="card">
-            <div class="flex items-center gap-2 mb-4 pb-3 border-b question-header">
-              <span class="w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0 question-number">
-                {{ i + 1 }}
-              </span>
-              <span class="chip chip-gray text-xs">{{ 'exercise_types.' + ex.type | translate }}</span>
-              <span class="chip skill-{{ ex.skill }} text-xs">{{ 'skills.' + ex.skill | translate }}</span>
-            </div>
-            <app-exercise-renderer [exercise]="ex" />
-          </div>
-        }
-      }
+  <div class="space-y-6">
+    @if (viewState() === 'empty') {
+    <div class="card text-center py-12 empty-state">
+      {{ 'lesson.no_exercises' | translate }}
     </div>
+    } @else {
+    @for (ex of exercises(); track ex.id; let i = $index) {
+    <div class="card">
+      <div class="flex items-center gap-2 mb-4 pb-3 border-b question-header">
+        <span
+          class="w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0 question-number">
+          {{ i + 1 }}
+        </span>
+        <span class="chip chip-gray text-xs">{{ 'exercise_types.' + ex.type | translate }}</span>
+        <span class="chip skill-{{ ex.skill }} text-xs">{{ 'skills.' + ex.skill | translate }}</span>
+      </div>
+      <app-exercise-renderer [exercise]="ex" />
+    </div>
+    }
+    }
+  </div>
   }
 
 </div>

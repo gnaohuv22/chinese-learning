@@ -12,9 +12,8 @@
             type="button"
             (click)="setSpeed(speed)"
             class="text-xs px-2 py-1 rounded font-mono transition-colors"
-            [class.bg-gray-100]="currentSpeed() !== speed"
+            [style.background]="currentSpeed() === speed ? 'var(--color-primary)' : 'rgba(126, 72, 10, 0.1)'"
             [style.color]="currentSpeed() === speed ? '#fff' : 'var(--color-text)'"
-            style="background: currentSpeed() === speed ? 'var(--color-primary)' : ''"
           >
             {{ speed }}x
           </button>
@@ -30,7 +29,7 @@
         (click)="selectOption($index)"
         [disabled]="checked()"
         class="w-full text-left px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all"
-        [class]="getOptionClass($index)"
+        [ngStyle]="getOptionStyle($index)"
       >
         <span class="font-mono mr-2" style="color: var(--color-text-muted)">{{ optionLabel($index) }}.</span>
         {{ option }}
@@ -44,20 +43,23 @@
     </button>
   } @else {
     <div
-      class="flex items-start gap-2 p-3 rounded-lg text-sm"
-      [class.bg-green-50]="isCorrect()"
-      [class.bg-red-50]="!isCorrect()"
+      class="flex items-start gap-2 p-3 rounded-lg text-sm border"
+      [style.background]="isCorrect() ? 'rgba(22,163,74,0.1)' : 'rgba(220,38,38,0.1)'"
+      [style.border-color]="isCorrect() ? '#16a34a' : '#dc2626'"
     >
       @if (isCorrect()) {
         <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <span class="text-green-700 font-medium">{{ 'exercise.correct' | translate }}</span>
+        <span class="font-semibold" style="color: #15803d;">{{ 'exercise.correct' | translate }}</span>
       } @else {
         <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        <span class="text-red-700">{{ 'exercise.incorrect' | translate }} <strong>{{ correctOptionText() }}</strong></span>
+        <span style="color: #dc2626;">
+          {{ 'exercise.incorrect' | translate }}
+          <strong>{{ correctOptionText() }}</strong>
+        </span>
       }
     </div>
   }
