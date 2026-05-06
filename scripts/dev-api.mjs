@@ -31,36 +31,32 @@ function initCloudinary() {
   }
 }
 
-// POST /api/cloudinary/upload
-app.post('/api/cloudinary/upload', (req, res) => {
-  const form = formidable({ maxFileSize: 250 * 1024 * 1024 });
+// POST /api/cloudinary/sign
+app.post('/api/cloudinary/sign', (req, res) => {
+  try {
+    initCloudinary();
 
-  form.parse(req, async (err, fields, files) => {
-    if (err) return res.status(400).json({ error: 'Form parse error', details: String(err) });
+    const timestamp = Math.round(new Date().getTime() / 1000);
 
-    try {
-      initCloudinary();
+    const paramsToSign = {
+      timestamp: timestamp,
+    };
 
-      const fileField = files['file'];
-      const uploadedFile = Array.isArray(fileField) ? fileField[0] : fileField;
-      if (!uploadedFile) return res.status(400).json({ error: 'No file provided' });
+    const signature = cloudinary.utils.api_sign_request(
+      paramsToSign,
+      cloudinary.config().api_secret
+    );
 
-      const uploadRes = await cloudinary.uploader.upload(uploadedFile.filepath, {
-        resource_type: 'auto',
-      });
-
-      fs.unlinkSync(uploadedFile.filepath);
-
-      return res.status(200).json({
-        fileId: uploadRes.secure_url,
-        embedUrl: uploadRes.secure_url,
-        thumbnailUrl: uploadRes.secure_url.replace(/\.[^/.]+$/, '.jpg'),
-      });
-    } catch (error) {
-      console.error('Cloudinary upload error:', error);
-      return res.status(500).json({ error: 'Upload failed', details: String(error) });
-    }
-  });
+    return res.status(200).json({
+      signature,
+      timestamp,
+      api_key: cloudinary.config().api_key,
+      cloud_name: cloudinary.config().cloud_name,
+    });
+  } catch (error) {
+    console.error('Cloudinary signature generation error:', error);
+    return res.status(500).json({ error: 'Failed to generate signature', details: String(error) });
+  }
 });
 
 // DELETE /api/cloudinary/delete?fileId=xxx
