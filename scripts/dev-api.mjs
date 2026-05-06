@@ -31,8 +31,8 @@ function initCloudinary() {
   }
 }
 
-// POST /api/drive/upload
-app.post('/api/drive/upload', (req, res) => {
+// POST /api/cloudinary/upload
+app.post('/api/cloudinary/upload', (req, res) => {
   const form = formidable({ maxFileSize: 250 * 1024 * 1024 });
 
   form.parse(req, async (err, fields, files) => {
@@ -63,8 +63,8 @@ app.post('/api/drive/upload', (req, res) => {
   });
 });
 
-// DELETE /api/drive/delete?fileId=xxx
-app.delete('/api/drive/delete', async (req, res) => {
+// DELETE /api/cloudinary/delete?fileId=xxx
+app.delete('/api/cloudinary/delete', async (req, res) => {
   const fileId = req.query.fileId;
   if (!fileId) return res.status(400).json({ error: 'fileId required' });
 

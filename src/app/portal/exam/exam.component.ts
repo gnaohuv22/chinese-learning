@@ -17,7 +17,7 @@ import { ExerciseService } from '../../core/services/exercise.service';
 import { SubmittedExamService } from '../../core/services/submitted-exam.service';
 import { Exam, Exercise, Skill } from '../../core/models';
 import { ModalService } from '../../shared/components/modal/modal.service';
-import { DriveService } from '../../core/services/drive.service';
+
 
 type ExamState = 'loading' | 'ready' | 'running' | 'submitted';
 
@@ -34,10 +34,12 @@ interface SectionResult {
   total: number;
 }
 
+import { MediaEmbedComponent } from '../../shared/components/media-embed/media-embed.component';
+
 @Component({
   selector: 'app-exam',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule],
+  imports: [CommonModule, RouterLink, TranslateModule, MediaEmbedComponent],
   templateUrl: './exam.component.html',
   styleUrl: './exam.component.scss',
 })
@@ -49,7 +51,7 @@ export class ExamComponent implements OnInit, OnDestroy {
   private submittedExamService = inject(SubmittedExamService);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
-  readonly drive = inject(DriveService);
+
 
   examState = signal<ExamState>('loading');
   exam = signal<Exam | null>(null);

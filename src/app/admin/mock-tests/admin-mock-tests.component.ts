@@ -5,12 +5,11 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MockTestService } from '../../core/services/mock-test.service';
-import { MockTest, MockTestCreatePayload, HocPhan, MockTestQuestion, ExerciseType, SKILL_EXERCISE_TYPES } from '../../core/models';
+import { MockTest, MockTestCreatePayload, HocPhan, MockTestQuestion, ExerciseType, SKILL_EXERCISE_TYPES, MockMedia } from '../../core/models';
 import { ModalService } from '../../shared/components/modal/modal.service';
-import { FileUploaderComponent } from '../../shared/components/file-uploader/file-uploader.component';
-import { MediaEmbedComponent } from '../../shared/components/media-embed/media-embed.component';
 import { ToastService } from '../../shared/components/toast/toast.service';
-import { DriveUploadResponse } from '../../core/services/drive.service';
+
+import { MockMediaUploaderComponent } from './components/mock-media-uploader/mock-media-uploader.component';
 
 type Skill = 'listening' | 'speaking' | 'reading' | 'writing';
 
@@ -19,7 +18,7 @@ type Skill = 'listening' | 'speaking' | 'reading' | 'writing';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, TranslateModule, DragDropModule,
-    FileUploaderComponent, MediaEmbedComponent
+    MockMediaUploaderComponent
   ],
   templateUrl: './admin-mock-tests.component.html',
 })
@@ -59,13 +58,12 @@ export class AdminMockTestsComponent implements OnInit {
   editingQuestionSkill = signal<Skill | null>(null);
   correctAnswers = signal<number[]>([]);
   validationErrors = signal<Record<string, string>>({});
+  questionMedias = signal<MockMedia[]>([]);
 
   questionForm = this.fb.group({
     type: ['mcq' as ExerciseType, Validators.required],
     skill: ['listening' as Skill, Validators.required],
     prompt: ['', Validators.required],
-    mediaUrl: [''],
-    mediaType: [''],
     answer: [''],
     options: this.fb.array([]),
   });
@@ -75,9 +73,7 @@ export class AdminMockTestsComponent implements OnInit {
   }
 
   get needsMedia(): boolean {
-    return ['mcq', 'audio_mcq', 'dictation', 'interactive_video', 'reflex_speaking'].includes(
-      this.questionForm.value.type ?? ''
-    );
+    return true; // Allow media for all question types
   }
 
   get needsOptions(): boolean {
@@ -88,13 +84,7 @@ export class AdminMockTestsComponent implements OnInit {
     return ['mcq', 'audio_mcq', 'dictation', 'scramble', 'scramble_dnd', 'viet_chinese_translation'].includes(this.questionForm.value.type ?? '');
   }
 
-  mediaAccept(): string {
-    const t = this.questionForm.value.mediaType;
-    if (t === 'video') return 'video/*';
-    if (t === 'audio') return 'audio/*';
-    if (t === 'image') return 'image/*';
-    return '*/*';
-  }
+  // Removed mediaAccept
 
   get validExerciseTypes(): ExerciseType[] {
     const skill = this.editingQuestionSkill();
@@ -225,9 +215,9 @@ export class AdminMockTestsComponent implements OnInit {
     this.editingQuestionSkill.set(skill);
     this.correctAnswers.set([]);
     this.validationErrors.set({});
-    
+
     while (this.optionsArray.length) this.optionsArray.removeAt(0);
-    
+
     const validTypes = SKILL_EXERCISE_TYPES[skill];
     const defaultType = validTypes.includes('mcq') ? 'mcq' : validTypes[0];
 
@@ -235,10 +225,9 @@ export class AdminMockTestsComponent implements OnInit {
       type: defaultType,
       skill: skill,
       prompt: '',
-      mediaUrl: '',
-      mediaType: '',
       answer: ''
     });
+    this.questionMedias.set([]);
   }
 
   editQuestion(q: MockTestQuestion, skill: Skill) {
@@ -250,12 +239,16 @@ export class AdminMockTestsComponent implements OnInit {
     while (this.optionsArray.length) this.optionsArray.removeAt(0);
     (q.options ?? []).forEach(o => this.optionsArray.push(this.fb.control(o)));
 
+    this.questionMedias.set([...(q.medias ?? [])]);
+    // Backward compatibility for old format
+    if (q.mediaUrl && q.mediaType && this.questionMedias().length === 0) {
+      this.questionMedias.set([{ url: q.mediaUrl, type: q.mediaType }]);
+    }
+
     this.questionForm.patchValue({
       type: q.type,
       skill: skill,
       prompt: q.prompt,
-      mediaUrl: q.mediaUrl ?? '',
-      mediaType: q.mediaType ?? '',
       answer: (q.type === 'mcq' || q.type === 'audio_mcq')
         ? ''
         : Array.isArray(q.answer) ? q.answer.join(', ') : (q.answer ?? '')
@@ -278,7 +271,7 @@ export class AdminMockTestsComponent implements OnInit {
       confirmLabel: 'Delete',
     });
     if (!confirmed) return;
-    
+
     this.sectionMap.update(m => {
       const list = m[skill].filter(x => x.id !== q.id);
       return { ...m, [skill]: list };
@@ -305,9 +298,11 @@ export class AdminMockTestsComponent implements OnInit {
       errors['options'] = 'admin.error_min_correct';
     }
     if (typePre === 'dictation') {
-      const mt = vPre.mediaType;
-      if (!vPre.mediaUrl?.trim()) errors['media'] = 'admin.error_dictation_media';
-      else if (mt !== 'audio' && mt !== 'video') errors['media'] = 'admin.error_dictation_media_type';
+      if (this.questionMedias().length === 0) errors['media'] = 'admin.error_dictation_media';
+      else {
+        const hasValidMedia = this.questionMedias().some(m => m.type === 'audio' || m.type === 'video');
+        if (!hasValidMedia) errors['media'] = 'admin.error_dictation_media_type';
+      }
       if (!(vPre.answer?.trim() ?? '')) errors['answer'] = 'admin.error_dictation_answer';
     } else if (this.needsAnswer && typePre !== 'mcq' && typePre !== 'audio_mcq') {
       if (!(vPre.answer?.trim() ?? '')) {
@@ -340,8 +335,7 @@ export class AdminMockTestsComponent implements OnInit {
       type,
       skill,
       prompt: v.prompt!,
-      ...(v.mediaUrl ? { mediaUrl: v.mediaUrl } : {}),
-      ...(v.mediaType ? { mediaType: v.mediaType as any } : {}),
+      ...(this.questionMedias().length ? { medias: this.questionMedias() } : {}),
       ...(answer !== undefined ? { answer } : {}),
       ...(this.optionsArray.length ? { options: this.optionsArray.value.filter(Boolean) } : {}),
     };
@@ -368,20 +362,14 @@ export class AdminMockTestsComponent implements OnInit {
   removeOption(i: number) {
     this.optionsArray.removeAt(i);
     // Remove i from correctAnswers and shift indices > i
-    this.correctAnswers.update(arr => 
+    this.correctAnswers.update(arr =>
       arr.filter(idx => idx !== i)
-         .map(idx => idx > i ? idx - 1 : idx)
+        .map(idx => idx > i ? idx - 1 : idx)
     );
   }
   toggleCorrectAnswer(i: number) {
-    this.correctAnswers.update(arr => 
+    this.correctAnswers.update(arr =>
       arr.includes(i) ? arr.filter(x => x !== i) : [...arr, i]
     );
-  }
-  onMediaUploaded(resp: DriveUploadResponse) {
-    this.questionForm.patchValue({ mediaUrl: resp.fileId });
-  }
-  onMediaCleared() {
-    this.questionForm.patchValue({ mediaUrl: '' });
   }
 }

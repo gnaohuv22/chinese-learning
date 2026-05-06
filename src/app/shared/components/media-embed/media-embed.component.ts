@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DriveService } from '../../../core/services/drive.service';
+
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -14,7 +14,7 @@ export class MediaEmbedComponent implements OnInit {
   @Input({ required: true }) fileId!: string;
   @Input() mediaType: 'video' | 'audio' | 'image' = 'video';
 
-  private drive = inject(DriveService);
+
   private router = inject(Router);
 
   isMockTest = false;
@@ -28,7 +28,7 @@ export class MediaEmbedComponent implements OnInit {
 
   get srcUrl(): string {
     if (this.isCloudinary) return this.fileId;
-    return this.drive.getDirectUrl(this.fileId);
+    return `https://drive.google.com/uc?export=download&id=${this.fileId}`;
   }
 
   get thumbnailUrl(): string {
@@ -37,7 +37,7 @@ export class MediaEmbedComponent implements OnInit {
       if (this.mediaType === 'image') return this.fileId;
       return this.fileId.replace(/\.[^/.]+$/, '.jpg');
     }
-    return this.drive.getThumbnailUrl(this.fileId);
+    return `https://drive.google.com/thumbnail?id=${this.fileId}`;
   }
 
   ngOnInit() {

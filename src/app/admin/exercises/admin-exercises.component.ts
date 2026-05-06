@@ -24,7 +24,7 @@ import { ExerciseService } from '../../core/services/exercise.service';
 import { LessonService } from '../../core/services/lesson.service';
 import { FileUploaderComponent } from '../../shared/components/file-uploader/file-uploader.component';
 import { Exercise, ExerciseType, Skill, SKILL_EXERCISE_TYPES } from '../../core/models';
-import { DriveUploadResponse } from '../../core/services/drive.service';
+
 import { ModalService } from '../../shared/components/modal/modal.service';
 import { ToastService } from '../../shared/components/toast/toast.service';
 import { MediaEmbedComponent } from '../../shared/components/media-embed/media-embed.component';
@@ -207,7 +207,7 @@ export class AdminExercisesComponent implements OnInit, OnDestroy {
     this.outlineArray.removeAt(i);
   }
 
-  onMediaUploaded(resp: DriveUploadResponse) {
+  onMediaUploaded(resp: any) {
     this.form.patchValue({ mediaUrl: resp.fileId });
   }
 

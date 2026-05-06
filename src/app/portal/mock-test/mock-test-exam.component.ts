@@ -15,7 +15,7 @@ import { MockTestService } from '../../core/services/mock-test.service';
 import { SubmittedExamService } from '../../core/services/submitted-exam.service';
 import { MockTest, MockTestQuestion, Skill } from '../../core/models';
 import { ModalService } from '../../shared/components/modal/modal.service';
-import { DriveService } from '../../core/services/drive.service';
+
 
 type TestState = 'loading' | 'running' | 'submitted';
 
@@ -34,10 +34,12 @@ interface SectionResult {
 
 const STORAGE_PREFIX = 'mock_test_progress_';
 
+import { MockMediaGridComponent } from '../../shared/components/mock-media-grid/mock-media-grid.component';
+
 @Component({
   selector: 'app-mock-test-exam',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule],
+  imports: [CommonModule, RouterLink, TranslateModule, MockMediaGridComponent],
   templateUrl: './mock-test-exam.component.html',
   styleUrl: './mock-test-exam.component.scss',
 })
@@ -48,7 +50,7 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
   private submittedExamService = inject(SubmittedExamService);
   private modalService = inject(ModalService);
   private translate = inject(TranslateService);
-  readonly drive = inject(DriveService);
+
 
   state = signal<TestState>('loading');
   test = signal<MockTest | null>(null);

@@ -2,6 +2,11 @@ import { ExerciseType, MediaType } from './exercise.model';
 import { Skill } from './lesson.model';
 export type HocPhan = 1 | 2 | 3 | 4;
 
+export interface MockMedia {
+  url: string;
+  type: MediaType;
+}
+
 export interface MockTestQuestion {
   id: string;            // nanoid or UUID generated client-side
   type: ExerciseType;
@@ -9,8 +14,9 @@ export interface MockTestQuestion {
   prompt: string;
   options?: string[];
   answer?: string | string[];
-  mediaUrl?: string;
-  mediaType?: MediaType;
+  medias?: MockMedia[];
+  mediaUrl?: string; // @deprecated
+  mediaType?: MediaType; // @deprecated
 }
 
 export interface MockTestSections {
