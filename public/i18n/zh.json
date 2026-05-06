@@ -64,6 +64,7 @@
     "detail": "详情",
     "optional": "可选",
     "required": "必填",
+    "clone": "克隆",
     "undefined": "未定义"
   },
   "skills": {
@@ -387,6 +388,8 @@
     "create_exam": "创建考试",
     "create_mock_test": "创建模拟考试",
     "edit_mock_test": "编辑模拟考试",
+    "clone_mock_test": "克隆模拟考试",
+    "clone_mock_test_success": "模拟考试克隆成功",
     "questions_count": "题",
     "drag_to_reorder": "拖拽排序",
     "shuffle": "随机顺序",

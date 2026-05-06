@@ -63,7 +63,8 @@
     "clear": "Xóa hết",
     "detail": "Chi tiết",
     "optional": "tùy chọn",
-    "required": "bắt buộc"
+    "required": "bắt buộc",
+    "clone": "Nhân bản"
   },
   "skills": {
     "listening": "Nghe",
@@ -387,6 +388,8 @@
     "create_exam": "Tạo đề thi mới",
     "create_mock_test": "Tạo đề thi thử mới",
     "edit_mock_test": "Sửa đề thi thử",
+    "clone_mock_test": "Nhân bản đề thi",
+    "clone_mock_test_success": "Nhân bản đề thi thành công",
     "questions_count": "câu hỏi",
     "drag_to_reorder": "Kéo để sắp xếp thứ tự",
     "shuffle": "Xáo trộn",
