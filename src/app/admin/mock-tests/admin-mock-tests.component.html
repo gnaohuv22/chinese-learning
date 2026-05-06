@@ -334,6 +334,10 @@
               <i class="fa-solid fa-pen text-xs"></i>
               <span class="hidden sm:inline ml-1">{{ 'common.edit' | translate }}</span>
             </button>
+            <button type="button" (click)="clone(test)" class="btn-secondary text-xs px-2.5 py-1.5" [title]="'admin.clone_mock_test' | translate">
+              <i class="fa-solid fa-copy text-xs"></i>
+              <span class="hidden sm:inline ml-1">{{ 'common.clone' | translate }}</span>
+            </button>
             <button type="button" (click)="delete(test)" class="btn-danger text-xs px-2.5 py-1.5">
               <i class="fa-solid fa-trash text-xs"></i>
               <span class="hidden sm:inline ml-1">{{ 'common.delete' | translate }}</span>

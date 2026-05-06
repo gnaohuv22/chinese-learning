@@ -63,7 +63,8 @@
     "clear": "Clear all",
     "detail": "Detail",
     "optional": "optional",
-    "required": "required"
+    "required": "required",
+    "clone": "Clone"
   },
   "skills": {
     "listening": "Listening",
@@ -386,6 +387,8 @@
     "create_exam": "Create Exam",
     "create_mock_test": "Create Mock Test",
     "edit_mock_test": "Edit Mock Test",
+    "clone_mock_test": "Clone Mock Test",
+    "clone_mock_test_success": "Mock test cloned successfully",
     "questions_count": "questions",
     "drag_to_reorder": "Drag to reorder",
     "shuffle": "Shuffle",

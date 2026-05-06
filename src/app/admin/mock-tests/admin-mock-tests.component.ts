@@ -201,6 +201,29 @@ export class AdminMockTestsComponent implements OnInit {
     this.mockTestService.deleteMockTest(test.id).subscribe();
   }
 
+  clone(test: MockTest) {
+    const cloneSections = (questions: MockTestQuestion[]): MockTestQuestion[] =>
+      questions.map(q => ({ ...q, id: crypto.randomUUID() }));
+
+    const payload: MockTestCreatePayload = {
+      title: test.title + ' (Clone)',
+      description: test.description,
+      hocPhan: test.hocPhan,
+      timeLimitSeconds: test.timeLimitSeconds,
+      sections: {
+        listening: cloneSections(test.sections?.listening ?? []),
+        speaking:  cloneSections(test.sections?.speaking  ?? []),
+        reading:   cloneSections(test.sections?.reading   ?? []),
+        writing:   cloneSections(test.sections?.writing   ?? []),
+      },
+    };
+
+    this.mockTestService.createMockTest(payload).subscribe({
+      next: () => this.toast.success(this.translate.instant('admin.clone_mock_test_success')),
+      error: ()  => this.toast.error(this.translate.instant('common.error')),
+    });
+  }
+
   totalExercises(test: MockTest): number {
     return this.mockTestService.totalExercises(test);
   }
