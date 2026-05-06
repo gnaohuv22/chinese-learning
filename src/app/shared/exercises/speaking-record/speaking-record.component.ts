@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { Exercise } from '../../../core/models';
-import { DriveService } from '../../../core/services/drive.service';
+import { CloudinaryService } from '../../../core/services/cloudinary.service';
 
 type RecordingState = 'idle' | 'recording' | 'uploading' | 'saved' | 'error';
 
@@ -15,7 +15,7 @@ type RecordingState = 'idle' | 'recording' | 'uploading' | 'saved' | 'error';
 export class SpeakingRecordComponent implements OnDestroy {
   @Input({ required: true }) exercise!: Exercise;
 
-  private drive = inject(DriveService);
+  private cloudinary = inject(CloudinaryService);
 
   state = signal<RecordingState>('idle');
   recordedUrl = signal<string | null>(null);
@@ -71,7 +71,7 @@ export class SpeakingRecordComponent implements OnDestroy {
     this.recordedUrl.set(localUrl);
 
     const filename = `recording_${Date.now()}.webm`;
-    this.drive.uploadFile(blob, filename, 'audio/webm').subscribe({
+    this.cloudinary.uploadFile(blob, filename, 'audio/webm').subscribe({
       next: () => {
         this.state.set('saved');
       },

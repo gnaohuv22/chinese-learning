@@ -12,7 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FileUploaderComponent } from '../../shared/components/file-uploader/file-uploader.component';
 import { ModalService } from '../../shared/components/modal/modal.service';
 import { ToastService } from '../../shared/components/toast/toast.service';
-import { DriveUploadResponse } from '../../core/services/drive.service';
+
 import { RadicalTopic, RadicalTopicCreatePayload } from '../../core/models';
 import { RadicalTopicService } from '../../core/services/radical-topic.service';
 
@@ -123,7 +123,7 @@ export class AdminRadicalsComponent {
     this.editingTopic.set(null);
   }
 
-  onVideoUploaded(resp: DriveUploadResponse, index: number) {
+  onVideoUploaded(resp: any, index: number) {
     this.characterArray.at(index).patchValue({ videoUrl: resp.fileId });
   }
 

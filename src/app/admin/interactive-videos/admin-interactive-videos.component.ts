@@ -19,7 +19,7 @@ import { LessonService } from '../../core/services/lesson.service';
 import { FileUploaderComponent } from '../../shared/components/file-uploader/file-uploader.component';
 import { ModalService } from '../../shared/components/modal/modal.service';
 import { ToastService } from '../../shared/components/toast/toast.service';
-import { DriveUploadResponse } from '../../core/services/drive.service';
+import { CloudinaryUploadResponse } from '../../core/services/cloudinary.service';
 import { InteractiveVideo, VideoCheckpoint, Course, Lesson } from '../../core/models';
 
 @Component({
@@ -146,7 +146,7 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
 
   // ─── Video upload ──────────────────────────────────────────────────────────
 
-  onVideoUploaded(resp: DriveUploadResponse) {
+  onVideoUploaded(resp: CloudinaryUploadResponse) {
     // resp.fileId for cloudinary is the full URL
     this.form.patchValue({ videoUrl: resp.fileId });
   }

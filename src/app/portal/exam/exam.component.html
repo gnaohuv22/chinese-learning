@@ -123,23 +123,7 @@
               </div>
             } @else if (ex.type === 'dictation' && ex.mediaUrl) {
               <div class="space-y-3">
-                @if (ex.mediaType === 'audio') {
-                  <audio controls class="w-full" [src]="drive.getDirectUrl(ex.mediaUrl)"></audio>
-                }
-                @if (ex.mediaType === 'video') {
-                  <div class="relative w-full rounded-lg overflow-hidden" style="padding-top: 56.25%">
-                    <iframe
-                      [src]="drive.getEmbedUrl(ex.mediaUrl)"
-                      width="1280"
-                      height="720"
-                      loading="lazy"
-                      title="Exam dictation video"
-                      class="absolute inset-0 w-full h-full border-0"
-                      allow="autoplay"
-                      allowfullscreen
-                    ></iframe>
-                  </div>
-                }
+                <app-media-embed [fileId]="ex.mediaUrl" [mediaType]="ex.mediaType || 'image'"></app-media-embed>
                 <input
                   type="text"
                   class="form-input w-full max-w-md"

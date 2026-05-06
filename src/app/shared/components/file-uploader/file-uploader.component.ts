@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
-import { DriveService, DriveUploadResponse } from '../../../core/services/drive.service';
+import { CloudinaryService, CloudinaryUploadResponse } from '../../../core/services/cloudinary.service';
 
 const MAX_VIDEO_SIZE_BYTES = 100 * 1024 * 1024; // 100 MB
 
@@ -27,10 +27,10 @@ export class FileUploaderComponent implements OnInit, OnChanges, OnDestroy {
   @Input() accept = '*/*';
   @Input() fileId: string | undefined;
   @Input() disabled = false;
-  @Output() uploaded = new EventEmitter<DriveUploadResponse>();
+  @Output() uploaded = new EventEmitter<CloudinaryUploadResponse>();
   @Output() cleared = new EventEmitter<void>();
 
-  private drive = inject(DriveService);
+  private cloudinary = inject(CloudinaryService);
 
   uploading = signal(false);
   progress = signal<number | null>(null);
@@ -83,7 +83,7 @@ export class FileUploaderComponent implements OnInit, OnChanges, OnDestroy {
     this.progress.set(0);
     this.error.set('');
 
-    this.drive.uploadFileWithProgress(file, file.name, file.type).subscribe({
+    this.cloudinary.uploadFileWithProgress(file, file.name, file.type).subscribe({
       next: (evt) => {
         this.progress.set(evt.progress);
         if (!evt.response) return;

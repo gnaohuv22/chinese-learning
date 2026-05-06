@@ -2,7 +2,6 @@ import { Component, Input, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { Exercise } from '../../../core/models';
-import { DriveService } from '../../../core/services/drive.service';
 import { MediaEmbedComponent } from '../../components/media-embed/media-embed.component';
 
 @Component({

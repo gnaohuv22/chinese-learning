@@ -2,7 +2,7 @@ import { Component, Input, signal, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { Exercise } from '../../../core/models';
-import { DriveService } from '../../../core/services/drive.service';
+
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
 
@@ -21,12 +21,12 @@ export class AudioMcqComponent {
   selectedIndex = signal<number | null>(null);
   checked = signal(false);
 
-  constructor(private drive: DriveService) {}
+  constructor() {}
 
   get audioSrc(): string {
     const url = this.exercise.mediaUrl || '';
     if (url.startsWith('http')) return url; // Cloudinary or full URL
-    return url ? this.drive.getDirectUrl(url) : '';
+    return url ? `https://drive.google.com/uc?export=download&id=${url}` : '';
   }
 
   setSpeed(speed: number) {

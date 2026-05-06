@@ -53,29 +53,13 @@
 
           @if (needsMedia) {
             <div class="form-field" [class.error]="validationErrors()['media']">
-              <label class="form-label">{{ 'admin.media_type' | translate }}</label>
-              <select formControlName="mediaType" class="form-input form-select">
-                <option value="">— {{ 'admin.no_media' | translate }} —</option>
-                <option value="video">Video</option>
-                <option value="audio">Audio</option>
-                @if (questionForm.value.type !== 'dictation') {
-                  <option value="image">{{ 'admin.image' | translate }}</option>
-                }
-              </select>
-            </div>
-            <div class="form-field">
               <label class="form-label">{{ 'admin.media_upload' | translate }}</label>
-              <app-file-uploader
-                [fileId]="questionForm.value.mediaUrl ?? undefined"
-                (uploaded)="onMediaUploaded($event)"
-                (cleared)="onMediaCleared()"
-                [accept]="mediaAccept()"
-                [disabled]="!questionForm.value.mediaType"
-              />
-              @if (questionForm.value.mediaUrl && questionForm.value.mediaType) {
-                <div class="mt-4 max-w-sm rounded-lg overflow-hidden border">
-                  <app-media-embed [fileId]="questionForm.value.mediaUrl" [mediaType]="$any(questionForm.value).mediaType" />
-                </div>
+              <app-mock-media-uploader
+                [medias]="questionMedias()"
+                (mediasChange)="questionMedias.set($event)"
+              ></app-mock-media-uploader>
+              @if (validationErrors()['media']) {
+                <p class="form-error mt-1"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ validationErrors()['media'] | translate }}</p>
               }
             </div>
           }
