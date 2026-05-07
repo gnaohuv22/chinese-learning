@@ -22,7 +22,7 @@ import { MockMedia } from '../../../../core/models';
         type="file"
         #fileInput
         class="hidden"
-        accept="image/*,video/*,audio/*"
+        accept="image/*,audio/*"
         (change)="onFileSelected($event)"
       />
 
@@ -69,15 +69,21 @@ export class MockMediaUploaderComponent {
       return;
     }
 
-    // Determine type from MIME type
-    let type: 'video' | 'audio' | 'image' = 'image'; // default
-    if (file.type.startsWith('video/')) type = 'video';
-    else if (file.type.startsWith('audio/')) type = 'audio';
-    else if (file.type.startsWith('image/')) type = 'image';
+    // Determine type from MIME type — only image and audio are allowed
+    let type: 'audio' | 'image';
+    if (file.type.startsWith('audio/')) {
+      type = 'audio';
+    } else if (file.type.startsWith('image/')) {
+      type = 'image';
+    } else {
+      this.error.set('Chỉ cho phép tải lên ảnh hoặc audio.');
+      input.value = '';
+      return;
+    }
 
-    const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
-    if (file.size > MAX_VIDEO_SIZE) {
-      this.error.set('Kích thước file vượt quá 100MB.');
+    const MAX_SIZE = 20 * 1024 * 1024; // 20MB cap for images/audio
+    if (file.size > MAX_SIZE) {
+      this.error.set('Kích thước file vượt quá 20MB.');
       input.value = '';
       return;
     }
