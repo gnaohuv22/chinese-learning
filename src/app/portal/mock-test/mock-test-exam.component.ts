@@ -13,7 +13,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { MockTestService } from '../../core/services/mock-test.service';
 import { SubmittedExamService } from '../../core/services/submitted-exam.service';
-import { MockTest, MockTestQuestion, Skill } from '../../core/models';
+import { MockTest, MockTestQuestion, MockMedia, Skill } from '../../core/models';
 import { ModalService } from '../../shared/components/modal/modal.service';
 
 
@@ -59,6 +59,8 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
   wasAutoSubmitted = signal(false);
   activeSection = signal<Skill>('listening');
   sectionResults = signal<SectionResult[]>([]);
+  /** URLs of audio media that have been played in the current attempt */
+  playedAudios = signal<Set<string>>(new Set());
 
   sections: Skill[] = ['listening', 'speaking', 'reading', 'writing'];
   private timerInterval: ReturnType<typeof setInterval> | null = null;
@@ -111,12 +113,16 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
     try {
       const saved = localStorage.getItem(this.storageKey);
       if (saved) {
-        const { answers, timeLeft } = JSON.parse(saved) as {
+        const { answers, timeLeft, playedAudios } = JSON.parse(saved) as {
           answers: Array<[string, string]>;
           timeLeft: number;
+          playedAudios?: string[];
         };
         this.answerMap.set(new Map(answers));
         this.timeLeft.set(timeLeft > 0 ? timeLeft : test.timeLimitSeconds);
+        if (playedAudios?.length) {
+          this.playedAudios.set(new Set(playedAudios));
+        }
       } else {
         this.timeLeft.set(test.timeLimitSeconds);
       }
@@ -138,6 +144,7 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
       const payload = {
         answers: Array.from(this.answerMap().entries()),
         timeLeft: this.timeLeft(),
+        playedAudios: Array.from(this.playedAudios()),
       };
       localStorage.setItem(this.storageKey, JSON.stringify(payload));
     } catch {
@@ -352,6 +359,7 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
     this.answerMap.set(new Map());
     this.sectionResults.set([]);
     this.wasAutoSubmitted.set(false);
+    this.playedAudios.set(new Set()); // reset audio played state for new attempt
     const test = this.test();
     if (test) {
       this.timeLeft.set(test.timeLimitSeconds);
@@ -366,6 +374,43 @@ export class MockTestExamComponent implements OnInit, OnDestroy {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
+  }
+
+  /** Mark an audio URL as played and persist */
+  handleAudioPlay(url: string) {
+    this.playedAudios.update(set => {
+      const next = new Set(set);
+      next.add(url);
+      return next;
+    });
+    this.saveProgress();
+  }
+
+  /** Returns only audio medias for a question */
+  getAudioMedias(ex: MockTestQuestion): MockMedia[] {
+    const result: MockMedia[] = [];
+    if (ex.medias?.length) result.push(...ex.medias.filter(m => m.type === 'audio'));
+    if (ex.mediaUrl && ex.mediaType === 'audio') result.push({ url: ex.mediaUrl, type: 'audio' });
+    return result;
+  }
+
+  /** Returns only non-audio medias for a question */
+  getImageMedias(ex: MockTestQuestion): MockMedia[] {
+    const result: MockMedia[] = [];
+    if (ex.medias?.length) result.push(...ex.medias.filter(m => m.type !== 'audio'));
+    if (ex.mediaUrl && (ex.mediaType !== 'audio')) result.push({ url: ex.mediaUrl, type: (ex.mediaType as any) || 'image' });
+    return result;
+  }
+
+  /** Play audio once inline; marks as played immediately */
+  playInlineAudio(url: string) {
+    if (this.playedAudios().has(url)) return;
+    try {
+      const src = url.startsWith('http') ? url : `https://drive.google.com/uc?export=download&id=${url}`;
+      const audio = new Audio(src);
+      audio.play().catch(() => {});
+    } catch { /* ignore */ }
+    this.handleAudioPlay(url);
   }
 
   /** SVG circle circumference for timer ring (radius 18) */

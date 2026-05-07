@@ -12,6 +12,40 @@ $timer-label:  #c8ac89;
 
 .timer-label {
   color: $timer-label;
+  font-size: 0.7rem;
+
+  @media (min-width: 768px) {
+    font-size: 0.85rem;
+  }
+}
+
+// ─── Responsive SVG timer ring ────────────────────────────────────────────────
+
+.timer-svg {
+  // Mobile: 44×44 (compact)
+  width: 44px;
+  height: 44px;
+
+  // Tablet / Desktop: scale up for readability
+  @media (min-width: 768px) {
+    width: 64px;
+    height: 64px;
+  }
+
+  @media (min-width: 1024px) {
+    width: 76px;
+    height: 76px;
+  }
+}
+
+// SVG text size mirrors the SVG viewBox scale via font-size
+.timer-text {
+  font-weight: bold;
+  font-size: 9px;            // default (matches viewBox 44)
+
+  @media (min-width: 768px) {
+    font-size: 8px;          // slightly smaller relative to enlarged viewBox
+  }
 }
 
 // SVG ring classes set in component SCSS so ::ng-deep is not needed
@@ -71,7 +105,12 @@ $timer-label:  #c8ac89;
   }
 }
 
-// ─── Question card ────────────────────────────────────────────────────────────
+// ─── Question card — allow media images to float above when hovered ───────────
+
+.card {
+  overflow: visible;
+}
+
 
 .q-number {
   background: var(--color-border);
@@ -80,6 +119,34 @@ $timer-label:  #c8ac89;
 
 .q-prompt {
   color: var(--color-text);
+}
+
+// ─── Inline audio speaker button ──────────────────────────────────────────────
+
+.audio-inline-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #efe7db;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.78rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.22);
+  transition: transform 0.15s, background 0.15s;
+
+  &:hover {
+    transform: scale(1.12);
+    background: color-mix(in srgb, var(--color-primary) 80%, #000);
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
 }
 
 // ─── MCQ option button ────────────────────────────────────────────────────────

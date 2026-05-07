@@ -1,8 +1,8 @@
-<!-- Compact floating timer -->
+<!-- Compact floating timer: compact on mobile, larger on desktop -->
 @if (state() === 'running' && test()) {
   <div class="fixed top-20 right-4 z-40 flex flex-col items-center gap-1 p-2 rounded-2xl shadow-xl border timer-widget">
     <!-- SVG ring timer -->
-    <svg width="44" height="44" viewBox="0 0 44 44">
+    <svg class="timer-svg" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
       <circle
         cx="22" cy="22" r="18"
         fill="none" stroke-width="3"
@@ -16,7 +16,7 @@
         [style.stroke-dasharray]="CIRCUMFERENCE"
         [style.stroke-dashoffset]="timerDashOffset()"
       />
-      <text x="22" y="26" text-anchor="middle" font-size="9" font-weight="bold" fill="#efe7db">
+      <text x="22" y="26" text-anchor="middle" class="timer-text" fill="#efe7db">
         {{ formatTime(timeLeft()) }}
       </text>
     </svg>
@@ -74,19 +74,37 @@
     <!-- Exercises for active section -->
     <div class="space-y-4 mb-8">
       @for (ex of sectionExercises(activeSection()); track ex.id; let i = $index) {
+        @let audioMedias = getAudioMedias(ex);
+        @let imageMedias = getImageMedias(ex);
         <div class="card">
+          <!-- Question header: number + prompt + inline audio button -->
           <div class="flex items-start gap-3 mb-3">
             <span class="w-7 h-7 rounded-full text-sm font-bold flex items-center justify-center flex-shrink-0 q-number">{{ i + 1 }}</span>
             <p class="text-sm font-medium leading-relaxed flex-1 q-prompt">{{ ex.prompt }}</p>
+            <!-- Compact speaker button — disappears after played -->
+            @for (aud of audioMedias; track $index) {
+              @if (!playedAudios().has(aud.url)) {
+                <button
+                  type="button"
+                  class="audio-inline-btn"
+                  (click)="playInlineAudio(aud.url)"
+                  title="Phát audio (1 lần)"
+                  aria-label="Phát audio"
+                >
+                  <i class="fa-solid fa-volume-high"></i>
+                </button>
+              }
+            }
           </div>
 
-          @if (ex.medias && ex.medias.length > 0) {
-            <div class="mb-4 pl-10 max-w-xl">
-              <app-mock-media-grid [medias]="ex.medias" [readonly]="true"></app-mock-media-grid>
-            </div>
-          } @else if (ex.mediaUrl) {
-            <div class="mb-4 pl-10 max-w-xl">
-              <app-mock-media-grid [medias]="[{ url: ex.mediaUrl, type: ex.mediaType || 'image' }]" [readonly]="true"></app-mock-media-grid>
+          <!-- Image/video medias only (audio shown inline above) -->
+          @if (imageMedias.length > 0) {
+            <div class="mb-4 pl-10">
+              <app-mock-media-grid
+                [medias]="imageMedias"
+                [readonly]="true"
+                [hideAudio]="true"
+              ></app-mock-media-grid>
             </div>
           }
 
@@ -100,7 +118,7 @@
                   class="w-full text-left px-4 py-2.5 rounded-xl border text-sm transition-all option-btn"
                   [class.option-selected]="getAnswer(ex.id)?.split(',')?.includes(j.toString())"
                 >
-                  <span class="font-mono mr-2 text-xs option-label">{{ ['A','B','C','D'][j] }}.</span>
+                  <span class="font-mono mr-2 text-xs option-label">{{ 'ABCDEFGHIJ'[j] }}.</span>
                   {{ opt }}
                 </button>
               }
@@ -116,7 +134,6 @@
               />
             </div>
           } @else if (ex.type === 'viet_chinese_translation') {
-            <!-- Viet-Chinese translation: text input for Chinese answer -->
             <div class="pl-10">
               <input
                 type="text"
@@ -127,7 +144,6 @@
               />
             </div>
           } @else {
-            <!-- Free text answer -->
             <div class="pl-10">
               <input
                 type="text"
