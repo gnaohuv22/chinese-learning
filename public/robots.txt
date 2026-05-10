@@ -1,8 +1,5 @@
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
-Disallow: /admin/
 Allow: /
+Disallow: /admin/
 
 Sitemap: https://han-ngu-ky.vercel.app/sitemap.xml
