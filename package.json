@@ -32,6 +32,8 @@
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "cherry-markdown": "^0.10.3",
     "cloudinary": "^2.9.0",
     "dotenv": "^17.4.2",
