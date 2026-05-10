@@ -72,11 +72,18 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
     option1: ['', Validators.required],
     option2: [''],
     option3: [''],
-    correctAnswers: [[] as string[], Validators.required],
     helperContent: [''],
     lessonLinkCourseId: [''],
     lessonLinkLessonId: [''],
   });
+
+  /**
+   * Tracks which option KEYS ('option0'…'option3') are marked correct.
+   * We store keys — not text values — so duplicate/identical option texts
+   * never cause false-positive cross-selection in the UI.
+   */
+  correctAnswerKeys = signal<string[]>([]);
+  noCorrectAnswerError = signal(false);
 
   pinnedTimestamp = signal<number | null>(null);
 
@@ -184,7 +191,9 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
     this.pinnedTimestamp.set(this.previewTime());
     this.previewVideoRef?.nativeElement?.pause();
     this.previewPlaying.set(false);
-    this.cpForm.reset({ correctAnswers: [], lessonLinkCourseId: '', lessonLinkLessonId: '' });
+    this.cpForm.reset({ lessonLinkCourseId: '', lessonLinkLessonId: '' });
+    this.correctAnswerKeys.set([]);
+    this.noCorrectAnswerError.set(false);
     this.selectedCourseLessons.set([]);
     this.editingCheckpointIndex.set(null);
     this.showCheckpointForm.set(true);
@@ -217,18 +226,24 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
     return [v.option0, v.option1, v.option2, v.option3].filter(Boolean) as string[];
   }
 
-  toggleCorrectAnswer(option: string) {
-    const current = (this.cpForm.value.correctAnswers as string[]) || [];
-    const idx = current.indexOf(option);
-    if (idx === -1) {
-      this.cpForm.patchValue({ correctAnswers: [...current, option] });
+  /**
+   * Toggle which option KEY is correct — never the text value.
+   * This means two options with identical text can never cross-select.
+   */
+  toggleCorrectAnswer(key: string) {
+    const optionText = (this.cpForm.get(key)?.value as string) ?? '';
+    if (!optionText) return;
+    const current = this.correctAnswerKeys();
+    if (current.includes(key)) {
+      this.correctAnswerKeys.set(current.filter(k => k !== key));
     } else {
-      this.cpForm.patchValue({ correctAnswers: current.filter((o) => o !== option) });
+      this.correctAnswerKeys.set([...current, key]);
     }
+    this.noCorrectAnswerError.set(false);
   }
 
-  isCorrectAnswer(option: string): boolean {
-    return ((this.cpForm.value.correctAnswers as string[]) || []).includes(option);
+  isCorrectAnswer(key: string): boolean {
+    return this.correctAnswerKeys().includes(key);
   }
 
   openEditCheckpoint(index: number) {
@@ -241,12 +256,19 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
       option1: cp.options[1] ?? '',
       option2: cp.options[2] ?? '',
       option3: cp.options[3] ?? '',
-      correctAnswers: [...cp.correctAnswers],
       helperContent: cp.helperContent ?? '',
       lessonLinkCourseId: cp.lessonLink?.courseId ?? '',
       lessonLinkLessonId: cp.lessonLink?.lessonId ?? '',
     });
-    
+
+    // Re-derive which keys are correct based on their position in cp.options
+    const optionKeys = ['option0', 'option1', 'option2', 'option3'];
+    const correctKeys = optionKeys.filter((_, i) =>
+      i < cp.options.length && cp.correctAnswers.includes(cp.options[i])
+    );
+    this.correctAnswerKeys.set(correctKeys);
+    this.noCorrectAnswerError.set(false);
+
     if (cp.lessonLink?.courseId) {
       this.lessonService
         .getLessons(cp.lessonLink.courseId)
@@ -265,10 +287,15 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
     this.cpForm.markAllAsTouched();
     const v = this.cpForm.value;
     const options = this.getOptionsForForm();
-    const correctAnswers = (v.correctAnswers as string[]).filter((a) => options.includes(a));
-    
-    if (correctAnswers.length === 0 && this.cpForm.controls.correctAnswers.touched) {
-      this.cpForm.controls.correctAnswers.setErrors({ required: true });
+
+    // Build correctAnswers from keys (not text) — immune to duplicate option text
+    const correctAnswers = this.correctAnswerKeys()
+      .map(k => (this.cpForm.get(k)?.value as string) ?? '')
+      .filter(Boolean);
+
+    if (correctAnswers.length === 0) {
+      this.noCorrectAnswerError.set(true);
+      return;
     }
 
     if (this.cpForm.invalid) return;
@@ -294,17 +321,13 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
       options,
       correctAnswers,
     };
-    if (v.helperContent) {
-      cp.helperContent = v.helperContent;
-    }
-    if (lessonLink) {
-      cp.lessonLink = lessonLink;
-    }
+    if (v.helperContent) cp.helperContent = v.helperContent;
+    if (lessonLink) cp.lessonLink = lessonLink;
 
     const list = [...this.checkpoints()];
     const editIdx = this.editingCheckpointIndex();
     if (editIdx !== null) {
-      cp.id = list[editIdx].id; // preserve id
+      cp.id = list[editIdx].id;
       list[editIdx] = cp;
     } else {
       list.push(cp);
@@ -314,12 +337,16 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
     this.showCheckpointForm.set(false);
     this.editingCheckpointIndex.set(null);
     this.pinnedTimestamp.set(null);
-    this.cpForm.reset({ correctAnswers: [], lessonLinkCourseId: '', lessonLinkLessonId: '' });
+    this.correctAnswerKeys.set([]);
+    this.noCorrectAnswerError.set(false);
+    this.cpForm.reset({ lessonLinkCourseId: '', lessonLinkLessonId: '' });
   }
 
   cancelCheckpoint() {
     this.showCheckpointForm.set(false);
     this.editingCheckpointIndex.set(null);
+    this.correctAnswerKeys.set([]);
+    this.noCorrectAnswerError.set(false);
   }
 
   removeCheckpoint(index: number) {

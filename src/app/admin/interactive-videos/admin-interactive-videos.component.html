@@ -123,11 +123,12 @@
               </div>
 
               <!-- Preview video -->
-              <div class="relative" style="background: #0a0a0a;">
+              <div class="relative flex items-center justify-center" style="background: #0a0a0a; min-height: 180px;">
                 <video
                   #previewVideoEl
                   [src]="form.value.videoUrl || ''"
-                  class="w-full max-h-64 object-contain block"
+                  class="w-full max-h-72 object-contain block"
+                  style="max-width: 100%;"
                   playsinline
                   preload="metadata"
                   (loadedmetadata)="onPreviewLoaded()"
@@ -222,11 +223,11 @@
                             @if ($any(cpForm.value)[key]) {
                               <button
                                 type="button"
-                                (click)="toggleCorrectAnswer($any(cpForm.value)[key]!)"
+                                (click)="toggleCorrectAnswer(key)"
                                 class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border transition-colors text-xs"
-                                [style.background]="isCorrectAnswer($any(cpForm.value)[key]!) ? '#16a34a' : 'var(--color-bg-surface)'"
-                                [style.border-color]="isCorrectAnswer($any(cpForm.value)[key]!) ? '#16a34a' : 'var(--color-border)'"
-                                [style.color]="isCorrectAnswer($any(cpForm.value)[key]!) ? '#fff' : 'var(--color-text-muted)'"
+                                [style.background]="isCorrectAnswer(key) ? '#16a34a' : 'var(--color-bg-surface)'"
+                                [style.border-color]="isCorrectAnswer(key) ? '#16a34a' : 'var(--color-border)'"
+                                [style.color]="isCorrectAnswer(key) ? '#fff' : 'var(--color-text-muted)'"
                                 [title]="'admin.answer' | translate"
                                 [id]="'cp-correct-' + key"
                               >
@@ -242,7 +243,7 @@
                     </div>
                     <p class="text-xs mt-1" style="color: var(--color-text-muted);" [innerHTML]="'admin.mark_correct_hint' | translate">
                     </p>
-                    @if (cpForm.controls.correctAnswers.invalid && cpForm.controls.correctAnswers.touched) {
+                    @if (noCorrectAnswerError()) {
                       <p class="form-error"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ 'admin.error_min_correct' | translate }}</p>
                     }
                   </div>
