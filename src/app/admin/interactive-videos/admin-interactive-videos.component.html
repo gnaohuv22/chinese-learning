@@ -182,13 +182,34 @@
               @if (showCheckpointForm()) {
                 <div class="border-t p-4 space-y-3 animate-slide-up" style="border-color: var(--color-border); background: var(--color-bg);">
                   <div class="flex items-center justify-between">
-                    <p class="text-sm font-semibold flex items-center gap-1.5" style="color: var(--color-primary);">
-                      <i class="fa-solid fa-location-pin"></i>
-                      {{ formatTime(pinnedTimestamp() ?? 0) }}
-                      @if (editingCheckpointIndex() !== null) { <span class="chip chip-gray text-xs">{{ 'admin.editing' | translate }}</span> }
-                    </p>
-                    <button type="button" (click)="cancelCheckpoint()" class="text-xs hover:opacity-60 breadcrumb">
-                      <i class="fa-solid fa-xmark"></i>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                      <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1.5 px-2 py-1.5 rounded border" style="border-color: var(--color-border); background: var(--color-bg-surface);">
+                          <i class="fa-solid fa-location-pin" style="color: var(--color-primary);"></i>
+                          <input
+                            type="number"
+                            [ngModel]="pinnedTimestamp()"
+                            (ngModelChange)="pinnedTimestamp.set($event)"
+                            [ngModelOptions]="{standalone: true}"
+                            class="w-16 bg-transparent border-none p-0 text-sm font-semibold focus:ring-0"
+                            style="color: var(--color-text);"
+                            step="0.1"
+                            min="0"
+                            id="cp-timestamp-input"
+                          />
+                          <span class="text-xs opacity-60 font-medium" style="color: var(--color-text);">s</span>
+                        </div>
+                        @if (editingCheckpointIndex() !== null) { <span class="chip chip-gray text-xs">{{ 'admin.editing' | translate }}</span> }
+                      </div>
+                      
+                      <button type="button" (click)="updatePinnedTimestamp()" class="btn-secondary text-xs py-1 px-2.5 h-auto flex items-center gap-1.5" title="Sử dụng thời gian hiện tại của video">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span class="hidden sm:inline">Lấy thời gian hiện tại ({{ formatTime(previewTime()) }})</span>
+                        <span class="sm:hidden">{{ formatTime(previewTime()) }}</span>
+                      </button>
+                    </div>
+                    <button type="button" (click)="cancelCheckpoint()" class="text-xs hover:opacity-60 breadcrumb h-8 w-8 flex items-center justify-center flex-shrink-0">
+                      <i class="fa-solid fa-xmark text-sm"></i>
                     </button>
                   </div>
 

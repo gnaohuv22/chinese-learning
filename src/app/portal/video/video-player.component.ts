@@ -44,6 +44,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   isLocked = false;
   isPlaying = false;
   currentTime = 0;
+  maxWatchedTime = 0;
   duration = 0;
   volume = 1;
   isMuted = false;
@@ -183,6 +184,17 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   onTimeUpdate() {
     if (this.isLocked) return;
     const video = this.videoRef.nativeElement;
+
+    if (video.currentTime > this.maxWatchedTime) {
+      if (video.currentTime - this.maxWatchedTime > 1.5) {
+        // Unauthorized forward seek (e.g. via native iOS controls)
+        video.currentTime = this.maxWatchedTime;
+      } else {
+        // Natural playback
+        this.maxWatchedTime = video.currentTime;
+      }
+    }
+
     this.currentTime = video.currentTime;
 
     const vid = this.videoData();
@@ -296,7 +308,14 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   onSeek(event: Event) {
     if (this.isLocked) return;
-    const val = +(event.target as HTMLInputElement).value;
+    const input = event.target as HTMLInputElement;
+    let val = +input.value;
+    
+    if (val > this.maxWatchedTime) {
+      val = this.maxWatchedTime;
+      input.value = val.toString();
+    }
+    
     this.videoRef.nativeElement.currentTime = val;
     this.currentTime = val;
   }

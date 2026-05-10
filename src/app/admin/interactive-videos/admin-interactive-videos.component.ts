@@ -199,6 +199,10 @@ export class AdminInteractiveVideosComponent implements OnInit, OnDestroy {
     this.showCheckpointForm.set(true);
   }
 
+  updatePinnedTimestamp() {
+    this.pinnedTimestamp.set(this.previewTime());
+  }
+
   formatTime(sec: number): string {
     if (!sec || isNaN(sec)) return '0:00';
     const m = Math.floor(sec / 60);
