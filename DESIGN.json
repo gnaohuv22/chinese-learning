@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-04-29T03:25:00Z",
+  "title": "Design System: ChineseLearning",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Gilded Timber",
+        "canonical": "oklch(41.4% 0.088 64)",
+        "tonalRamp": [
+          "oklch(15% 0.04 64)",
+          "oklch(25% 0.06 64)",
+          "oklch(35% 0.08 64)",
+          "oklch(45% 0.09 64)",
+          "oklch(55% 0.10 64)",
+          "oklch(65% 0.08 64)",
+          "oklch(75% 0.06 64)",
+          "oklch(85% 0.04 64)"
+        ]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Soft Sand",
+        "canonical": "oklch(93.4% 0.016 85)",
+        "tonalRamp": [
+          "oklch(15% 0.005 85)",
+          "oklch(30% 0.005 85)",
+          "oklch(45% 0.01 85)",
+          "oklch(60% 0.01 85)",
+          "oklch(75% 0.015 85)",
+          "oklch(85% 0.015 85)",
+          "oklch(93% 0.016 85)",
+          "oklch(98% 0.005 85)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headlines and major section titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Standard reading and instructional text."
+      }
+    },
+    "shadows": [
+      {
+        "name": "studio-shadow",
+        "value": "0 4px 12px rgba(58, 27, 0, 0.1)",
+        "purpose": "Default elevation for cards and containers."
+      },
+      {
+        "name": "lifted-state",
+        "value": "0 12px 24px -10px rgba(58, 27, 0, 0.2)",
+        "purpose": "Hover response for interactive elements."
+      }
+    ],
+    "motion": [
+      {
+        "name": "bouncy-ease",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Tactile, springy transitions for hover and entry."
+      },
+      {
+        "name": "standard-fade",
+        "value": "0.15s ease",
+        "purpose": "Quick state changes for buttons and links."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action for the workshop.",
+      "html": "<button class=\"ds-btn-primary\">CONTINUE LEARNING</button>",
+      "css": ".ds-btn-primary { background: #7e480a; color: #fff; padding: 12px 24px; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); } .ds-btn-primary:hover { background: #3a1b00; transform: translateY(-2px); }"
+    },
+    {
+      "name": "Workshop Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The primary container for lessons and characters.",
+      "html": "<div class=\"ds-card\"><h3>Radical: 水 (Water)</h3><p>Essential for understanding characters related to liquid.</p></div>",
+      "css": ".ds-card { background: #faf6f0; border: 1px solid #c8ac89; border-radius: 20px; padding: 24px; box-shadow: 0 4px 12px rgba(58, 27, 0, 0.1); transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease; } .ds-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(58, 27, 0, 0.2); } .ds-card h3 { margin: 0 0 8px 0; color: #3a1b00; } .ds-card p { margin: 0; color: #be9672; font-size: 14px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Calligraphy Workshop",
+    "overview": "ChineseLearning is designed as a modern, tactile studio for the digital calligrapher. It balances the focused minimalism of a clean workspace with the creative warmth of traditional learning tools.",
+    "keyCharacteristics": [
+      "Studio Warmth",
+      "Tactile Feedback",
+      "Rewarding Clarity",
+      "Focused Simplicity"
+    ],
+    "rules": [
+      {
+        "name": "The Rarity Rule",
+        "body": "Vibrant reward colors are forbidden in the standard learning UI. They appear only as a response to achievement.",
+        "section": "colors"
+      },
+      {
+        "name": "The Response Rule",
+        "body": "Surfaces are never elevated without purpose. Elevation is a response to user focus or interaction.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use large, generous border radii (20px) for main content containers.",
+      "Do use Soft Sand (#efe7db) for the global background.",
+      "Do celebrate success with the Success Pop animation."
+    ],
+    "donts": [
+      "Don't use pure black (#000) or pure white (#fff).",
+      "Don't use SaaS-cliché gradient text or glassmorphism as a default.",
+      "Don't use cluttered grids; prioritize whitespace."
+    ]
+  }
+}
