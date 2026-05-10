@@ -44,6 +44,19 @@ export class FileUploaderComponent implements OnInit, OnChanges, OnDestroy {
   /** True when we have a fileId from a previous upload but no local blob (edit mode). */
   hasRemoteFile = computed(() => !!this.currentFileId() && !this.previewBlobUrl());
 
+  /** True if the remote fileId is a video URL (Cloudinary or common video extension). */
+  isVideoUrl = computed(() => {
+    const id = this.currentFileId();
+    return /\.(mp4|webm|mov|ogg|m4v)$/i.test(id) || id.includes('cloudinary.com');
+  });
+
+  /** Toggle for showing the remote video preview inline. */
+  showRemotePreview = signal(false);
+
+  toggleRemotePreview() {
+    this.showRemotePreview.update((v) => !v);
+  }
+
   ngOnInit() {
     this.currentFileId.set(this.fileId ?? '');
   }
@@ -115,6 +128,7 @@ export class FileUploaderComponent implements OnInit, OnChanges, OnDestroy {
     this.revokeBlob();
     this.currentFileId.set('');
     this.showPreview.set(false);
+    this.showRemotePreview.set(false);
     this.cleared.emit();
   }
 

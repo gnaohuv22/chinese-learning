@@ -42,9 +42,35 @@
 
     <!-- Remote-only file (edit mode, no local blob) -->
     @if (hasRemoteFile()) {
-      <p class="text-xs mb-2" style="color: var(--color-text-muted);">
-        <i class="fa-solid fa-circle-info mr-1"></i>{{ 'admin.preview_unavailable' | translate }}
-      </p>
+      @if (isVideoUrl()) {
+        <!-- Video: show toggle + inline player -->
+        <div class="flex items-center gap-2 mb-2">
+          <button
+            type="button"
+            (click)="toggleRemotePreview()"
+            class="text-xs px-2 py-0.5 rounded flex items-center gap-1 transition-colors flex-shrink-0"
+            style="background: var(--color-primary-10, rgba(180,120,40,0.12)); color: var(--color-primary);"
+          >
+            <i [class]="showRemotePreview() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" class="text-xs"></i>
+            <span class="hidden sm:inline">{{ showRemotePreview() ? ('admin.hide_preview' | translate) : ('admin.preview' | translate) }}</span>
+          </button>
+        </div>
+        @if (showRemotePreview()) {
+          <div class="mb-2 rounded-lg overflow-hidden border bg-black" style="border-color: var(--color-border); aspect-ratio: 16/9;">
+            <video
+              [src]="currentFileId()"
+              controls
+              class="w-full h-full object-contain"
+              preload="metadata"
+            ></video>
+          </div>
+        }
+      } @else {
+        <!-- Non-video: keep the informational notice -->
+        <p class="text-xs mb-2" style="color: var(--color-text-muted);">
+          <i class="fa-solid fa-circle-info mr-1"></i>{{ 'admin.preview_unavailable' | translate }}
+        </p>
+      }
     }
   }
 
